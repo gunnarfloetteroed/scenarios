@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network>
+
+<!-- ====================================================================== -->
+
+	<nodes>
+		<node id="6000" x="-1188657.673798409" y="7.224513774296942" >
+			<attributes>
+				<attribute name="Altitude" class="java.lang.String">0.1</attribute>
+				<attribute name="CentroidID" class="java.lang.String">1</attribute>
+			</attributes>
+		</node>
+		<node id="6001" x="-1188657.585072831" y="7.3378259884393655" >
+			<attributes>
+				<attribute name="Altitude" class="java.lang.String">0.05</attribute>
+				<attribute name="CentroidID" class="java.lang.String">2</attribute>
+			</attributes>
+		</node>
+		<node id="6002" x="-1188657.4963472516" y="7.451138201759831" >
+			<attributes>
+				<attribute name="Altitude" class="java.lang.String">0.07</attribute>
+				<attribute name="CentroidID" class="java.lang.String">3</attribute>
+			</attributes>
+		</node>
+		<node id="6003" x="-1188657.407621673" y="7.564450414258333" >
+			<attributes>
+				<attribute name="Altitude" class="java.lang.String">0.043333333</attribute>
+				<attribute name="CentroidID" class="java.lang.String"></attribute>
+			</attributes>
+		</node>
+		<node id="6004" x="-1188657.3188960934" y="7.677762625934877" >
+			<attributes>
+				<attribute name="Altitude" class="java.lang.String">0.028333333</attribute>
+				<attribute name="CentroidID" class="java.lang.String">4</attribute>
+			</attributes>
+		</node>
+		<node id="6005" x="-1188657.2301705137" y="7.79107483678946" >
+			<attributes>
+				<attribute name="Altitude" class="java.lang.String">0.013333333</attribute>
+				<attribute name="CentroidID" class="java.lang.String">5</attribute>
+			</attributes>
+		</node>
+	</nodes>
+
+<!-- ====================================================================== -->
+
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
+		<link id="1" from="6000" to="6001" length="1500.0" freespeed="5.555555555555555" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="bicycleSpeed_M_S" class="java.lang.Double">4.277777777777778</attribute>
+				<attribute name="connector" class="java.lang.String">0</attribute>
+				<attribute name="generalizedCost" class="java.lang.Double">4.0</attribute>
+				<attribute name="linkType" class="java.lang.String">cykelbana</attribute>
+				<attribute name="slope" class="java.lang.String">1.2</attribute>
+			</attributes>
+		</link>
+		<link id="10" from="6004" to="6005" length="1450.0" freespeed="6.111111111111111" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="bicycleSpeed_M_S" class="java.lang.Double">4.7407407416666665</attribute>
+				<attribute name="connector" class="java.lang.String">1</attribute>
+				<attribute name="generalizedCost" class="java.lang.Double">3.0</attribute>
+				<attribute name="linkType" class="java.lang.String">cykelfalt</attribute>
+				<attribute name="slope" class="java.lang.String">0.2</attribute>
+			</attributes>
+		</link>
+		<link id="2" from="6000" to="6002" length="1300.0" freespeed="2.7777777777777777" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="bicycleSpeed_M_S" class="java.lang.Double">4.222222222222222</attribute>
+				<attribute name="connector" class="java.lang.String">0</attribute>
+				<attribute name="generalizedCost" class="java.lang.Double">5.0</attribute>
+				<attribute name="linkType" class="java.lang.String">cykelbana</attribute>
+				<attribute name="slope" class="java.lang.String">1.1</attribute>
+			</attributes>
+		</link>
+		<link id="3" from="6001" to="6003" length="1240.0" freespeed="4.166666666666667" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="bicycleSpeed_M_S" class="java.lang.Double">4.388888888888889</attribute>
+				<attribute name="connector" class="java.lang.String">0</attribute>
+				<attribute name="generalizedCost" class="java.lang.Double">6.0</attribute>
+				<attribute name="linkType" class="java.lang.String">cykelbana</attribute>
+				<attribute name="slope" class="java.lang.String">0.7</attribute>
+			</attributes>
+		</link>
+		<link id="4" from="6002" to="6003" length="2220.0" freespeed="3.888888888888889" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="bicycleSpeed_M_S" class="java.lang.Double">4.407407408333333</attribute>
+				<attribute name="connector" class="java.lang.String">0</attribute>
+				<attribute name="generalizedCost" class="java.lang.Double">5.0</attribute>
+				<attribute name="linkType" class="java.lang.String">cykelbana</attribute>
+				<attribute name="slope" class="java.lang.String">0.9</attribute>
+			</attributes>
+		</link>
+		<link id="5" from="6000" to="6003" length="3120.0" freespeed="4.166666666666667" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="bicycleSpeed_M_S" class="java.lang.Double">4.462962963888889</attribute>
+				<attribute name="connector" class="java.lang.String">0</attribute>
+				<attribute name="generalizedCost" class="java.lang.Double">4.0</attribute>
+				<attribute name="linkType" class="java.lang.String">blandtrafik</attribute>
+				<attribute name="slope" class="java.lang.String">0.7</attribute>
+			</attributes>
+		</link>
+		<link id="6" from="6003" to="6000" length="3120.0" freespeed="4.444444444444445" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="bicycleSpeed_M_S" class="java.lang.Double">4.518518519444444</attribute>
+				<attribute name="connector" class="java.lang.String">0</attribute>
+				<attribute name="generalizedCost" class="java.lang.Double">2.0</attribute>
+				<attribute name="linkType" class="java.lang.String">blandtrafik</attribute>
+				<attribute name="slope" class="java.lang.String">0.6</attribute>
+			</attributes>
+		</link>
+		<link id="7" from="6003" to="6005" length="1110.0" freespeed="3.888888888888889" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="bicycleSpeed_M_S" class="java.lang.Double">4.5740740749999995</attribute>
+				<attribute name="connector" class="java.lang.String">0</attribute>
+				<attribute name="generalizedCost" class="java.lang.Double">2.0</attribute>
+				<attribute name="linkType" class="java.lang.String">blandtrafik</attribute>
+				<attribute name="slope" class="java.lang.String">0.5</attribute>
+			</attributes>
+		</link>
+		<link id="8" from="6005" to="6003" length="1110.0" freespeed="3.0555555555555554" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="bicycleSpeed_M_S" class="java.lang.Double">4.629629630555556</attribute>
+				<attribute name="connector" class="java.lang.String">0</attribute>
+				<attribute name="generalizedCost" class="java.lang.Double">4.0</attribute>
+				<attribute name="linkType" class="java.lang.String">cykelfalt</attribute>
+				<attribute name="slope" class="java.lang.String">0.4</attribute>
+			</attributes>
+		</link>
+		<link id="9" from="6005" to="6004" length="1450.0" freespeed="5.833333333333333" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="bicycleSpeed_M_S" class="java.lang.Double">4.685185186111111</attribute>
+				<attribute name="connector" class="java.lang.String">1</attribute>
+				<attribute name="generalizedCost" class="java.lang.Double">3.0</attribute>
+				<attribute name="linkType" class="java.lang.String">cykelfalt</attribute>
+				<attribute name="slope" class="java.lang.String">0.3</attribute>
+			</attributes>
+		</link>
+	</links>
+
+<!-- ====================================================================== -->
+
+</network>

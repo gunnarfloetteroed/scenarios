@@ -1,0 +1,44 @@
+2020-08-17T21:23:16,051  WARN RandomizingTimeDistanceTravelDisutilityFactory:112 There will be no routing randomness. The randomization of the travel disutility requires the monetary distance rate to be different than zero. Continuing anyway.
+2020-08-17T21:23:16,051  WARN RandomizingTimeDistanceTravelDisutilityFactory:117 There will be no routing randomness. The randomization of the travel disutility requires the travel time cost rate to be different than zero. Continuing anyway.
+2020-08-17T21:23:16,221  WARN ObjectAttributesConverter:77 No AttributeConverter found for class java.util.Collections$UnmodifiableMap. Not all attribute values can be converted.
+2020-08-17T21:23:23,540 ERROR MatsimRuntimeModifications:75 Getting uncaught Exception in Thread main
+java.lang.NoSuchMethodError: org.jfree.chart.title.ImageTitle.<init>(Ljava/awt/Image;Lorg/jfree/chart/ui/RectangleEdge;Lorg/jfree/chart/ui/HorizontalAlignment;Lorg/jfree/chart/ui/VerticalAlignment;)V
+	at org.matsim.core.utils.charts.ChartUtil.addMatsimLogo(ChartUtil.java:83) ~[matsim-12.0.jar:?]
+	at org.matsim.analysis.IterationStopWatch.writeGraphFile(IterationStopWatch.java:297) ~[matsim-12.0.jar:?]
+	at org.matsim.core.controler.AbstractController.iteration(AbstractController.java:166) ~[matsim-12.0.jar:?]
+	at org.matsim.core.controler.AbstractController.doIterations(AbstractController.java:113) ~[matsim-12.0.jar:?]
+	at org.matsim.core.controler.AbstractController$1.run(AbstractController.java:80) ~[matsim-12.0.jar:?]
+	at org.matsim.core.controler.MatsimRuntimeModifications.run(MatsimRuntimeModifications.java:69) [matsim-12.0.jar:?]
+	at org.matsim.core.controler.MatsimRuntimeModifications.run(MatsimRuntimeModifications.java:52) [matsim-12.0.jar:?]
+	at org.matsim.core.controler.AbstractController.run(AbstractController.java:88) [matsim-12.0.jar:?]
+	at org.matsim.core.controler.NewControler.run(NewControler.java:82) [matsim-12.0.jar:?]
+	at org.matsim.core.controler.Controler.run(Controler.java:249) [matsim-12.0.jar:?]
+	at stockholm.bicycles.tests.configgenerationTest.RunConfigTest.main(RunConfigTest.java:58) [classes/:?]
+2020-08-17T21:23:23,558 ERROR MatsimRuntimeModifications:81 ERROR --- This is an unexpected shutdown!
+2020-08-17T21:23:23,558 ERROR MatsimRuntimeModifications:84 Shutdown possibly caused by the following Exception:
+java.lang.NoSuchMethodError: org.jfree.chart.title.ImageTitle.<init>(Ljava/awt/Image;Lorg/jfree/chart/ui/RectangleEdge;Lorg/jfree/chart/ui/HorizontalAlignment;Lorg/jfree/chart/ui/VerticalAlignment;)V
+	at org.matsim.core.utils.charts.ChartUtil.addMatsimLogo(ChartUtil.java:83) ~[matsim-12.0.jar:?]
+	at org.matsim.analysis.IterationStopWatch.writeGraphFile(IterationStopWatch.java:297) ~[matsim-12.0.jar:?]
+	at org.matsim.core.controler.AbstractController.iteration(AbstractController.java:166) ~[matsim-12.0.jar:?]
+	at org.matsim.core.controler.AbstractController.doIterations(AbstractController.java:113) ~[matsim-12.0.jar:?]
+	at org.matsim.core.controler.AbstractController$1.run(AbstractController.java:80) ~[matsim-12.0.jar:?]
+	at org.matsim.core.controler.MatsimRuntimeModifications.run(MatsimRuntimeModifications.java:69) [matsim-12.0.jar:?]
+	at org.matsim.core.controler.MatsimRuntimeModifications.run(MatsimRuntimeModifications.java:52) [matsim-12.0.jar:?]
+	at org.matsim.core.controler.AbstractController.run(AbstractController.java:88) [matsim-12.0.jar:?]
+	at org.matsim.core.controler.NewControler.run(NewControler.java:82) [matsim-12.0.jar:?]
+	at org.matsim.core.controler.Controler.run(Controler.java:249) [matsim-12.0.jar:?]
+	at stockholm.bicycles.tests.configgenerationTest.RunConfigTest.main(RunConfigTest.java:58) [classes/:?]
+2020-08-17T21:23:23,604 ERROR MatsimRuntimeModifications$1:62 Getting uncaught Exception in Thread main
+java.lang.NoSuchMethodError: org.jfree.chart.title.ImageTitle.<init>(Ljava/awt/Image;Lorg/jfree/chart/ui/RectangleEdge;Lorg/jfree/chart/ui/HorizontalAlignment;Lorg/jfree/chart/ui/VerticalAlignment;)V
+	at org.matsim.core.utils.charts.ChartUtil.addMatsimLogo(ChartUtil.java:83) ~[matsim-12.0.jar:?]
+	at org.matsim.analysis.PHbyModeCalculator.writePHTText(PHbyModeCalculator.java:169) ~[matsim-12.0.jar:?]
+	at org.matsim.analysis.PHbyModeCalculator.writeOutput(PHbyModeCalculator.java:115) ~[matsim-12.0.jar:?]
+	at org.matsim.analysis.IterationTravelStatsControlerListener.notifyShutdown(IterationTravelStatsControlerListener.java:92) ~[matsim-12.0.jar:?]
+	at org.matsim.core.controler.ControlerListenerManagerImpl.fireControlerShutdownEvent(ControlerListenerManagerImpl.java:127) ~[matsim-12.0.jar:?]
+	at org.matsim.core.controler.AbstractController$1.shutdown(AbstractController.java:85) ~[matsim-12.0.jar:?]
+	at org.matsim.core.controler.MatsimRuntimeModifications.run(MatsimRuntimeModifications.java:87) ~[matsim-12.0.jar:?]
+	at org.matsim.core.controler.MatsimRuntimeModifications.run(MatsimRuntimeModifications.java:52) ~[matsim-12.0.jar:?]
+	at org.matsim.core.controler.AbstractController.run(AbstractController.java:88) ~[matsim-12.0.jar:?]
+	at org.matsim.core.controler.NewControler.run(NewControler.java:82) ~[matsim-12.0.jar:?]
+	at org.matsim.core.controler.Controler.run(Controler.java:249) ~[matsim-12.0.jar:?]
+	at stockholm.bicycles.tests.configgenerationTest.RunConfigTest.main(RunConfigTest.java:58) ~[classes/:?]

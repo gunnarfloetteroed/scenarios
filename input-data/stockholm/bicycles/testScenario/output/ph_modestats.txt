@@ -1,0 +1,2 @@
+Iteration	bike_travel	bike_wait	stageActivity_travel	stageActivity_wait
+0	33.66166666666667	0.0	0.0	0.0

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE objectAttributes SYSTEM "http://matsim.org/files/dtd/objectattributes_v1.dtd">
+
+<objectAttributes>
+	<object id="1">
+		<attribute name="bicycleSpeed_M_S" class="java.lang.Double">4.277777777777778</attribute>
+		<attribute name="connector" class="java.lang.String">0</attribute>
+		<attribute name="generalizedCost" class="java.lang.Double">4.0</attribute>
+		<attribute name="linkType" class="java.lang.String">cykelbana</attribute>
+		<attribute name="slope" class="java.lang.String">1.2</attribute>
+	</object>
+	<object id="2">
+		<attribute name="bicycleSpeed_M_S" class="java.lang.Double">4.222222222222222</attribute>
+		<attribute name="connector" class="java.lang.String">0</attribute>
+		<attribute name="generalizedCost" class="java.lang.Double">5.0</attribute>
+		<attribute name="linkType" class="java.lang.String">cykelbana</attribute>
+		<attribute name="slope" class="java.lang.String">1.1</attribute>
+	</object>
+	<object id="3">
+		<attribute name="bicycleSpeed_M_S" class="java.lang.Double">4.388888888888889</attribute>
+		<attribute name="connector" class="java.lang.String">0</attribute>
+		<attribute name="generalizedCost" class="java.lang.Double">6.0</attribute>
+		<attribute name="linkType" class="java.lang.String">cykelbana</attribute>
+		<attribute name="slope" class="java.lang.String">0.7</attribute>
+	</object>
+	<object id="4">
+		<attribute name="bicycleSpeed_M_S" class="java.lang.Double">4.407407408333333</attribute>
+		<attribute name="connector" class="java.lang.String">0</attribute>
+		<attribute name="generalizedCost" class="java.lang.Double">5.0</attribute>
+		<attribute name="linkType" class="java.lang.String">cykelbana</attribute>
+		<attribute name="slope" class="java.lang.String">0.9</attribute>
+	</object>
+	<object id="5">
+		<attribute name="bicycleSpeed_M_S" class="java.lang.Double">4.462962963888889</attribute>
+		<attribute name="connector" class="java.lang.String">0</attribute>
+		<attribute name="generalizedCost" class="java.lang.Double">4.0</attribute>
+		<attribute name="linkType" class="java.lang.String">blandtrafik</attribute>
+		<attribute name="slope" class="java.lang.String">0.7</attribute>
+	</object>
+	<object id="6">
+		<attribute name="bicycleSpeed_M_S" class="java.lang.Double">4.518518519444444</attribute>
+		<attribute name="connector" class="java.lang.String">0</attribute>
+		<attribute name="generalizedCost" class="java.lang.Double">2.0</attribute>
+		<attribute name="linkType" class="java.lang.String">blandtrafik</attribute>
+		<attribute name="slope" class="java.lang.String">0.6</attribute>
+	</object>
+	<object id="7">
+		<attribute name="bicycleSpeed_M_S" class="java.lang.Double">4.5740740749999995</attribute>
+		<attribute name="connector" class="java.lang.String">0</attribute>
+		<attribute name="generalizedCost" class="java.lang.Double">2.0</attribute>
+		<attribute name="linkType" class="java.lang.String">blandtrafik</attribute>
+		<attribute name="slope" class="java.lang.String">0.5</attribute>
+	</object>
+	<object id="8">
+		<attribute name="bicycleSpeed_M_S" class="java.lang.Double">4.629629630555556</attribute>
+		<attribute name="connector" class="java.lang.String">0</attribute>
+		<attribute name="generalizedCost" class="java.lang.Double">4.0</attribute>
+		<attribute name="linkType" class="java.lang.String">cykelfalt</attribute>
+		<attribute name="slope" class="java.lang.String">0.4</attribute>
+	</object>
+	<object id="9">
+		<attribute name="bicycleSpeed_M_S" class="java.lang.Double">4.685185186111111</attribute>
+		<attribute name="connector" class="java.lang.String">1</attribute>
+		<attribute name="generalizedCost" class="java.lang.Double">3.0</attribute>
+		<attribute name="linkType" class="java.lang.String">cykelfalt</attribute>
+		<attribute name="slope" class="java.lang.String">0.3</attribute>
+	</object>
+	<object id="10">
+		<attribute name="bicycleSpeed_M_S" class="java.lang.Double">4.7407407416666665</attribute>
+		<attribute name="connector" class="java.lang.String">1</attribute>
+		<attribute name="generalizedCost" class="java.lang.Double">3.0</attribute>
+		<attribute name="linkType" class="java.lang.String">cykelfalt</attribute>
+		<attribute name="slope" class="java.lang.String">0.2</attribute>
+	</object>
+</objectAttributes>

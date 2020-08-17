@@ -20,10 +20,10 @@ public class RunConfigTest {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		String inputPath = System.getProperty("user.dir")+"\\input-data\\stockholm\\bicycles\\";
-		inputPath = inputPath.replaceAll("\\\\", "/");
+		String inputPathScenario = System.getProperty("user.dir")+"\\input-data\\stockholm\\bicycles\\testScenario\\";
+		inputPathScenario = inputPathScenario.replaceAll("\\\\", "/");
 		
-		final String ConfigFile = inputPath + "config_test.xml";
+		final String ConfigFile = inputPathScenario + "config_test.xml";
 		Config config = ConfigUtils.loadConfig(  ConfigFile ) ;
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config );

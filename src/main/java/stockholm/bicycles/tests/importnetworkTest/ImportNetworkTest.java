@@ -16,7 +16,8 @@ public class ImportNetworkTest {
 		final String linksFile = inputPath + "Links.csv";
 		
 		// final String outputPath = "./ihop2/network-output/";
-		final String outputPath = System.getProperty("user.dir")+"\\input-data\\stockholm\\bicycles\\";
+		String outputPath = System.getProperty("user.dir")+"\\input-data\\stockholm\\bicycles\\testScenario\\";
+		outputPath = outputPath.replaceAll("\\\\", "/");
 		final String matsimPlainFile = outputPath + "network_test.xml";
 		final String matsimFullFile = outputPath + "network_raw_test.xml";
 		final String linkAttributesFile = outputPath + "link_attributes_test.xml";

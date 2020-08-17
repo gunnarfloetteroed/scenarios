@@ -13,8 +13,9 @@ public class DemandMatrixToPlanTest {
 		String inputPath = System.getProperty("user.dir")+"\\input-data\\stockholm\\bicycles\\";
 		inputPath = inputPath.replaceAll("\\\\", "/");
 		final String demandFile = inputPath + "ODDemand.csv";
-	    final String networkFile = inputPath + "network_test.xml";
-		final String planFile = inputPath + "population.xml";
+		final String inputPathScenario = inputPath+"testScenario/";
+	    final String networkFile = inputPathScenario + "network_test.xml";
+		final String planFile = inputPathScenario + "population.xml";
 		DemandMatrixToPlan planreader = new DemandMatrixToPlan(demandFile, networkFile, planFile);
 		planreader.generatePlan();
 	}
