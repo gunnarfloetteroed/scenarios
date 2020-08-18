@@ -128,6 +128,12 @@
 			<artifactId>opencsv</artifactId>
 			<version>5.0</version>
 		</dependency>
+		
+		<dependency>
+          <groupId>jfree</groupId>
+          <artifactId>jfreechart</artifactId>
+          <version>1.0.12</version>
+        </dependency>
 
 		<dependency>
 			<!-- Include the JUnit testing library.  Not transitive. -->
