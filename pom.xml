@@ -48,19 +48,19 @@
 		<dependency>
 			<groupId>com.github.gunnarfloetteroed.java</groupId>
 			<artifactId>utilities</artifactId>
-			<version>2020-02-11_test05</version>
+			<version>2020-08-20_snapshot</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.github.gunnarfloetteroed.java</groupId>
 			<artifactId>experimental</artifactId>
-			<version>2020-02-11_test05</version>
+			<version>2020-08-20_snapshot</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.github.gunnarfloetteroed.java</groupId>
 			<artifactId>opdyts</artifactId>
-			<version>2020-02-11_test05</version>
+			<version>2020-08-20_snapshot</version>
 		</dependency>
 
 		<!--  
@@ -122,18 +122,6 @@
 			<artifactId>matsim</artifactId>
 			<version>${matsim.version}</version>
 		</dependency>
-		
-		<dependency>
-			<groupId>com.opencsv</groupId>
-			<artifactId>opencsv</artifactId>
-			<version>5.0</version>
-		</dependency>
-		
-		<dependency>
-          <groupId>jfree</groupId>
-          <artifactId>jfreechart</artifactId>
-          <version>1.0.12</version>
-        </dependency>
 
 		<dependency>
 			<!-- Include the JUnit testing library.  Not transitive. -->
