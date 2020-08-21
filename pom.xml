@@ -46,30 +46,40 @@
 	<dependencies>
 	
 		<dependency>
+    		<groupId>com.opencsv</groupId>
+    		<artifactId>opencsv</artifactId>
+    		<version>5.2</version>
+		</dependency>
+
+		<dependency>
 			<groupId>com.github.gunnarfloetteroed.java</groupId>
 			<artifactId>utilities</artifactId>
-			<version>2020-08-20_snapshot</version>
+			<version>2020-08-21_snapshot</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.github.gunnarfloetteroed.java</groupId>
 			<artifactId>experimental</artifactId>
-			<version>2020-08-20_snapshot</version>
+			<version>2020-08-21_snapshot</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.github.gunnarfloetteroed.java</groupId>
 			<artifactId>opdyts</artifactId>
-			<version>2020-08-20_snapshot</version>
+			<version>2020-08-21_snapshot</version>
 		</dependency>
 
-		<!--  
+		<dependency>
+          <groupId>jfree</groupId>
+          <artifactId>jfreechart</artifactId>
+          <version>1.0.12</version>
+        </dependency>
+        
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>18.0</version>
+			<version>28.2-jre</version>
 		</dependency>
-		-->
 
 		<dependency>
 			<groupId>org.geotools</groupId>
