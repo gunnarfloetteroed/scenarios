@@ -31,28 +31,28 @@ public class RunConfigTest {
 		Controler controler = new Controler(scenario);
 		
 		
-		controler.addOverridingModule( new AbstractModule(){
-			@Override
-			public void install(){
-				this.addTravelTimeBinding( TransportMode.bike ).toInstance( new TravelTime(){
-					@Inject @Named(TransportMode.bike) TravelTimeCalculator bikeCalculator ;
-					@Override public double getLinkTravelTime( Link link, double time, Person person, Vehicle vehicle ){
-						String linkType = (String) link.getAttributes().getAttribute("linkType");
-						double speedFromLink = link.getFreespeed( time );
-						
-						// some stupid logic to calculate travel speed. WILL CHANGE WHEN WE RUN THE ACTUAL MODEL
-						if (linkType.equals("cykelbana")) {
-							speedFromLink=speedFromLink+2;
-						}else if (linkType.equals("cykelfalt")) {
-							speedFromLink=speedFromLink+1;
-						}
-						
-						return link.getLength()/speedFromLink ;
-					}
-				} );
-			}
-		} ) ;		
-		
+//		controler.addOverridingModule( new AbstractModule(){
+//			@Override
+//			public void install(){
+//				this.addTravelTimeBinding( TransportMode.bike ).toInstance( new TravelTime(){
+//					@Inject @Named(TransportMode.bike) TravelTimeCalculator bikeCalculator ;
+//					@Override public double getLinkTravelTime( Link link, double time, Person person, Vehicle vehicle ){
+//						String linkType = (String) link.getAttributes().getAttribute("linkType");
+//						double speedFromLink = link.getFreespeed( time );
+//						
+//						// some stupid logic to calculate travel speed. WILL CHANGE WHEN WE RUN THE ACTUAL MODEL
+//						if (linkType.equals("cykelbana")) {
+//							speedFromLink=speedFromLink+2;
+//						}else if (linkType.equals("cykelfalt")) {
+//							speedFromLink=speedFromLink+1;
+//						}
+//						
+//						return link.getLength()/speedFromLink ;
+//					}
+//				} );
+//			}
+//		} ) ;		
+//		
 
 		
 		controler.run();

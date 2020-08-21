@@ -17,7 +17,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import com.google.common.collect.Table;
 import com.opencsv.exceptions.CsvException;
@@ -34,27 +33,53 @@ public class TransCad2MATSimNetwork {
 
 	private final String matsimFullFileName;
 
-	private final String linkAttributesFileName;
-	
-	private final String nodeAttributesFileName;
-	
 
 
 
 	public TransCad2MATSimNetwork(String tcNodesFileName, String tcLinksFileName,
-			String matsimPlainNetworkFileName, String matsimFullFileName, String nodeAttributesFileName, String linkAttributesFileName) {
+			String matsimPlainNetworkFileName, String matsimFullFileName) {
 		super();
 		this.tcNodesFileName = tcNodesFileName;
 		this.tcLinksFileName = tcLinksFileName;
 		this.matsimPlainNetworkFileName = matsimPlainNetworkFileName;
 		this.matsimFullFileName = matsimFullFileName;
-		this.linkAttributesFileName = linkAttributesFileName;
-		this.nodeAttributesFileName=nodeAttributesFileName;
 	} // end constructor
 
-
-	public void run() throws IOException, CsvException {
-        final Network matsimNetwork = NetworkUtils.createNetwork();
+	
+	
+	public void runGenerateNetwork() throws IOException, CsvException {
+        
+		Network matsimNetwork=this.generateNetwork();
+		
+		NetworkWriter plainNetworkWriter = new NetworkWriter(matsimNetwork);
+		plainNetworkWriter.write(matsimPlainNetworkFileName);
+		
+		//----------------------------------
+		
+//		// (4) write the node and link attribute files
+//		final ObjectAttributesXmlWriter linkAttributesWriter = new ObjectAttributesXmlWriter(linkAttributes);
+//		linkAttributesWriter.writeFile(this.linkAttributesFileName);
+//		
+//		final ObjectAttributesXmlWriter nodeAttributesWriter = new ObjectAttributesXmlWriter(nodeAttributes);
+//		nodeAttributesWriter.writeFile(this.nodeAttributesFileName);
+		
+	} // end run()
+	
+	public void runNetworkWithTurnPentalty() throws IOException, CsvException {
+		Network matsimNetwork=this.generateNetwork();
+		
+		//to do:  recode matsimNetwork to generate a new network with Penalty.
+		
+		//1. loop each node
+		//2. for each node we check the incoming and outcoming links and as long as there are more than 2 nodes connected we define this node as intersection.
+		
+		
+		NetworkWriter plainNetworkWriter = new NetworkWriter(matsimNetwork);
+		plainNetworkWriter.write(matsimPlainNetworkFileName);
+	}
+	
+	public Network generateNetwork() throws IOException, CsvException {
+		final Network matsimNetwork = NetworkUtils.createNetwork();
 		final NetworkFactory matsimNetworkFactory = matsimNetwork.getFactory();
 		final ObjectAttributes linkAttributes = new ObjectAttributes();
 		final ObjectAttributes nodeAttributes = new ObjectAttributes();
@@ -114,9 +139,9 @@ public class TransCad2MATSimNetwork {
 					matsimFromNode, matsimToNode);
 			// set link length and speed as default attribute to links
 			double LinkLengthKM= Double.parseDouble(ALink.get("length"));
-			double LinkFreeSpeedKM_H= Double.parseDouble(ALink.get("bicycleTravelTime"));
+			double LinkTravelTimeMin= Double.parseDouble(ALink.get("bicycleTravelTime"));
 			matsimLink.setLength(LinkLengthKM*1000); // change back to: matsimLink.setLength(LinkLengthKM * Units.M_PER_KM);
-			matsimLink.setFreespeed(LinkFreeSpeedKM_H/3.6);   // change back to: matsimLink.setFreespeed(LinkFreeSpeedKM_H * Units.M_S_PER_KM_H);  when GunnarRepo is updated.
+			matsimLink.setFreespeed(LinkLengthKM/(LinkTravelTimeMin/60)/3.6);   // change back to: matsimLink.setFreespeed(LinkFreeSpeedKM_H * Units.M_S_PER_KM_H);  when GunnarRepo is updated.
 			matsimLink.setAllowedModes(allowedModes);
 			
 			
@@ -169,18 +194,11 @@ public class TransCad2MATSimNetwork {
 		System.out.println("Number of links: " + matsimNetwork.getLinks().size());
 		System.out.println("------------------------------------------------------------");
 		System.out.println();
-		NetworkWriter plainNetworkWriter = new NetworkWriter(matsimNetwork);
-		plainNetworkWriter.write(this.matsimPlainNetworkFileName);
-		//----------------------------------
+		return matsimNetwork;
 		
-		// (4) write the node and link attribute files
-		final ObjectAttributesXmlWriter linkAttributesWriter = new ObjectAttributesXmlWriter(linkAttributes);
-		linkAttributesWriter.writeFile(this.linkAttributesFileName);
-		
-		final ObjectAttributesXmlWriter nodeAttributesWriter = new ObjectAttributesXmlWriter(nodeAttributes);
-		nodeAttributesWriter.writeFile(this.nodeAttributesFileName);
-		
-	} // end run()
+	}
+	
+
 
 
 

@@ -25,7 +25,7 @@ public class MatsimDijkstraTest {
 
 	public static void main(String[] args) {
 		
-		String inputPath = System.getProperty("user.dir")+"\\input-data\\stockholm\\bicycles\\";
+		String inputPath = System.getProperty("user.dir")+"\\input-data\\stockholm\\bicycles\\testScenario\\";
 		inputPath = inputPath.replaceAll("\\\\", "/");
 		final String matsimPlainFile = inputPath + "network_test.xml";
 		Config config = ConfigUtils.createConfig();

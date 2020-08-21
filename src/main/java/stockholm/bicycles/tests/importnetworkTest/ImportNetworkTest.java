@@ -23,9 +23,9 @@ public class ImportNetworkTest {
 		final String linkAttributesFile = outputPath + "link_attributes_test.xml";
 		final String nodeAttributesFile = outputPath + "node_attributes_test.xml";
 		TransCad2MATSimNetwork networktransformer = new TransCad2MATSimNetwork(nodesFile, linksFile,
-				matsimPlainFile, matsimFullFile, nodeAttributesFile,linkAttributesFile);
+				matsimPlainFile, matsimFullFile);
 		
-		networktransformer.run();
+		networktransformer.runGenerateNetwork();
 
 	}
 
