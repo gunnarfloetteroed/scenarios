@@ -21,6 +21,7 @@ package norrkoping;
 
 import java.util.Scanner;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -39,6 +40,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -264,6 +268,13 @@ public class NorrkopingProductionRunner {
 			}
 		});
 
+		controler.addControlerListener(new StartupListener() {			
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				Logger.getLogger(EventsManagerImpl.class).setLevel(Level.OFF);								
+			}
+		});
+		
 		greedo.meet(controler);
 
 		// controler.addOverridingModule(new AbstractModule() {
