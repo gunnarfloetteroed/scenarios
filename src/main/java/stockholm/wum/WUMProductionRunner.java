@@ -120,8 +120,6 @@ public class WUMProductionRunner {
 	static void runProductionScenarioWithSampersDynamics(final String configFileName) {
 
 		final boolean terminateUponBoardingDenied = false;
-		// final boolean removeModeInformation = true;
-		final boolean removeModeInformation = false;
 		final boolean useGreedo = true;
 
 		final Config config = ConfigUtils.loadConfig(configFileName, new SwissRailRaptorConfigGroup(),
@@ -141,9 +139,6 @@ public class WUMProductionRunner {
 			PTInteractionsRemover.run(person, false);
 		}
 
-		if (removeModeInformation) {
-			removeModeInformation(scenario);
-		}
 		scaleTransitCapacities(scenario, config.qsim().getStorageCapFactor());
 		fixCarAvailability(scenario);
 		new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "tr_").createNetwork();
@@ -160,8 +155,6 @@ public class WUMProductionRunner {
 
 		final Controler controler = new Controler(scenario);
 
-		// 2020-08-14: changed while moving to MATSim 12
-		// OLD: controler.setModules(new ControlerDefaultsWithRoadPricingModule());
 		controler.addOverridingModule(new RoadPricingModule());
 
 		controler.addOverridingModule(new SampersDifferentiatedPTScoringFunctionModule());
@@ -184,9 +177,6 @@ public class WUMProductionRunner {
 		if (useGreedo) {
 			greedo.meet(controler);
 		}
-		// for (AbstractModule module : greedo.getModules()) {
-		// controler.addOverridingModule(module);
-		// }
 
 		if (terminateUponBoardingDenied) {
 			controler.addOverridingModule(new AbstractModule() {
@@ -220,7 +210,6 @@ public class WUMProductionRunner {
 					bind(CalibrationModeExtractor.class).toInstance(new WUMModeExtractor(
 							ConfigUtils.addOrGetModule(getConfig(), ModalShareCalibrationConfigGroup.class), "home",
 							"work", "other", "intermediate_home"));
-					// addControlerListenerBinding().to(WireCadytsModalShareCalibratorIntoMATSimControlerListener.class);
 					addControlerListenerBinding().to(WireModalShareCalibratorIntoMATSimControlerListener.class);
 				}
 			});
