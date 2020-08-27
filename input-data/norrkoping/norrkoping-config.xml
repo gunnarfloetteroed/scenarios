@@ -3,7 +3,7 @@
 <config>
 
 	<module name="global">
-		<param name="numberOfThreads" value="7" />
+		<param name="numberOfThreads" value="15" />
 		<param name="randomSeed" value="4711" />
 	</module>
 
@@ -17,7 +17,7 @@
 		<param name="inputPlansFile" value="norrkoping-plans.25pct.xml.gz" />		
 		<!-- String: minOfDurationAndEndTime tryEndTimeThenDuration endTimeOnly. Anything besides minOfDurationAndEndTime will internally use a different (simpler) version of the TimeAllocationMutator. -->
 		<param name="activityDurationInterpretation" value="minOfDurationAndEndTime" />
-		<param name="handlingOfPlansWithoutRoutingMode" value="useMainModeIdentifier" />
+		<!-- <param name="handlingOfPlansWithoutRoutingMode" value="useMainModeIdentifier" /> -->
 	</module>
 
 	<module name="qsim">
@@ -249,7 +249,7 @@
 
 		<parameterset type="modeParams">
 			<param name="mode" value="bike" />
-			<param name="constant" value="0.51" />
+			<param name="constant" value="-0.34" />
 			<param name="marginalUtilityOfDistance_util_m" value="-0.000182" />
 			<param name="marginalUtilityOfTraveling_util_hr" value="-0.0" />
 			<param name="monetaryDistanceRate" value="-0.0" />
@@ -264,7 +264,7 @@
 			<param name="monetaryDistanceRate" value="-0.0064" /> at 4 km/h
 			-->
 			<param name="mode" value="walk" />
-			<param name="constant" value="0.31" />	
+			<param name="constant" value="0.05" />	
 			<param name="marginalUtilityOfDistance_util_m" value="-0.000278" />
 			<param name="marginalUtilityOfTraveling_util_hr" value="-0.0" />
 			<param name="monetaryDistanceRate" value="-0.0" />
@@ -272,7 +272,7 @@
 		
 		<parameterset type="modeParams">
 			<param name="mode" value="busPassenger" />
-			<param name="constant" value="-2.14" />
+			<param name="constant" value="-0.8" />
 			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
 			<param name="marginalUtilityOfTraveling_util_hr" value="-0.84" />
 			<param name="monetaryDistanceRate" value="-0.0017067" /> <!-- at 15 km/h -->
@@ -282,7 +282,7 @@
 
 		<parameterset type="modeParams">
 			<param name="mode" value="tramPassenger" />
-			<param name="constant" value="-2.14" />
+			<param name="constant" value="-0.8" />
 			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
 			<param name="marginalUtilityOfTraveling_util_hr" value="-0.84" />
 			<param name="monetaryDistanceRate" value="-0.0012800" /> <!-- at 20 km/h -->
@@ -292,7 +292,7 @@
 
 		<parameterset type="modeParams">
 			<param name="mode" value="subwayPassenger" />
-			<param name="constant" value="-2.14" />
+			<param name="constant" value="-0.8" />
 			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
 			<param name="marginalUtilityOfTraveling_util_hr" value="-0.84" />
 			<param name="monetaryDistanceRate" value="-0.00085333" /> <!-- at 30 km/h -->
@@ -302,7 +302,7 @@
 
 		<parameterset type="modeParams">
 			<param name="mode" value="railPassenger" />
-			<param name="constant" value="-2.14" />
+			<param name="constant" value="-0.8" />
 			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
 			<param name="marginalUtilityOfTraveling_util_hr" value="-0.84" />
 			<param name="monetaryDistanceRate" value="-0.00042667" /> <!-- at 60 km/h -->
@@ -312,7 +312,7 @@
 		
 		<parameterset type="modeParams">
 			<param name="mode" value="ferryPassenger" />
-			<param name="constant" value="-2.14" />
+			<param name="constant" value="-0.8" />
 			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
 			
 			<param name="marginalUtilityOfTraveling_util_hr" value="-0.42" />
@@ -377,7 +377,7 @@
 	
 	<module name="ier">
 		<param name="writePerformanceOutput" value="true" />
-		<param name="iterationsPerCycle" value="10" />
+		<param name="iterationsPerCycle" value="2" />
 		<param name="batchSize" value="200" />
 	</module>
 

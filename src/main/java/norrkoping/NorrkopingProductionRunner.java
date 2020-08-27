@@ -67,9 +67,9 @@ import ch.sbb.matsim.mobsim.qsim.SBBTransitModule;
 import ch.sbb.matsim.mobsim.qsim.pt.SBBTransitEngineQSimModule;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import floetteroed.utilities.Units;
-import stockholm.saleem.StockholmTransformationFactory;
 import stockholm.ihop2.regent.demandreading.ZonalSystem;
 import stockholm.ihop2.regent.demandreading.Zone;
+import stockholm.saleem.StockholmTransformationFactory;
 import stockholm.utils.ShapeUtils;
 import stockholm.wum.analysis.PopulationSampler;
 import stockholm.wum.creation.CropTransitSystem;
@@ -250,8 +250,7 @@ public class NorrkopingProductionRunner {
 		greedo.meet(scenario);
 
 		final Controler controler = new Controler(scenario);
-		// controler.addOverridingModule(new
-		// SampersDifferentiatedPTScoringFunctionModule());
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -268,28 +267,14 @@ public class NorrkopingProductionRunner {
 			}
 		});
 
-		controler.addControlerListener(new StartupListener() {			
+		controler.addControlerListener(new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				Logger.getLogger(EventsManagerImpl.class).setLevel(Level.OFF);								
+				Logger.getLogger(EventsManagerImpl.class).setLevel(Level.OFF);
 			}
 		});
-		
+
 		greedo.meet(controler);
-
-		// controler.addOverridingModule(new AbstractModule() {
-		// @Override
-		// public void install() {
-		// bind(ModeASCContainer.class);
-		// }
-		// });
-
-		// controler.addOverridingModule(new AbstractModule() {
-		// @Override
-		// public void install() {
-		// addControlerListenerBinding().to(WUMASCInstaller.class);
-		// }
-		// });
 
 		controler.run();
 	}
@@ -320,19 +305,18 @@ public class NorrkopingProductionRunner {
 
 		System.out.println("STARTED ...");
 
-		final double xMin = 531377;
-		final double xMax = 622208;
-		final double yMin = 6474497;
-		final double yMax = 6524013;
-
-		final double demandUpscale = 100.0 / 18.0;
+//		final double xMin = 531377;
+//		final double xMax = 622208;
+//		final double yMin = 6474497;
+//		final double yMax = 6524013;
+//		final double demandUpscale = 100.0 / 18.0;
 
 		// cutFromSwedenCarOnly(xMin, xMax, yMin, yMax);
 		// cutFromSwedenPTOnly(xMin, xMax, yMin, yMax);
 		// createDemand(demandUpscale);
 		// runXY2Links();
-
 		// reducePopulation();
+
 		runSimulation(args[0]);
 
 		System.out.println("... DONE");
