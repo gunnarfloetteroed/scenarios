@@ -12,7 +12,7 @@ public class DemandMatrixToPlanTest {
 		// TODO Auto-generated method stub
 		String inputPath = System.getProperty("user.dir")+"\\input-data\\stockholm\\bicycles\\";
 		inputPath = inputPath.replaceAll("\\\\", "/");
-		final String demandFile = inputPath + "ODDemand.csv";
+		final String demandFile = inputPath + "ODDemandTest.csv";
 		final String inputPathScenario = inputPath+"testScenario/";
 	    final String networkFile = inputPathScenario + "network_test.xml";
 		final String planFile = inputPathScenario + "population.xml";

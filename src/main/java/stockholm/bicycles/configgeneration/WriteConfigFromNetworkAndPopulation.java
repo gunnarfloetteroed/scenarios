@@ -70,7 +70,7 @@ public class WriteConfigFromNetworkAndPopulation {
 	    // config.network().setInputCRS("SWEREF99 TM");
 		// "PROJCS[\"SWEREF99 TM\", GEOGCS[\"SWEREF99\", DATUM[\"SWEREF99\", SPHEROID[\"GRS 1980\",6378137,298.257222101, AUTHORITY[\"EPSG\",\"7019\"]], TOWGS84[0,0,0,0,0,0,0],  AUTHORITY[\"EPSG\",\"6619\"]], PRIMEM[\"Greenwich\",0, AUTHORITY[\"EPSG\",\"8901\"]], UNIT[\"degree\",0.01745329251994328, AUTHORITY[\"EPSG\",\"9122\"]], AUTHORITY[\"EPSG\",\"4619\"]], UNIT[\"metre\",1, AUTHORITY[\"EPSG\",\"9001\"]], PROJECTION[\"Transverse_Mercator\"], PARAMETER[\"latitude_of_origin\",0], PARAMETER[\"central_meridian\",15], PARAMETER[\"scale_factor\",0.9996], PARAMETER[\"false_easting\",500000], PARAMETER[\"false_northing\",0], AUTHORITY[\"EPSG\",\"3006\"], AXIS[\"y\",EAST], AXIS[\"x\",NORTH]]"
 		config.plans().setInputFile(this.matsimPlanFileName);
-		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(1);
 		ActivityParams home = new ActivityParams("home");
 		home.setTypicalDuration(16 * 60 * 60);
 		config.planCalcScore().addActivityParams(home);

@@ -3,7 +3,7 @@
 <config>
 	<module name="controler" >
 		<!-- Default=1000. Last Iteration of a simulation. -->
-		<param name="lastIteration" value="0" />
+		<param name="lastIteration" value="1" />
 		<param name="outputDirectory" value="C:/Users/ChengxiL/git/scenariosGunnar/input-data/stockholm/bicycles/testScenario/output" />
 		<!-- Possible values: failIfDirectoryExists, overwriteExistingFiles, deleteDirectoryIfExists -->
 		<param name="overwriteFiles" value="deleteDirectoryIfExists" />

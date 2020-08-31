@@ -49,7 +49,7 @@ public class LinkVolumeHandler implements LinkEnterEventHandler {
 	@Override
 	public void reset(int iteration) {
 		this.LinkVolume = new HashMap<Id<Link>, double[]>();
-	}
+		}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
@@ -62,6 +62,7 @@ public class LinkVolumeHandler implements LinkEnterEventHandler {
 			int hour=getSlot(event.getTime());
 			oneLinkVolume[hour]=oneLinkVolume[hour]+1;
 			this.LinkVolume.put(linkID,oneLinkVolume);
+			
 		} else {
 			double[] oneLinkVolume = new double [24];
 			Arrays.fill(oneLinkVolume, 0.0); 

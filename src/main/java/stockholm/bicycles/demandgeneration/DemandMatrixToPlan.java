@@ -84,7 +84,7 @@ public class DemandMatrixToPlan {
 		
 		// 3. sample number of out-of-home trips per origin zone
 		MultinomialDistributionSamplerMap originZoneTripSampler= new MultinomialDistributionSamplerMap(numberOfTripsInEachOriginZone);
-        int totalNumberOfTripsToBeSampled = (int) (totalNumberOfTrips/5);  // assuming we sample 20% of total number of out-of-home trips.
+        int totalNumberOfTripsToBeSampled = (int) (totalNumberOfTrips/2);  // assuming we sample 50% of total number of out-of-home trips.
         String[] sampledTripsFromOrigin=originZoneTripSampler.sampleMapWithoutReplacement(totalNumberOfTripsToBeSampled);
         for (int i=0; i<sampledTripsFromOrigin.length;i++) {
 			System.out.println("Map sampler's sample without replacement is: "+ sampledTripsFromOrigin[i]);

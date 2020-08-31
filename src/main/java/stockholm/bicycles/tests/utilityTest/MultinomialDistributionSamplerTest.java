@@ -26,9 +26,9 @@ public class MultinomialDistributionSamplerTest {
 //		System.out.println("index is: "+index);
 		
 		// test MultinomialDistributionSampler
-		List<Double> weights = Arrays.asList(1.0,1.0,1.0,0.5,0.5,0.5,0.5,0.5,1.0,4.0,1.0,1.0,1.0,1.0);
+		List<Double> weights = Arrays.asList(2.4,2.0,3.5,1.9,0.2);
 		MultinomialDistributionSampler sampler = new MultinomialDistributionSampler(weights);
-		Integer[] result=sampler.sampleWithoutReplacement(5);
+		Integer[] result=sampler.sampleWithoutReplacement(10);
 		
 		for (int i=0; i<result.length;i++) {
 			System.out.println("sample without replacement is: "+ result[i]);
@@ -40,7 +40,7 @@ public class MultinomialDistributionSamplerTest {
 //		}
 		
 		
-		Integer[] resultWithReplacement=sampler.sampleWithReplacement(8);
+		Integer[] resultWithReplacement=sampler.sampleWithReplacement(10);
 		for (int i=0; i<resultWithReplacement.length;i++) {
 			System.out.println("sample with replacement is: "+ resultWithReplacement[i]);
 		}

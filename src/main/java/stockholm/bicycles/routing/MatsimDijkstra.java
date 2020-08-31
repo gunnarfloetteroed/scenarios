@@ -142,6 +142,7 @@ public class MatsimDijkstra implements LeastCostPathCalculator {
 		this.queue.add(startNode);
 
 	}
+	
 	private void update(Id<Node> nodeToUpdate){
 		this.queue.remove(nodeToUpdate);
 		this.queue.add(nodeToUpdate);
