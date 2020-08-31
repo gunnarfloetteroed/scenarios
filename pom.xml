@@ -51,30 +51,30 @@
     		<version>5.2</version>
 		</dependency>
 
-	    <dependency>
-		    <groupId>org.jfree</groupId>
-	    	<artifactId>jfreechart</artifactId>
-	    	<version>1.5.0</version>
-	    </dependency>
-
 		<dependency>
 			<groupId>com.github.gunnarfloetteroed.java</groupId>
 			<artifactId>utilities</artifactId>
-			<version>2020-08-21_snapshot</version>
+			<version>2020-08-25</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.github.gunnarfloetteroed.java</groupId>
 			<artifactId>experimental</artifactId>
-			<version>2020-08-21_snapshot</version>
+			<version>2020-08-25</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.github.gunnarfloetteroed.java</groupId>
 			<artifactId>opdyts</artifactId>
-			<version>2020-08-21_snapshot</version>
+			<version>2020-08-25</version>
 		</dependency>
-        
+
+        <dependency>
+			<groupId>org.jfree</groupId>
+			<artifactId>jfreechart</artifactId>
+			<version>1.5.0</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
@@ -123,7 +123,7 @@
 		<dependency>
      		<groupId>ch.sbb</groupId>
      		<artifactId>matsim-sbb-extensions</artifactId>
-     		<version>12.0</version>
+     		<version>12.10</version>
  		</dependency>
 			
 		<dependency>

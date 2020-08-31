@@ -19,9 +19,14 @@
  */
 package stockholm.ekocstrans;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -52,7 +57,7 @@ import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import ch.sbb.matsim.mobsim.qsim.SBBTransitModule;
 import ch.sbb.matsim.mobsim.qsim.pt.SBBTransitEngineQSimModule;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-import modalsharecalibrator.ModalShareCalibrationConfigGroup;
+import floetteroed.utilities.FractionalIterable;
 import modalsharecalibrator.ModeASCContainer;
 import stockholm.ihop4.sampersutilities.SampersDifferentiatedPTScoringFunctionModule;
 import stockholm.wum.WUMASCInstaller;
@@ -94,6 +99,30 @@ public class EkoCSTransProductionRunner {
 		}
 	}
 
+	public static void resetNetworkInformationInPopulation(final Scenario scenario) {
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			for (Plan plan : person.getPlans()) {
+				for (PlanElement planElement : plan.getPlanElements()) {
+					if (planElement instanceof Activity) {
+						final Activity act = (Activity) planElement;
+						act.setLinkId(null);
+					} else if (planElement instanceof Leg) {
+						final Leg leg = (Leg) planElement;
+						leg.setMode(TransportMode.car);
+						leg.setRoute(null);
+					}
+				}
+			}
+		}
+	}
+
+	public static void downsamplePopulation(final Scenario scenario, final double fraction) {
+		Set<Id<Person>> all = new LinkedHashSet<>(scenario.getPopulation().getPersons().keySet());
+		for (Id<Person> id : new FractionalIterable<Id<Person>>(all, 1.0 - fraction)) {
+			scenario.getPopulation().getPersons().remove(id);
+		}
+	}
+
 	static void fixCarAvailability(final Scenario scenario) {
 		int drivers = 0;
 		int nonDrivers = 0;
@@ -113,9 +142,11 @@ public class EkoCSTransProductionRunner {
 
 		final boolean terminateUponBoardingDenied = false;
 		final boolean removeModeInformation = false;
+		final boolean resetNetworkInformationInPopulation = true;
+		final double populationFraction = 0.01;
 
 		final Config config = ConfigUtils.loadConfig(configFileName, new SwissRailRaptorConfigGroup(),
-				new SBBTransitConfigGroup(), new RoadPricingConfigGroup(), 
+				new SBBTransitConfigGroup(), new RoadPricingConfigGroup(),
 				// new ModalShareCalibrationConfigGroup(),
 				new GreedoConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -124,8 +155,12 @@ public class EkoCSTransProductionRunner {
 		greedo.meet(config);
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		downsamplePopulation(scenario, populationFraction);
 		if (removeModeInformation) {
 			removeModeInformation(scenario);
+		}
+		if (resetNetworkInformationInPopulation) {
+			resetNetworkInformationInPopulation(scenario);
 		}
 		scaleTransitCapacities(scenario, config.qsim().getStorageCapFactor());
 		fixCarAvailability(scenario);

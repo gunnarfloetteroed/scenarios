@@ -1,0 +1,409 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+
+	<module name="global">
+		<param name="numberOfThreads" value="15" />
+		<param name="randomSeed" value="4711" />
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="norrkoping-network.xml.gz" />
+		<!-- <param name="inputNetworkFile" value="C:\\Users\\GunnarF\\NoBackup\\data-workspace\\norrkoping\\norrkoping-network.xml.gz" /> -->
+	</module>
+
+	<module name="plans">
+		<param name="inputPersonAttributesFile" value="null" />
+		<param name="inputPlansFile" value="norrkoping-plans.25pct.xml.gz" />		
+		<!-- String: minOfDurationAndEndTime tryEndTimeThenDuration endTimeOnly. Anything besides minOfDurationAndEndTime will internally use a different (simpler) version of the TimeAllocationMutator. -->
+		<param name="activityDurationInterpretation" value="minOfDurationAndEndTime" />
+		<!-- <param name="handlingOfPlansWithoutRoutingMode" value="useMainModeIdentifier" /> -->
+	</module>
+
+	<module name="qsim">
+		<param name="flowCapacityFactor" value="0.25" />
+		<param name="storageCapacityFactor" value="0.25" />
+		<param name="numberOfThreads" value="7" />
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="30:00:00" />
+	</module>
+
+	<module name="strategy">
+
+		<!-- Re-parametrized by Greedo. -->
+
+		<param name="ModuleProbability_1" value="1.0" />
+		<param name="Module_1" value="ReRoute" />
+		
+		<param name="ModuleProbability_2" value="1.0" />
+		<param name="Module_2" value="ChangeTripMode" />
+		
+	</module>
+
+	<module name="changeMode">
+		<param name="modes" value="car,pt,walk,bike" />			
+		<param name="ignoreCarAvailability" value="true" />
+		<param name="modeSwitchBehavior" value="fromAllModesToSpecifiedModes" />
+	</module>
+
+	<module name="controler">
+		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
+
+		<param name="outputDirectory" value="output" />
+
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="100" />
+		<param name="eventsFileFormat" value="xml" />
+		<!-- iterationNumber % writeEventsInterval == 0 defines in which iterations 
+			events are written to a file. `0' disables events writing completely. -->
+		<param name="writeEventsInterval" value="10" />
+
+		<!-- iterationNumber % writePlansInterval == 0 defines (hopefully) in which 
+			iterations plans are written to a file. `0' disables plans writing completely. 
+			Some plans in early iterations are always written -->
+		<param name="writePlansInterval" value="10" />
+
+		<!-- iterationNumber % writeSnapshotsInterval == 0 defines in which iterations 
+			snapshots are written to a file. `0' disables snapshots writing completely -->
+		<param name="writeSnapshotsInterval" value="10" />
+
+		<param name="dumpDataAtEnd" value="true" />
+		<param name="mobsim" value="qsim" />
+	</module>
+
+	<!-- continue here -->
+
+	<module name="planscalcroute">
+
+		<param name="beelineDistanceFactor" value="2.0" />
+		<param name="bikeSpeed" value="4.166666666666667" /> <!-- 15 km/h -->
+		<param name="walkSpeed" value="1.11111111111111" /> <!-- 4km/h -->
+
+		<!-- REMOVE <param name="undefinedModeSpeed" value="13.88888888888889" /> -->
+
+	</module>
+
+	<module name="planCalcScore">
+		
+		<parameterset type="activityParams">
+			<param name="activityType" value="start" />
+			<param name="typicalDuration" value="41400" />
+		</parameterset>
+
+		<parameterset type="activityParams">
+			<param name="activityType" value="end" />
+			<param name="typicalDuration" value="41400" />
+		</parameterset>
+		
+		<param name="writeExperiencedPlans" value="false" />
+				
+		<!-- Only leg scoring, plus schedule delay cost. -->
+		<param name="performing" value="0" /> 
+
+		<param name="marginalUtilityOfMoney" value="0.015" /> 
+		
+		<!-- CAR 
+		
+		Using work tour parameters.
+	
+		Cost coeff. for mean income group (200-300kSEK/yr): -0.015 utl/SEK
+		Time coeff. (for all incomes): 						-0.039 utl/min = -2.34 utl/hr
+		Distance coeff. (for all incomes):					 0.0 utl/km
+		ASC:												 0.0 utl
+	
+		-->
+
+		<parameterset type="modeParams">
+			<param name="mode" value="car" />
+			<param name="constant" value="0.0" />
+			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+			<param name="marginalUtilityOfTraveling_util_hr" value="-2.34" />
+			<param name="monetaryDistanceRate" value="-0.00185" /> <!-- 18.5 SEK/mil = 0.00185 SEK/m -->
+		</parameterset>
+
+		<!-- PT BELOW -->
+		
+		<!-- PT transfer penalty is 5min = 300 sek. beta_time_PT is -0.84 utl/hr. Hence:
+			 utilityOfLineSwitch = (300 / 3600) * (-0.84) = -0.007.
+	         This concrete parameter is presumably used in the Raptor routing. -->			 
+		<!-- CORR_1.1 <param name="utilityOfLineSwitch" value="-0.007" /> THIS WAS WRONG -->
+		<param name="utilityOfLineSwitch" value="-0.07" /> <!-- THIS IS CORRECT -->
+		
+		<!-- First PT waiting time is multiplied with a factor of 1.5. beta_time_PT is -0.84 utl/hr. Hence:
+			 beta_PT_wait = 1.5 * (-0.84utl/hr) = -1.26 utl/hr.
+			 This concrete parameter is presumably used in the Raptor routing. -->
+		<param name="waitingPt" value="-1.26" />
+
+		<!-- 
+
+		General assumptions on public transport.
+
+		PRICE
+
+			Everybody uses reskassa.
+
+			price [SEK/75min] = 32.
+
+			Given a mode-specific speed v in km/h, one has:
+
+			v [m/min] = v [km/h] * 1000 [m] / 60 [s] = v [km/h]
+				
+			dist [m] = v[m/min] * 75 [min]
+                                 = (v [km/h] * 1000 / 60 ) * 75
+				 = v [km/h] * 1250 
+
+			price [SEK/m] = 32 [SEK] / dist [m]
+				      = 32 / 1250 / v [km/h]
+				      = 0.0256 / v [km/h]
+
+			Sanity check: 
+			* At 1km/h, one travels 1000 / 60 = 16.667 meter per minute.
+			* Hence 16.667 * 75 = 1250 meter per 75 min.
+			* Given a ticket price of 32 SEK per minute, one pays 32 / 1250 = 0.0256 SEK per meter.
+
+		TIME
+
+			Walk and cycle have no time cost.
+
+			PT has approximately half the time cost of car:
+			beta_pt / beta_car = (30 + x) / (30 + 120) = 0.5
+			x = 45
+
+		DISTANCE
+
+			We have the following parameters from Sampers:
+			
+				beta_time,car  =  -0.039 / min
+			
+				beta_dist,bike  =  -0.182 / km
+				beta_dist,walk  =  -0.278 / km
+			
+			The SAMPERS ratios are hence
+			
+				(use 1 min / km  =  (1 / 60 h) / (1000 m)  = (1 / 60'000) h / m 
+			
+				beta_dist,bike / beta_time,car  =  4.67 min / km  = 0.000077833 h / m  
+				beta_dist,walk / beta_time,car  =  7.13 min / km  = 0.00011883 h / m
+			
+			This yields the following MATSim coefficients:
+			
+				beta_dist,bike  =  0.000077833 h/m * -150 util/h  = -0.011675 util/m  
+				beta_dist,walk  =  0.00011883 h/m * -150 util/h = -0.017825 util/m
+			
+		-->
+
+		<!-- CONTINUE HERE -->
+
+		<!-- BIKE 
+		
+		Using work tour parameters.
+	
+		Cost coeff. for mean income group (200-300kSEK/yr): 0 utl/SEK
+		Time coeff. (for all incomes): 						0 utl/min
+		Distance coeff. (for all incomes):					-0.182 utl/km = -0.000182 utl/m
+		ASC:												 0.433 utl
+	
+		-->
+
+		<!-- SHOULD NOT BE USED BY ANYONE
+		<parameterset type="modeParams">
+			<param name="mode" value="bike" />
+			<param name="constant" value="0.433" />
+			<param name="marginalUtilityOfDistance_util_m" value="-0.000182" />
+			<param name="marginalUtilityOfTraveling_util_hr" value="0" />
+			<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+		-->
+		
+		<!-- WALK 
+		
+		Using work tour parameters.
+	
+		Cost coeff. for mean income group (200-300kSEK/yr):  0 utl/SEK
+		Time coeff. (for all incomes): 						 0 utl/min = 0 utl/hr
+		Distance coeff. (for all incomes):					-0.278 utl/km = -0.000278 utl/m
+		ASC:												 0.101 utl
+	
+		-->
+
+		<!--
+		<parameterset type="modeParams">
+			<param name="mode" value="walk" />
+			<param name="constant" value="0.101" />
+			<param name="marginalUtilityOfDistance_util_m" value="-0.000278" />
+			<param name="marginalUtilityOfTraveling_util_hr" value="0" />
+			<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+		-->
+		
+		<!-- BUS, TRAM, SUBWAY, RAIL, FERRY, TRANSIT-WALK
+		
+		Using work tour parameters.
+	
+		Cost coeff. for mean income group (200-300kSEK/yr): -0.015 utl/SEK
+		Time coeff. (for all incomes): 						-0.014 utl/min = -0.84 utl/hr
+		Distance coeff. (for all incomes):					 0 utl/km
+		ASC:												-0.758 utl
+	
+		-->
+
+		<parameterset type="modeParams">
+			<param name="mode" value="bike" />
+			<param name="constant" value="-0.34" />
+			<param name="marginalUtilityOfDistance_util_m" value="-0.000182" />
+			<param name="marginalUtilityOfTraveling_util_hr" value="-0.0" />
+			<param name="monetaryDistanceRate" value="-0.0" />
+		</parameterset>
+
+		<parameterset type="modeParams">
+			<!-- 
+			<param name="mode" value="walk" />
+			<param name="constant" value="0.31" />
+			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+			<param name="marginalUtilityOfTraveling_util_hr" value="-0.84" />
+			<param name="monetaryDistanceRate" value="-0.0064" /> at 4 km/h
+			-->
+			<param name="mode" value="walk" />
+			<param name="constant" value="0.05" />	
+			<param name="marginalUtilityOfDistance_util_m" value="-0.000278" />
+			<param name="marginalUtilityOfTraveling_util_hr" value="-0.0" />
+			<param name="monetaryDistanceRate" value="-0.0" />
+		</parameterset>
+		
+		<parameterset type="modeParams">
+			<param name="mode" value="busPassenger" />
+			<param name="constant" value="-0.8" />
+			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+			<param name="marginalUtilityOfTraveling_util_hr" value="-0.84" />
+			<param name="monetaryDistanceRate" value="-0.0017067" /> <!-- at 15 km/h -->
+		</parameterset>
+
+		<!-- TRAM  -->
+
+		<parameterset type="modeParams">
+			<param name="mode" value="tramPassenger" />
+			<param name="constant" value="-0.8" />
+			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+			<param name="marginalUtilityOfTraveling_util_hr" value="-0.84" />
+			<param name="monetaryDistanceRate" value="-0.0012800" /> <!-- at 20 km/h -->
+		</parameterset>
+
+		<!-- SUBWAY -->
+
+		<parameterset type="modeParams">
+			<param name="mode" value="subwayPassenger" />
+			<param name="constant" value="-0.8" />
+			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+			<param name="marginalUtilityOfTraveling_util_hr" value="-0.84" />
+			<param name="monetaryDistanceRate" value="-0.00085333" /> <!-- at 30 km/h -->
+		</parameterset>
+
+		<!-- RAIL -->
+
+		<parameterset type="modeParams">
+			<param name="mode" value="railPassenger" />
+			<param name="constant" value="-0.8" />
+			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+			<param name="marginalUtilityOfTraveling_util_hr" value="-0.84" />
+			<param name="monetaryDistanceRate" value="-0.00042667" /> <!-- at 60 km/h -->
+		</parameterset>
+
+		<!-- FERRY -->
+		
+		<parameterset type="modeParams">
+			<param name="mode" value="ferryPassenger" />
+			<param name="constant" value="-0.8" />
+			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+			
+			<param name="marginalUtilityOfTraveling_util_hr" value="-0.42" />
+			<!-- <param name="marginalUtilityOfTraveling_util_hr" value="-0.84" /> -->
+
+			<param name="monetaryDistanceRate" value="-0.0017067" /> <!-- 8 knop = 8 * 1,852 km/h \approx 15 km/h -->
+		</parameterset>
+
+	</module>
+
+	<module name="transit">
+		<param name="transitScheduleFile" value="transitSchedule-norrkoping-20190214.xml.gz" />
+		<param name="vehiclesFile" value="transitVehicles-norrkoping-20190214.xml.gz" />
+		<param name="transitModes"
+			value="pt,busPassenger,tramPassenger,subwayPassenger,railPassenger,ferryPassenger" />
+		<param name="useTransit" value="true" />
+	</module>
+
+	<module name="transitRouter" >
+		<!-- additional time the router allocates when a line switch happens. Can be interpreted as a 'safety' time that agents need to safely transfer from one line to another -->
+		<param name="additionalTransferTime" value="300.0" />
+		<!-- Factor with which direct walk generalized cost is multiplied before it is compared to the pt generalized cost.  Set to a very high value to reduce direct walk results. -->
+		<param name="directWalkFactor" value="1.0" />
+		<!-- step size to increase searchRadius if no stops are found -->
+		<param name="extensionRadius" value="200.0" />
+		<!-- maximum beeline distance between stops that agents could transfer to by walking -->
+		<param name="maxBeelineWalkConnectionDistance" value="500.0" />
+		<!-- the radius in which stop locations are searched, given a start or target coordinate -->
+		<param name="searchRadius" value="1000.0" />
+	</module>
+
+
+	<module name="SBBPt">
+		<param name="deterministicServiceModes"
+			value="bus,tram,subway,rail,ferry" /> <!-- like in transitSchedule.xml -->
+		<param name="createLinkEventsInterval" value="1" /> <!-- zero turns event writing off -->
+	</module>
+
+	<module name="swissRailRaptor">
+		<param name="useModeMappingForPassengers" value="true" />
+		<parameterset type="modeMapping">
+			<param name="routeMode" value="bus" /> <!-- like in transitSchedule.xml -->
+			<param name="passengerMode" value="busPassenger" /> <!-- like in transit.transitModes -->
+		</parameterset>
+		<parameterset type="modeMapping">
+			<param name="routeMode" value="tram" /> <!-- like in transitSchedule.xml -->
+			<param name="passengerMode" value="tramPassenger" /> <!-- like in transit.transitModes -->
+		</parameterset>
+		<parameterset type="modeMapping">
+			<param name="routeMode" value="subway" /> <!-- like in transitSchedule.xml -->
+			<param name="passengerMode" value="subwayPassenger" /> <!-- like in transit.transitModes -->
+		</parameterset>
+		<parameterset type="modeMapping">
+			<param name="routeMode" value="rail" /> <!-- like in transitSchedule.xml -->
+			<param name="passengerMode" value="railPassenger" /> <!-- like in transit.transitModes -->
+		</parameterset>
+		<parameterset type="modeMapping">
+			<param name="routeMode" value="ferry" /> <!-- like in transitSchedule.xml -->
+			<param name="passengerMode" value="ferryPassenger" /> <!-- like in transit.transitModes -->
+		</parameterset>		
+	</module>
+	
+	<module name="ier">
+		<param name="writePerformanceOutput" value="true" />
+		<param name="iterationsPerCycle" value="2" />
+		<param name="batchSize" value="200" />
+	</module>
+
+	<module name="greedo">
+
+		<param name="constrainDeltaToZero" value="true" />
+		<param name="acceptNegativeDisappointment" value="true" />
+ 		<param name="replannerIdentifier" value="accelerate" />
+
+		<param name="minAbsoluteMemoryLength" value="4" />
+		<!-- <param name="maxAbsoluteMemoryLength" value="4" /> -->
+		<param name="maxRelativeMemoryLength" value="0.5" />
+
+		<param name="initialMeanReplanningRate" value="1.0" />
+		<param name="replanningRateIterationExponent" value="-1.0" />
+		<param name="enforceMeanReplanningRate" value="false" />
+		<param name="ageWeightExponent" value="1.0" />
+
+		<param name="startTime_s" value="0" />
+		<param name="binSize_s" value="3600" />
+		<param name="binCnt" value="24" />
+
+		<param name="adjustStrategyWeights" value="true" />
+		<!-- "cheapStrategies" per default -->
+		<!-- "expensiveStrategies" per default -->
+				
+	</module>
+	
+</config>

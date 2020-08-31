@@ -17,7 +17,7 @@
  * contact: gunnar.flotterod@gmail.com
  *
  */
-package norrkoping;
+package openberlin;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -51,7 +51,7 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
  * @author Gunnar Flötteröd
  *
  */
-public class NorrkopingRunner {
+public class OpenBerlinRunner {
 
 	private static void createHugeCapacityPTSystem(final Scenario scenario) {
 
@@ -76,38 +76,37 @@ public class NorrkopingRunner {
 
 	static void runSimulation(final String configFileName) {
 
-		final Config config = ConfigUtils.loadConfig(configFileName, new SwissRailRaptorConfigGroup(),
-				new SBBTransitConfigGroup(), new GreedoConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-
-		final Greedo greedo = new Greedo();
-		greedo.meet(config);
+		final Config config = ConfigUtils.loadConfig(configFileName);
+//		final Config config = ConfigUtils.loadConfig(configFileName, new SwissRailRaptorConfigGroup(),
+//				new SBBTransitConfigGroup(), new GreedoConfigGroup());
+//		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+//
+//		final Greedo greedo = new Greedo();
+//		greedo.meet(config);
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		createHugeCapacityPTSystem(scenario);
-		new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "tr_").createNetwork();
-		greedo.meet(scenario);
+//		createHugeCapacityPTSystem(scenario);
+//		new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "tr_").createNetwork();
+//		greedo.meet(scenario);
 
 		final Controler controler = new Controler(scenario);
-		// controler.addOverridingModule(new
-		// SampersDifferentiatedPTScoringFunctionModule());
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				this.install(new SBBTransitModule());
-				this.install(new SwissRailRaptorModule());
-			}
-
-			@Provides
-			QSimComponentsConfig provideQSimComponentsConfig() {
-				QSimComponentsConfig components = new QSimComponentsConfig();
-				new StandardQSimComponentConfigurator(config).configure(components);
-				SBBTransitEngineQSimModule.configure(components);
-				return components;
-			}
-		});
-
-		greedo.meet(controler);
+//		controler.addOverridingModule(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				this.install(new SBBTransitModule());
+//				this.install(new SwissRailRaptorModule());
+//			}
+//
+//			@Provides
+//			QSimComponentsConfig provideQSimComponentsConfig() {
+//				QSimComponentsConfig components = new QSimComponentsConfig();
+//				new StandardQSimComponentConfigurator(config).configure(components);
+//				SBBTransitEngineQSimModule.configure(components);
+//				return components;
+//			}
+//		});
+//
+//		greedo.meet(controler);
 
 		controler.run();
 	}
