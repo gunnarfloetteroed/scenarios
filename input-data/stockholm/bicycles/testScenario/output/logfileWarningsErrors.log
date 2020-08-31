@@ -1,4 +1,5 @@
-2020-08-18T10:14:05,576  WARN RandomizingTimeDistanceTravelDisutilityFactory:112 There will be no routing randomness. The randomization of the travel disutility requires the monetary distance rate to be different than zero. Continuing anyway.
-2020-08-18T10:14:05,576  WARN RandomizingTimeDistanceTravelDisutilityFactory:117 There will be no routing randomness. The randomization of the travel disutility requires the travel time cost rate to be different than zero. Continuing anyway.
-2020-08-18T10:14:05,665  WARN ObjectAttributesConverter:77 No AttributeConverter found for class java.util.Collections$UnmodifiableMap. Not all attribute values can be converted.
-2020-08-18T10:14:13,760  WARN ObjectAttributesConverter:77 No AttributeConverter found for class java.util.Collections$UnmodifiableMap. Not all attribute values can be converted.
+2020-08-31T16:45:35,667  WARN ObjectAttributesConverter:77 No AttributeConverter found for class java.util.Collections$UnmodifiableMap. Not all attribute values can be converted.
+2020-08-31T16:45:42,736  WARN ObjectAttributesConverter:77 No AttributeConverter found for class java.util.Collections$UnmodifiableMap. Not all attribute values can be converted.
+2020-08-31T16:45:48,250  WARN ObjectAttributesConverter:77 No AttributeConverter found for class java.util.Collections$UnmodifiableMap. Not all attribute values can be converted.
+2020-08-31T16:45:48,740 ERROR DumpDataAtEndImpl:187 writing output trips did not work; probably parameters were such that no trips CSV were generated in the final iteration
+2020-08-31T16:45:48,741 ERROR DumpDataAtEndImpl:202 writing output trips did not work; probably parameters were such that no trips CSV were generated in the final iteration
