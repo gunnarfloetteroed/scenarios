@@ -10,6 +10,8 @@ import java.util.List;
 import com.google.common.collect.HashBasedTable; 
 import com.google.common.collect.Table;
 
+import org.matsim.matrices.Matrix;
+
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
@@ -62,7 +64,10 @@ public class CsvReaderToIteratable {
 	        
 	        for (int counter=0; counter<record.length;counter++) {
 	        	if (counter!=headerIDLocation) {
-	        		output.put(record[headerIDLocation], header[counter], record[counter]);
+	        		if (!record[headerIDLocation].isEmpty()) {
+	        			output.put(record[headerIDLocation], header[counter], record[counter]);
+	        		}
+	        		
 	        	}
 	        }
 
@@ -100,6 +105,31 @@ public class CsvReaderToIteratable {
 	    
 
 	    return output;
+
+	}
+	
+	
+	public Matrix readODMatrixWithUniqueID(int headerIDLocation) throws IOException, CsvException {
+		// int headerIDLocation gives which column is the ID column 
+		List<String[]> records= readTable();
+	    String[] header= records.get(0);       
+	    records.remove(0);
+	    int numberOfZones=records.size();
+	    Matrix odMatrix = new Matrix("ODMatrix", "Dummy");
+	    for (int i =0; i<(numberOfZones);i++) {
+	    	String[] record=records.get(0);
+	        System.out.println("row: "+(i+1) + " reads in: " + (record.length-1) + " OD.");
+	        for (int counter=0; counter<record.length;counter++) {
+	        	if (counter!=headerIDLocation) {
+	        		odMatrix.setEntry(record[headerIDLocation], header[counter], Double.parseDouble(record[counter]));
+	        	}
+	        }
+	        records.remove(0);
+
+	    }
+	    
+
+	    return odMatrix;
 
 	}
 	

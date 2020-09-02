@@ -50,6 +50,9 @@ public class WriteConfigFromNetworkAndPopulation {
 	    for (Entry<Id<Link>, ? extends Link> linkMap:links.entrySet()) {
 	    	System.out.println("following links are read: "+linkMap.getKey());
 	    	Link link=linkMap.getValue();
+	    	if(link.getLength()<=0) {
+	    		link.setLength(0.01);
+	    	}
 	    	Attributes attributes = link.getAttributes();
 	    	System.out.println(attributes.toString());
 	    }

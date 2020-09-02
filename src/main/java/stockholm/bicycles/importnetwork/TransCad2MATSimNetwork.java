@@ -131,7 +131,7 @@ public class TransCad2MATSimNetwork {
 			matsimNetwork.addNode(matsimNode);
 			System.out.println("Node added: "+TransCadNodeID);
 		}
-		
+		System.out.println("Total nodes loaded: "+ TransCadNodeIDSet.size());
 		nodeTable=null;
 		//----------------------------------
 		
@@ -154,6 +154,7 @@ public class TransCad2MATSimNetwork {
 			
 			// create a AB link
 			String TransCadLinkID_AB=TransCadLinkID+"_AB";
+			
 			final Link matsimABLink = matsimNetworkFactory.createLink(Id.create(TransCadLinkID_AB, Link.class),
 					matsimFromNode, matsimToNode);
 			// set link length and speed as default attribute to links
@@ -216,7 +217,7 @@ public class TransCad2MATSimNetwork {
 			matsimNetwork.addLink(matsimBALink);
 			System.out.println("BA_Link added: "+TransCadLinkID);
 		}
-		
+		System.out.println("Total links loaded: "+ TransCadLinkIDSet.size());
 		linkTable=null;
 		
 		

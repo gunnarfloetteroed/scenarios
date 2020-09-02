@@ -1,7 +1,9 @@
 package stockholm.bicycles.demandgeneration;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,6 +23,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.matrices.Entry;
+import org.matsim.matrices.Matrix;
 
 import com.google.common.collect.Table;
 import com.opencsv.exceptions.CsvException;
@@ -56,84 +60,110 @@ public class DemandMatrixToPlan {
 	}
 
 
-	public void generatePlan() throws IOException, CsvException {
-		CsvReaderToIteratable demandMatrixReader = new CsvReaderToIteratable(this.demandMatrixFileName,';');
-		Table<String, String, String> demandMatrixTable = demandMatrixReader.readTableWithUniqueID(0);
+	public static double matrixSum(Matrix matrix) {
 		
-		// 1. calculate total number of trips per zone (row)
-		Set<String> transCadOringinZoneIDSet=demandMatrixTable.rowKeySet();
-		double totalNumberOfTrips =0;
-		HashMap<String, String> numberOfTripsInEachOriginZone= new HashMap<>();
+		Map<String, Double> rowSum =matrixRowSum(matrix);
+	
+		double sum =0;
+		for (String key:rowSum.keySet()) {
+			double sumOfRow=rowSum.get(key);
+			sum=sum+sumOfRow;
+		}
+		return sum;
+	}
+	
+	public static Map<String, Double> matrixRowSum(Matrix matrix){
+		Map<String, ArrayList<Entry>> FromId = matrix.getFromLocations();
+		Map<String, Double> rowSum = new HashMap<>();
 		
-		// 2. loop each origin zone to store number of trips in each origin zone (numberOfTripsInEachOriginZone).
-		for (String TransCadOriginZoneID: transCadOringinZoneIDSet) {
-			Map<String, String> oneOriginToAllDestination = demandMatrixTable.row(TransCadOriginZoneID);
-			double totalNumberOfTripInOringinZone = 0;
-			for (Map.Entry<String, String> entry : oneOriginToAllDestination.entrySet()) {
-				String tripsFromAOriginToADestination=entry.getValue();
-				if (tripsFromAOriginToADestination.isEmpty()) {
-					tripsFromAOriginToADestination="0";
-				}
-				totalNumberOfTripInOringinZone=totalNumberOfTripInOringinZone+Double.parseDouble(tripsFromAOriginToADestination);
+		for (String key:FromId.keySet()) {
+			ArrayList<Entry> OD=FromId.get(key);
+			double sum =0;
+			for (Entry eachElement : OD) {
+				sum=sum+eachElement.getValue();
+				// System.out.println("Row: "+eachElement.getFromLocation()+ "; Col: "+eachElement.getToLocation()+"; Value:  "+eachElement.getValue());
 			}
-			numberOfTripsInEachOriginZone.put(TransCadOriginZoneID,Double.toString(totalNumberOfTripInOringinZone));
-			totalNumberOfTrips=totalNumberOfTrips+totalNumberOfTripInOringinZone;
-			System.out.println("Oringin zone ID: "+TransCadOriginZoneID + " has "+ totalNumberOfTripInOringinZone +  " zones.");
+			rowSum.put(key, sum);
 		}
 		
+		return rowSum;
+		
+	}
+	
+	private static Map<String, Double> rowEntryListToMap(List<Entry> entryList){
+		Map<String, Double> outputMap = new HashMap<>();
+		for (Entry entry : entryList) {
+			outputMap.put(entry.getToLocation(), entry.getValue());
+		}
+		return outputMap;
+	}
+	
+	public void generatePlan() throws IOException, CsvException {
+		CsvReaderToIteratable demandMatrixReader = new CsvReaderToIteratable(this.demandMatrixFileName,';');
+		Matrix demandMatrixTable = demandMatrixReader.readODMatrixWithUniqueID(0);
+		// 1. calculate total number of trips per zone (row)
+		double totalNumberOfTrips=matrixSum(demandMatrixTable);
+		System.out.println("Total number of trips: " +totalNumberOfTrips+".");
+		Map<String, Double> numberOfTripsInEachOriginZone =matrixRowSum(demandMatrixTable);
 		
 		// 3. sample number of out-of-home trips per origin zone
 		MultinomialDistributionSamplerMap originZoneTripSampler= new MultinomialDistributionSamplerMap(numberOfTripsInEachOriginZone);
-        int totalNumberOfTripsToBeSampled = (int) (totalNumberOfTrips/2);  // assuming we sample 50% of total number of out-of-home trips.
-        String[] sampledTripsFromOrigin=originZoneTripSampler.sampleMapWithoutReplacement(totalNumberOfTripsToBeSampled);
+		int totalNumberOfTripsToBeSampled = (int) (totalNumberOfTrips-2);  // assuming we sample 50% of total number of out-of-home trips.
+		String[] sampledTripsFromOrigin=originZoneTripSampler.sampleMapWithoutReplacement(totalNumberOfTripsToBeSampled);
+		
         for (int i=0; i<sampledTripsFromOrigin.length;i++) {
 			System.out.println("Map sampler's sample without replacement is: "+ sampledTripsFromOrigin[i]);
 		}
         
         // 4. for each sampled trip, we sample a destination and randomly generate a trip timing. Create a stupid random histogram of trip timing, 
-        HashMap<String,String> departureTimeDistribution=new HashMap<>();
-        departureTimeDistribution.put("1", "1");  // this means you have 1% chance of departing at 1:00.
-        departureTimeDistribution.put("2", "1");
-        departureTimeDistribution.put("3", "2");
-        departureTimeDistribution.put("4", "3");
-        departureTimeDistribution.put("5", "8");
-        departureTimeDistribution.put("6", "15");
-        departureTimeDistribution.put("7", "20");
-        departureTimeDistribution.put("8", "15");
-        departureTimeDistribution.put("9", "10");
-        departureTimeDistribution.put("10", "5");
-        departureTimeDistribution.put("11", "5");
-        departureTimeDistribution.put("12", "5");
-        departureTimeDistribution.put("13", "5");
-        departureTimeDistribution.put("14", "5");
-        departureTimeDistribution.put("15", "0");
-        departureTimeDistribution.put("16", "0");
-        departureTimeDistribution.put("17", "0");
-        departureTimeDistribution.put("18", "0");
-        departureTimeDistribution.put("19", "0");
-        departureTimeDistribution.put("20", "0");
-        departureTimeDistribution.put("21", "0");
-        departureTimeDistribution.put("22", "0");
-        departureTimeDistribution.put("23", "0");
-        departureTimeDistribution.put("24", "0");
+        HashMap<String,Double> departureTimeDistribution=new HashMap<>();
+        departureTimeDistribution.put("1", 1.0);  // this means you have 1% chance of departing at 1:00.
+        departureTimeDistribution.put("2", 1.0);
+        departureTimeDistribution.put("3", 2.0);
+        departureTimeDistribution.put("4", 3.0);
+        departureTimeDistribution.put("5", 8.0);
+        departureTimeDistribution.put("6", 15.0);
+        departureTimeDistribution.put("7", 20.0);
+        departureTimeDistribution.put("8", 15.0);
+        departureTimeDistribution.put("9", 10.0);
+        departureTimeDistribution.put("10", 5.0);
+        departureTimeDistribution.put("11", 5.0);
+        departureTimeDistribution.put("12", 5.0);
+        departureTimeDistribution.put("13", 5.0);
+        departureTimeDistribution.put("14", 5.0);
+        departureTimeDistribution.put("15", 0.0);
+        departureTimeDistribution.put("16", 0.0);
+        departureTimeDistribution.put("17", 0.0);
+        departureTimeDistribution.put("18", 0.0);
+        departureTimeDistribution.put("19", 0.0);
+        departureTimeDistribution.put("20", 0.0);
+        departureTimeDistribution.put("21", 0.0);
+        departureTimeDistribution.put("22", 0.0);
+        departureTimeDistribution.put("23", 0.0);
+        departureTimeDistribution.put("24", 0.0);
         
         
         // 5. for each sampled trip, generate a person-plan for that.
         for (int i=0; i<sampledTripsFromOrigin.length;i++) {
         	String personID="person_"+(i+1);
         	String tripOrigin=sampledTripsFromOrigin[i];
-        	// sample a destination
-        	Map<String, String> oneOriginToAllDestination = demandMatrixTable.row(tripOrigin);
-        	MultinomialDistributionSamplerMap destinationZoneTripSampler= new MultinomialDistributionSamplerMap(oneOriginToAllDestination);
-        	String tripDestination=destinationZoneTripSampler.sampleMap();
+        	if (tripOrigin!=null) {
+        		// sample a destination
+            	List<Entry> oneOriginToAllDestinationEntryList = demandMatrixTable.getFromLocEntries(tripOrigin);
+            	Map<String, Double> oneOriginToAllDestination = rowEntryListToMap(oneOriginToAllDestinationEntryList);
+            	
+            	MultinomialDistributionSamplerMap destinationZoneTripSampler= new MultinomialDistributionSamplerMap(oneOriginToAllDestination);
+            	String tripDestination=destinationZoneTripSampler.sampleMap();
+            	
+            	// randomly generate a departure time
+            	MultinomialDistributionSamplerMap departureTimeSampler= new MultinomialDistributionSamplerMap(departureTimeDistribution);
+            	String departureTimeInHour=departureTimeSampler.sampleMap();
+            	
+            	System.out.println("trip " + i + " starts from zone: " + tripOrigin +", departs at: "+ departureTimeInHour + ", ends at zone: " + tripDestination);
+            	
+            	createOnePersonPlan(this.scenario,personID,tripOrigin,tripDestination,departureTimeInHour);
+        	}
         	
-        	// randomly generate a departure time
-        	MultinomialDistributionSamplerMap departureTimeSampler= new MultinomialDistributionSamplerMap(departureTimeDistribution);
-        	String departureTimeInHour=departureTimeSampler.sampleMap();
-        	
-        	System.out.println("trip " + i + " starts from zone: " + tripOrigin +", departs at: "+ departureTimeInHour + ", ends at zone: " + tripDestination);
-        	
-        	createOnePersonPlan(this.scenario,personID,tripOrigin,tripDestination,departureTimeInHour);
         }
         
         
