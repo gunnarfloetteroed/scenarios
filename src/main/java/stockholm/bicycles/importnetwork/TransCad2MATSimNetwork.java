@@ -80,7 +80,7 @@ public class TransCad2MATSimNetwork {
 		plainNetworkWriter.write(matsimPlainNetworkFileName);
 	}
 	
-	private static double checkLength(double linkLengthMeterFromData, Link matsimABLink) {
+	public static double checkLength(double linkLengthMeterFromData, Link matsimABLink) {
 		double outputLinklength=linkLengthMeterFromData;
 		Node matsimFromNode = matsimABLink.getFromNode();
 		Node matsimToNode = matsimABLink.getToNode();

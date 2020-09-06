@@ -26,7 +26,8 @@ public class LinkVolumeHandler implements LinkEnterEventHandler {
 	private int getSlot(double time){
 		int timeHour=(int) (time/3600);
 		if (timeHour>=24) {
-			timeHour=timeHour-24;
+			int devide=(int) (timeHour/24);
+			timeHour=timeHour-24*devide;
 		}
 		return timeHour;
 	}
@@ -60,6 +61,7 @@ public class LinkVolumeHandler implements LinkEnterEventHandler {
 		if (this.LinkVolume.containsKey(linkID)) {
 			double[] oneLinkVolume = this.LinkVolume.get(linkID);
 			int hour=getSlot(event.getTime());
+
 			oneLinkVolume[hour]=oneLinkVolume[hour]+1;
 			this.LinkVolume.put(linkID,oneLinkVolume);
 			
