@@ -35,8 +35,8 @@ public class MatsimDijkstraTest {
 		Network testNetwork = scenario.getNetwork();
 		MatsimDijkstra dijkstraRouter = new MatsimDijkstra(testNetwork, travelDisutility, null);
 		Map<Id<Node>, ? extends Node> allNodes = testNetwork.getNodes();
-		Node node_6000 = allNodes.get(Id.create("6000", Node.class));
-		Node node_6005 = allNodes.get(Id.create("6005", Node.class));
+		Node node_6000 = allNodes.get(Id.create("104920", Node.class));
+		Node node_6005 = allNodes.get(Id.create("119975", Node.class));
 		Path testPath = dijkstraRouter.calcLeastCostPath(node_6000, node_6005, 0, null, null);
 		System.out.println(testPath.travelCost);
 		List<Link> linksInPath = testPath.links;
@@ -48,9 +48,9 @@ public class MatsimDijkstraTest {
 			System.out.println("node: "+node.getId());
 		}
 
-		Node node_6002 = allNodes.get(Id.create("6002", Node.class));
-		Node node_6003 = allNodes.get(Id.create("6003", Node.class));
-		Node node_6004 = allNodes.get(Id.create("6004", Node.class));
+		Node node_6002 = allNodes.get(Id.create("149068", Node.class));
+		Node node_6003 = allNodes.get(Id.create("161917", Node.class));
+		Node node_6004 = allNodes.get(Id.create("26269", Node.class));
 		List<Node> toNodes = new ArrayList<Node>();
 		toNodes.add(node_6005);
 		toNodes.add(node_6003);

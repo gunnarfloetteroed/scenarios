@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v6.dtd">
+
+<population>
+
+	<attributes>
+		<attribute name="coordinateReferenceSystem" class="java.lang.String">Atlantis</attribute>
+	</attributes>
+
+
+<!-- ====================================================================== -->
+
+	<person id="person_1">
+		<attributes>
+			<attribute name="hasBike" class="java.lang.Boolean">true</attribute>
+		</attributes>
+		<plan selected="yes">
+			<activity type="home" x="674835.4809052752" y="6579908.541818319" end_time="08:00:00" >
+			</activity>
+			<leg mode="busPassenger">
+			</leg>
+			<activity type="work" x="674778.2503369034" y="6580593.956881495" end_time="12:00:00" >
+			</activity>
+			<leg mode="busPassenger">
+			</leg>
+			<activity type="home" x="674835.4809052752" y="6579908.541818319" >
+			</activity>
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+
+</population>

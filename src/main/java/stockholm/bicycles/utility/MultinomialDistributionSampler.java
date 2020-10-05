@@ -144,4 +144,9 @@ public class MultinomialDistributionSampler implements RandomDistributionSampler
 		return cdfWeights;
 	}
 
+	@Override
+	public void setSeed(long seed) {
+		this.random.setSeed(seed);
+	}
+
 }

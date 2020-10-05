@@ -18,6 +18,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
 import com.opencsv.exceptions.CsvException;
+import org.matsim.utils.MemoryObserver;
 
 
 
@@ -59,9 +60,11 @@ public class CsvReaderToIteratable {
 	    }
 	    
 	    records.remove(0);
-	    for (String[] record : records) {
+	    
+	    int numberOfRows=records.size();
+	    for (int i =0; i<(numberOfRows);i++) {
 	        // System.out.println("Id : " + record[headerIDLocation]);
-	        
+	    	String[] record=records.get(0);
 	        for (int counter=0; counter<record.length;counter++) {
 	        	if (counter!=headerIDLocation) {
 	        		if (!record[headerIDLocation].isEmpty()) {
@@ -70,12 +73,10 @@ public class CsvReaderToIteratable {
 	        		
 	        	}
 	        }
+	        records.remove(0);
 
 	    }
-	    
-
 	    return output;
-
 	}
 	
 	
@@ -87,21 +88,20 @@ public class CsvReaderToIteratable {
 	    String[] header= records.get(0);    
 	    Table<String, String, String> output = HashBasedTable.create();     
 	    records.remove(0);
-	    for (String[] record : records) {
-//	        int headercounter = 0;
-//	        for (String recordelement:record) {
-//	        	 // System.out.println(header[headercounter] + ": "+ recordelement);  
-//	        	 output.put(record[headerIDLocation], header[headercounter], recordelement);
-//	        	 headercounter++;
-//	        }
-	        
+	    int numberOfRows=records.size();
+	    for (int i =0; i<(numberOfRows);i++) {
+	    	String[] record=records.get(0);
 	        for (int counter=0; counter<record.length;counter++) {
 	        	if (counter!=headerIDLocation) {
-	        		output.put(record[headerIDLocation], header[counter], record[counter]);
+	        		if (!record[headerIDLocation].isEmpty()) {
+	        			output.put(record[headerIDLocation], header[counter], record[counter]);
+	        		}
 	        	}
 	        }
-
+	        records.remove(0);
+	        // MemoryObserver.printMemory();
 	    }
+	    
 	    
 
 	    return output;
@@ -118,7 +118,7 @@ public class CsvReaderToIteratable {
 	    Matrix odMatrix = new Matrix("ODMatrix", "Dummy");
 	    for (int i =0; i<(numberOfZones);i++) {
 	    	String[] record=records.get(0);
-	        System.out.println("row: "+(i+1) + " reads in: " + (record.length-1) + " OD.");
+	        // System.out.println("row: "+(i+1) + " reads in: " + (record.length-1) + " OD.");
 	        for (int counter=0; counter<record.length;counter++) {
 	        	if (counter!=headerIDLocation) {
 	        		odMatrix.setEntry(record[headerIDLocation], header[counter], Double.parseDouble(record[counter]));

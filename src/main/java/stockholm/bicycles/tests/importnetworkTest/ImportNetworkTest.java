@@ -20,6 +20,7 @@ public class ImportNetworkTest {
 		outputPath = outputPath.replaceAll("\\\\", "/");
 		final String matsimPlainFile = outputPath + "network_test.xml";
 		final String matsimFullFile = outputPath + "network_raw_test.xml";
+		@SuppressWarnings("unused")
 		final String linkAttributesFile = outputPath + "link_attributes_test.xml";
 		final String nodeAttributesFile = outputPath + "node_attributes_test.xml";
 		TransCad2MATSimNetwork networktransformer = new TransCad2MATSimNetwork(nodesFile, linksFile,

@@ -24,12 +24,18 @@ public class RunEventsHandlingProductionRunner {
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		// TODO Auto-generated method stub
 		
-		//path to events file. For this you first need to run a simulation.
-		String inputPath = "D:/MatsimBicycleSimulation/Simulation/";
-		final String inputFile = inputPath+"output/output_events.xml.gz";
+		//path to events file. For this you first need to run a simulation. Base scenario
+//		String inputPath = "D:/MatsimBicycleSimulation/Simulation/";
+//		final String inputFile = inputPath+"output/output_events.xml.gz";
+//		String outputPath = inputPath;
+//		final String outputFile = outputPath+"output/linkVolume.csv";
 		
+		//path to events file. For this you first need to run a simulation. Boatline scenario
+		String inputPath = "C:/Users/ChengxiL/Box Sync/MatsimBicycleSimulation/Simulation/output_boatScenario/";
+		final String inputFile = inputPath+"output_events.xml.gz";
 		String outputPath = inputPath;
-		final String outputFile = outputPath+"output/linkVolume.csv";
+		final String outputFile = outputPath+"linkVolume.csv";
+		
 		//create an event object
 		EventsManager events = EventsUtils.createEventsManager();
 
@@ -44,7 +50,7 @@ public class RunEventsHandlingProductionRunner {
 		HashMap<Id<Link>, double[]> linkVolume = linkVolumeHandler1.getLinkVolume();
 		int counter =1;
 		for (Entry<Id<Link>, double[]> entry: linkVolume.entrySet()) {
-			String savePath=inputPath+"output/departuresPerHour_linkID_"+counter+".png";
+			String savePath=inputPath+"departuresPerHour_linkID_"+counter+".png";
 			linkVolumeHandler1.writeChart(entry.getKey(),savePath);
 			counter++;
 			if (counter>5) {

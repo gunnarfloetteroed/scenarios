@@ -95,6 +95,7 @@ public class TransCad2MATSimNetwork {
 		
 	}
 	
+	
 	public Network generateNetwork() throws IOException, CsvException {
 		final Network matsimNetwork = NetworkUtils.createNetwork();
 		final NetworkFactory matsimNetworkFactory = matsimNetwork.getFactory();
@@ -161,7 +162,7 @@ public class TransCad2MATSimNetwork {
 			double linkLengthFromDataMeter= Double.parseDouble(ALink.get("SHAPE_LEN"));
 			double linkLength = checkLength(linkLengthFromDataMeter,matsimABLink);
 			
-			double linkTravelTimeMin_AB= Double.parseDouble(ALink.get("AB_cykelrestid"));
+			
 			double bicycleSpeedM_S_AB= Double.parseDouble(ALink.get("AB_cykelspeed"))/3.6;// change back to: double bicycleSpeedM_S= Double.parseDouble(ALink.get("bicycleSpeed")) * Units.M_S_PER_KM_H;
 			matsimABLink.setLength(linkLength); // change back to: matsimLink.setLength(LinkLengthKM * Units.M_PER_KM);
 			matsimABLink.setFreespeed(bicycleSpeedM_S_AB);  
@@ -196,7 +197,7 @@ public class TransCad2MATSimNetwork {
 			String TransCadLinkID_BA=TransCadLinkID+"_BA";
 			final Link matsimBALink = matsimNetworkFactory.createLink(Id.create(TransCadLinkID_BA, Link.class),
 					 matsimToNode,matsimFromNode);
-			double linkTravelTimeMin_BA= Double.parseDouble(ALink.get("BA_cykelrestid"));
+			
 			double bicycleSpeedM_S_BA= Double.parseDouble(ALink.get("BA_cykelspeed"))/3.6;// change back to: double bicycleSpeedM_S= Double.parseDouble(ALink.get("bicycleSpeed")) * Units.M_S_PER_KM_H;
 			
 			

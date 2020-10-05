@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<stopFacility id="StopFac0" x="674858.6238842849" y="6579978.862071003" linkRefId="tr_0" isBlocking="false">
+			<attributes>
+				<attribute name="accessLinkId_bike" class="java.lang.String">5588953_AB</attribute>
+				<attribute name="bikeAccessible" class="java.lang.Boolean">true</attribute>
+			</attributes>
+
+		</stopFacility>
+		<stopFacility id="StopFac1" x="674730.7585358424" y="6580151.051983579" linkRefId="tr_1" isBlocking="false">
+			<attributes>
+				<attribute name="accessLinkId_bike" class="java.lang.String">5588984_AB</attribute>
+				<attribute name="bikeAccessible" class="java.lang.Boolean">true</attribute>
+			</attributes>
+
+		</stopFacility>
+		<stopFacility id="StopFac2" x="674711.3214958636" y="6580548.826247933" linkRefId="tr_2" isBlocking="false">
+			<attributes>
+				<attribute name="accessLinkId_bike" class="java.lang.String">5563262_AB</attribute>
+				<attribute name="bikeAccessible" class="java.lang.Boolean">true</attribute>
+			</attributes>
+
+		</stopFacility>
+	</transitStops>
+	<transitLine id="line1">
+		<transitRoute id="route1">
+			<transportMode>bus</transportMode>
+			<routeProfile>
+				<stop refId="StopFac0" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="StopFac1" arrivalOffset="00:00:01" departureOffset="00:00:01" awaitDeparture="true"/>
+				<stop refId="StopFac2" arrivalOffset="00:00:01" departureOffset="00:00:01" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="tr_0"/>
+				<link refId="tr_1"/>
+				<link refId="tr_2"/>
+			</route>
+			<departures>
+				<departure id="tr_0" departureTime="07:00:00" vehicleRefId="tr_0"/>
+				<departure id="tr_1" departureTime="07:05:00" vehicleRefId="tr_1"/>
+				<departure id="tr_10" departureTime="07:50:00" vehicleRefId="tr_10"/>
+				<departure id="tr_11" departureTime="07:55:00" vehicleRefId="tr_11"/>
+				<departure id="tr_12" departureTime="08:00:00" vehicleRefId="tr_12"/>
+				<departure id="tr_13" departureTime="08:05:00" vehicleRefId="tr_13"/>
+				<departure id="tr_14" departureTime="08:10:00" vehicleRefId="tr_14"/>
+				<departure id="tr_15" departureTime="08:15:00" vehicleRefId="tr_15"/>
+				<departure id="tr_16" departureTime="08:20:00" vehicleRefId="tr_16"/>
+				<departure id="tr_17" departureTime="08:25:00" vehicleRefId="tr_17"/>
+				<departure id="tr_18" departureTime="08:30:00" vehicleRefId="tr_18"/>
+				<departure id="tr_19" departureTime="08:35:00" vehicleRefId="tr_19"/>
+				<departure id="tr_2" departureTime="07:10:00" vehicleRefId="tr_2"/>
+				<departure id="tr_20" departureTime="08:40:00" vehicleRefId="tr_20"/>
+				<departure id="tr_21" departureTime="08:45:00" vehicleRefId="tr_21"/>
+				<departure id="tr_22" departureTime="08:50:00" vehicleRefId="tr_22"/>
+				<departure id="tr_23" departureTime="08:55:00" vehicleRefId="tr_23"/>
+				<departure id="tr_24" departureTime="09:00:00" vehicleRefId="tr_24"/>
+				<departure id="tr_25" departureTime="09:05:00" vehicleRefId="tr_25"/>
+				<departure id="tr_26" departureTime="09:10:00" vehicleRefId="tr_26"/>
+				<departure id="tr_27" departureTime="09:15:00" vehicleRefId="tr_27"/>
+				<departure id="tr_28" departureTime="09:20:00" vehicleRefId="tr_28"/>
+				<departure id="tr_29" departureTime="09:25:00" vehicleRefId="tr_29"/>
+				<departure id="tr_3" departureTime="07:15:00" vehicleRefId="tr_3"/>
+				<departure id="tr_30" departureTime="09:30:00" vehicleRefId="tr_30"/>
+				<departure id="tr_31" departureTime="09:35:00" vehicleRefId="tr_31"/>
+				<departure id="tr_32" departureTime="09:40:00" vehicleRefId="tr_32"/>
+				<departure id="tr_33" departureTime="09:45:00" vehicleRefId="tr_33"/>
+				<departure id="tr_34" departureTime="09:50:00" vehicleRefId="tr_34"/>
+				<departure id="tr_35" departureTime="09:55:00" vehicleRefId="tr_35"/>
+				<departure id="tr_36" departureTime="10:00:00" vehicleRefId="tr_36"/>
+				<departure id="tr_37" departureTime="10:05:00" vehicleRefId="tr_37"/>
+				<departure id="tr_38" departureTime="10:10:00" vehicleRefId="tr_38"/>
+				<departure id="tr_39" departureTime="10:15:00" vehicleRefId="tr_39"/>
+				<departure id="tr_4" departureTime="07:20:00" vehicleRefId="tr_4"/>
+				<departure id="tr_40" departureTime="10:20:00" vehicleRefId="tr_40"/>
+				<departure id="tr_41" departureTime="10:25:00" vehicleRefId="tr_41"/>
+				<departure id="tr_42" departureTime="10:30:00" vehicleRefId="tr_42"/>
+				<departure id="tr_43" departureTime="10:35:00" vehicleRefId="tr_43"/>
+				<departure id="tr_44" departureTime="10:40:00" vehicleRefId="tr_44"/>
+				<departure id="tr_45" departureTime="10:45:00" vehicleRefId="tr_45"/>
+				<departure id="tr_46" departureTime="10:50:00" vehicleRefId="tr_46"/>
+				<departure id="tr_47" departureTime="10:55:00" vehicleRefId="tr_47"/>
+				<departure id="tr_48" departureTime="11:00:00" vehicleRefId="tr_48"/>
+				<departure id="tr_49" departureTime="11:05:00" vehicleRefId="tr_49"/>
+				<departure id="tr_5" departureTime="07:25:00" vehicleRefId="tr_5"/>
+				<departure id="tr_50" departureTime="11:10:00" vehicleRefId="tr_50"/>
+				<departure id="tr_51" departureTime="11:15:00" vehicleRefId="tr_51"/>
+				<departure id="tr_52" departureTime="11:20:00" vehicleRefId="tr_52"/>
+				<departure id="tr_53" departureTime="11:25:00" vehicleRefId="tr_53"/>
+				<departure id="tr_54" departureTime="11:30:00" vehicleRefId="tr_54"/>
+				<departure id="tr_55" departureTime="11:35:00" vehicleRefId="tr_55"/>
+				<departure id="tr_56" departureTime="11:40:00" vehicleRefId="tr_56"/>
+				<departure id="tr_57" departureTime="11:45:00" vehicleRefId="tr_57"/>
+				<departure id="tr_58" departureTime="11:50:00" vehicleRefId="tr_58"/>
+				<departure id="tr_59" departureTime="11:55:00" vehicleRefId="tr_59"/>
+				<departure id="tr_6" departureTime="07:30:00" vehicleRefId="tr_6"/>
+				<departure id="tr_60" departureTime="12:00:00" vehicleRefId="tr_60"/>
+				<departure id="tr_61" departureTime="12:05:00" vehicleRefId="tr_61"/>
+				<departure id="tr_62" departureTime="12:10:00" vehicleRefId="tr_62"/>
+				<departure id="tr_63" departureTime="12:15:00" vehicleRefId="tr_63"/>
+				<departure id="tr_64" departureTime="12:20:00" vehicleRefId="tr_64"/>
+				<departure id="tr_65" departureTime="12:25:00" vehicleRefId="tr_65"/>
+				<departure id="tr_66" departureTime="12:30:00" vehicleRefId="tr_66"/>
+				<departure id="tr_67" departureTime="12:35:00" vehicleRefId="tr_67"/>
+				<departure id="tr_68" departureTime="12:40:00" vehicleRefId="tr_68"/>
+				<departure id="tr_69" departureTime="12:45:00" vehicleRefId="tr_69"/>
+				<departure id="tr_7" departureTime="07:35:00" vehicleRefId="tr_7"/>
+				<departure id="tr_70" departureTime="12:50:00" vehicleRefId="tr_70"/>
+				<departure id="tr_71" departureTime="12:55:00" vehicleRefId="tr_71"/>
+				<departure id="tr_72" departureTime="13:00:00" vehicleRefId="tr_72"/>
+				<departure id="tr_73" departureTime="13:05:00" vehicleRefId="tr_73"/>
+				<departure id="tr_74" departureTime="13:10:00" vehicleRefId="tr_74"/>
+				<departure id="tr_75" departureTime="13:15:00" vehicleRefId="tr_75"/>
+				<departure id="tr_76" departureTime="13:20:00" vehicleRefId="tr_76"/>
+				<departure id="tr_77" departureTime="13:25:00" vehicleRefId="tr_77"/>
+				<departure id="tr_78" departureTime="13:30:00" vehicleRefId="tr_78"/>
+				<departure id="tr_79" departureTime="13:35:00" vehicleRefId="tr_79"/>
+				<departure id="tr_8" departureTime="07:40:00" vehicleRefId="tr_8"/>
+				<departure id="tr_80" departureTime="13:40:00" vehicleRefId="tr_80"/>
+				<departure id="tr_81" departureTime="13:45:00" vehicleRefId="tr_81"/>
+				<departure id="tr_82" departureTime="13:50:00" vehicleRefId="tr_82"/>
+				<departure id="tr_83" departureTime="13:55:00" vehicleRefId="tr_83"/>
+				<departure id="tr_84" departureTime="14:00:00" vehicleRefId="tr_84"/>
+				<departure id="tr_85" departureTime="14:05:00" vehicleRefId="tr_85"/>
+				<departure id="tr_86" departureTime="14:10:00" vehicleRefId="tr_86"/>
+				<departure id="tr_87" departureTime="14:15:00" vehicleRefId="tr_87"/>
+				<departure id="tr_88" departureTime="14:20:00" vehicleRefId="tr_88"/>
+				<departure id="tr_89" departureTime="14:25:00" vehicleRefId="tr_89"/>
+				<departure id="tr_9" departureTime="07:45:00" vehicleRefId="tr_9"/>
+				<departure id="tr_90" departureTime="14:30:00" vehicleRefId="tr_90"/>
+				<departure id="tr_91" departureTime="14:35:00" vehicleRefId="tr_91"/>
+				<departure id="tr_92" departureTime="14:40:00" vehicleRefId="tr_92"/>
+				<departure id="tr_93" departureTime="14:45:00" vehicleRefId="tr_93"/>
+				<departure id="tr_94" departureTime="14:50:00" vehicleRefId="tr_94"/>
+				<departure id="tr_95" departureTime="14:55:00" vehicleRefId="tr_95"/>
+				<departure id="tr_96" departureTime="15:00:00" vehicleRefId="tr_96"/>
+				<departure id="tr_97" departureTime="15:05:00" vehicleRefId="tr_97"/>
+				<departure id="tr_98" departureTime="15:10:00" vehicleRefId="tr_98"/>
+				<departure id="tr_99" departureTime="15:15:00" vehicleRefId="tr_99"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>

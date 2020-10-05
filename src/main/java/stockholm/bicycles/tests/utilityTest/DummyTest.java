@@ -2,6 +2,7 @@ package stockholm.bicycles.tests.utilityTest;
 
 import java.util.Arrays;
 import java.util.PriorityQueue;
+import java.util.Random;
 
 public class DummyTest {
 
@@ -37,6 +38,17 @@ public class DummyTest {
         for (String element : unique) {
         	System.out.println(element);
         }
+        
+        
+        // test random seed functionality
+        Random randomSeed = new Random(20);
+        Random random = new Random();
+        Random random2 = new Random();
+        random.setSeed(randomSeed.nextLong());
+        random2.setSeed(randomSeed.nextLong());
+        
+        System.out.println("first random: "+random.nextDouble());
+        System.out.println("second random: "+random2.nextDouble());
   
 	}
 	

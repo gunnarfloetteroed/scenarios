@@ -29,6 +29,7 @@ public class MultinomialDistributionSamplerMap extends MultinomialDistributionSa
 	}
 	
 	public MultinomialDistributionSamplerMap(Map<String, Double> weights) {
+		super();
 		String[] sampleCode = new String[weights.size()];
 		double[] weightListFromInput = new double[weights.size()];
 		int counter=0;

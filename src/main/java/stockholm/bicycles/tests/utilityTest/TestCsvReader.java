@@ -20,7 +20,7 @@ public class TestCsvReader {
 		CsvReaderToIteratable csvToUserClass = new CsvReaderToIteratable(SAMPLE_CSV_FILE_PATH,';');
 		
 		try {
-			Table<String, String, String> result = csvToUserClass.readTableWithUniqueID("Name");
+			Table<String, String, String> result = csvToUserClass.readTableWithUniqueID(0);
 			// Set<String> columnKey=result.columnKeySet();
 			
 			Map<String, String> specificColumn = result.column("Phone"); 

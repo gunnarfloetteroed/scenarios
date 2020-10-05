@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -26,7 +26,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 
-import com.google.common.collect.Table;
 import com.opencsv.exceptions.CsvException;
 
 import stockholm.bicycles.utility.CsvReaderToIteratable;
@@ -107,8 +106,10 @@ public class DemandMatrixToPlan {
 		Map<String, Double> numberOfTripsInEachOriginZone =matrixRowSum(demandMatrixTable);
 		
 		// 3. sample number of out-of-home trips per origin zone
+		Random randomSeed = new Random(200);
 		MultinomialDistributionSamplerMap originZoneTripSampler= new MultinomialDistributionSamplerMap(numberOfTripsInEachOriginZone);
-		int totalNumberOfTripsToBeSampled = (int) (totalNumberOfTrips-2);  // assuming we sample 50% of total number of out-of-home trips.
+		originZoneTripSampler.setSeed(randomSeed.nextLong());
+		int totalNumberOfTripsToBeSampled = (int) (totalNumberOfTrips-2);  // assuming we sample X% of total number of out-of-home trips.
 		String[] sampledTripsFromOrigin=originZoneTripSampler.sampleMapWithoutReplacement(totalNumberOfTripsToBeSampled);
 		
         for (int i=0; i<sampledTripsFromOrigin.length;i++) {
@@ -153,10 +154,12 @@ public class DemandMatrixToPlan {
             	Map<String, Double> oneOriginToAllDestination = rowEntryListToMap(oneOriginToAllDestinationEntryList);
             	
             	MultinomialDistributionSamplerMap destinationZoneTripSampler= new MultinomialDistributionSamplerMap(oneOriginToAllDestination);
+            	destinationZoneTripSampler.setSeed(randomSeed.nextLong());
             	String tripDestination=destinationZoneTripSampler.sampleMap();
             	
             	// randomly generate a departure time
             	MultinomialDistributionSamplerMap departureTimeSampler= new MultinomialDistributionSamplerMap(departureTimeDistribution);
+            	departureTimeSampler.setSeed(randomSeed.nextLong());
             	String departureTimeInHour=departureTimeSampler.sampleMap();
             	
             	System.out.println("trip " + i + " starts from zone: " + tripOrigin +", departs at: "+ departureTimeInHour + ", ends at zone: " + tripDestination);

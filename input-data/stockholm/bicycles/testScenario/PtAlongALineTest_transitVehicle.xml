@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd">
+	<vehicleType id="bus">
+		<capacity>
+			<seats persons="100"/>
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="27.77777777777778"/>
+		<accessTime secondsPerPerson="1.0"/>
+		<egressTime secondsPerPerson="1.0"/>
+		<doorOperation mode="serial"/>
+		<passengerCarEquivalents pce="1.0"/>
+	</vehicleType>
+	<vehicle id="tr_0" type="bus"/>
+	<vehicle id="tr_1" type="bus"/>
+	<vehicle id="tr_2" type="bus"/>
+	<vehicle id="tr_3" type="bus"/>
+	<vehicle id="tr_4" type="bus"/>
+	<vehicle id="tr_5" type="bus"/>
+	<vehicle id="tr_6" type="bus"/>
+	<vehicle id="tr_7" type="bus"/>
+	<vehicle id="tr_8" type="bus"/>
+	<vehicle id="tr_9" type="bus"/>
+	<vehicle id="tr_10" type="bus"/>
+	<vehicle id="tr_11" type="bus"/>
+	<vehicle id="tr_12" type="bus"/>
+	<vehicle id="tr_13" type="bus"/>
+	<vehicle id="tr_14" type="bus"/>
+	<vehicle id="tr_15" type="bus"/>
+	<vehicle id="tr_16" type="bus"/>
+	<vehicle id="tr_17" type="bus"/>
+	<vehicle id="tr_18" type="bus"/>
+	<vehicle id="tr_19" type="bus"/>
+	<vehicle id="tr_20" type="bus"/>
+	<vehicle id="tr_21" type="bus"/>
+	<vehicle id="tr_22" type="bus"/>
+	<vehicle id="tr_23" type="bus"/>
+	<vehicle id="tr_24" type="bus"/>
+	<vehicle id="tr_25" type="bus"/>
+	<vehicle id="tr_26" type="bus"/>
+	<vehicle id="tr_27" type="bus"/>
+	<vehicle id="tr_28" type="bus"/>
+	<vehicle id="tr_29" type="bus"/>
+	<vehicle id="tr_30" type="bus"/>
+	<vehicle id="tr_31" type="bus"/>
+	<vehicle id="tr_32" type="bus"/>
+	<vehicle id="tr_33" type="bus"/>
+	<vehicle id="tr_34" type="bus"/>
+	<vehicle id="tr_35" type="bus"/>
+	<vehicle id="tr_36" type="bus"/>
+	<vehicle id="tr_37" type="bus"/>
+	<vehicle id="tr_38" type="bus"/>
+	<vehicle id="tr_39" type="bus"/>
+	<vehicle id="tr_40" type="bus"/>
+	<vehicle id="tr_41" type="bus"/>
+	<vehicle id="tr_42" type="bus"/>
+	<vehicle id="tr_43" type="bus"/>
+	<vehicle id="tr_44" type="bus"/>
+	<vehicle id="tr_45" type="bus"/>
+	<vehicle id="tr_46" type="bus"/>
+	<vehicle id="tr_47" type="bus"/>
+	<vehicle id="tr_48" type="bus"/>
+	<vehicle id="tr_49" type="bus"/>
+	<vehicle id="tr_50" type="bus"/>
+	<vehicle id="tr_51" type="bus"/>
+	<vehicle id="tr_52" type="bus"/>
+	<vehicle id="tr_53" type="bus"/>
+	<vehicle id="tr_54" type="bus"/>
+	<vehicle id="tr_55" type="bus"/>
+	<vehicle id="tr_56" type="bus"/>
+	<vehicle id="tr_57" type="bus"/>
+	<vehicle id="tr_58" type="bus"/>
+	<vehicle id="tr_59" type="bus"/>
+	<vehicle id="tr_60" type="bus"/>
+	<vehicle id="tr_61" type="bus"/>
+	<vehicle id="tr_62" type="bus"/>
+	<vehicle id="tr_63" type="bus"/>
+	<vehicle id="tr_64" type="bus"/>
+	<vehicle id="tr_65" type="bus"/>
+	<vehicle id="tr_66" type="bus"/>
+	<vehicle id="tr_67" type="bus"/>
+	<vehicle id="tr_68" type="bus"/>
+	<vehicle id="tr_69" type="bus"/>
+	<vehicle id="tr_70" type="bus"/>
+	<vehicle id="tr_71" type="bus"/>
+	<vehicle id="tr_72" type="bus"/>
+	<vehicle id="tr_73" type="bus"/>
+	<vehicle id="tr_74" type="bus"/>
+	<vehicle id="tr_75" type="bus"/>
+	<vehicle id="tr_76" type="bus"/>
+	<vehicle id="tr_77" type="bus"/>
+	<vehicle id="tr_78" type="bus"/>
+	<vehicle id="tr_79" type="bus"/>
+	<vehicle id="tr_80" type="bus"/>
+	<vehicle id="tr_81" type="bus"/>
+	<vehicle id="tr_82" type="bus"/>
+	<vehicle id="tr_83" type="bus"/>
+	<vehicle id="tr_84" type="bus"/>
+	<vehicle id="tr_85" type="bus"/>
+	<vehicle id="tr_86" type="bus"/>
+	<vehicle id="tr_87" type="bus"/>
+	<vehicle id="tr_88" type="bus"/>
+	<vehicle id="tr_89" type="bus"/>
+	<vehicle id="tr_90" type="bus"/>
+	<vehicle id="tr_91" type="bus"/>
+	<vehicle id="tr_92" type="bus"/>
+	<vehicle id="tr_93" type="bus"/>
+	<vehicle id="tr_94" type="bus"/>
+	<vehicle id="tr_95" type="bus"/>
+	<vehicle id="tr_96" type="bus"/>
+	<vehicle id="tr_97" type="bus"/>
+	<vehicle id="tr_98" type="bus"/>
+	<vehicle id="tr_99" type="bus"/>
+</vehicleDefinitions>

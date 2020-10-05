@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v6.dtd">
+
+<population>
+
+	<attributes>
+		<attribute name="coordinateReferenceSystem" class="java.lang.String">Atlantis</attribute>
+	</attributes>
+
+
+<!-- ====================================================================== -->
+
+	<person id="person_1">
+		<attributes>
+			<attribute name="hasBike" class="java.lang.Boolean">true</attribute>
+		</attributes>
+		<plan score="-4.661934985682485" selected="no">
+			<activity type="home" link="5588960_AB" x="674835.4809052752" y="6579908.541818319" end_time="08:00:00" >
+			</activity>
+			<leg mode="bike" dep_time="08:00:00" trav_time="00:00:40">
+				<attributes>
+					<attribute name="routingMode" class="java.lang.String">busPassenger</attribute>
+				</attributes>
+				<route type="links" start_link="5588960_AB" end_link="5588953_AB" trav_time="00:00:40" distance="218.16379233531973" vehicleRefId="null">5588960_AB 5588960_BA 5588969_BA 5589035_AB 5589784_AB 5589796_BA 5588997_AB 5588953_AB</route>
+			</leg>
+			<activity type="pt interaction" link="5588953_AB" x="674823.194575172" y="6579921.579648069" max_dur="00:00:00" >
+			</activity>
+			<leg mode="walk" dep_time="08:00:40" trav_time="00:00:00">
+				<attributes>
+					<attribute name="routingMode" class="java.lang.String">busPassenger</attribute>
+				</attributes>
+				<route type="generic" start_link="5588953_AB" end_link="tr_0" trav_time="00:00:00" distance="0.0"></route>
+			</leg>
+			<activity type="pt interaction" link="tr_0" x="674858.6238842849" y="6579978.862071003" max_dur="00:00:00" >
+			</activity>
+			<leg mode="busPassenger" dep_time="08:00:40" trav_time="00:04:20">
+				<attributes>
+					<attribute name="routingMode" class="java.lang.String">busPassenger</attribute>
+				</attributes>
+				<route type="default_pt" start_link="tr_0" end_link="tr_2" trav_time="00:04:20" distance="612.722444376658">{"transitRouteId":"route1","boardingTime":"08:05:00","transitLineId":"line1","accessFacilityId":"StopFac0","egressFacilityId":"StopFac2"}</route>
+			</leg>
+			<activity type="pt interaction" link="tr_2" x="674711.3214958636" y="6580548.826247933" max_dur="00:00:00" >
+			</activity>
+			<leg mode="walk" dep_time="08:05:01" trav_time="00:00:00">
+				<attributes>
+					<attribute name="routingMode" class="java.lang.String">busPassenger</attribute>
+				</attributes>
+				<route type="generic" start_link="tr_2" end_link="5563262_AB" trav_time="00:00:00" distance="0.0"></route>
+			</leg>
+			<activity type="pt interaction" link="5563262_AB" x="674730.7585358424" y="6580151.051983579" max_dur="00:00:00" >
+			</activity>
+			<leg mode="bike" dep_time="08:05:01" trav_time="00:01:35">
+				<attributes>
+					<attribute name="routingMode" class="java.lang.String">busPassenger</attribute>
+				</attributes>
+				<route type="links" start_link="5563262_AB" end_link="5576203_AB" trav_time="00:01:35" distance="559.6953812106129" vehicleRefId="null">5563262_AB tr_2 5576203_BA 5576203_AB</route>
+			</leg>
+			<activity type="work" link="5576203_AB" x="674778.2503369034" y="6580593.956881495" end_time="12:00:00" >
+			</activity>
+			<leg mode="walk" dep_time="12:00:00" trav_time="02:29:01">
+				<attributes>
+					<attribute name="routingMode" class="java.lang.String">busPassenger</attribute>
+				</attributes>
+				<route type="generic" start_link="5576203_AB" end_link="5588960_AB" trav_time="02:29:01" distance="894.140289924845"></route>
+			</leg>
+			<activity type="home" link="5588960_AB" x="674835.4809052752" y="6579908.541818319" >
+			</activity>
+		</plan>
+
+		<plan score="-5.860141602332237" selected="yes">
+			<activity type="home" link="5588960_AB" x="674835.4809052752" y="6579908.541818319" end_time="08:00:00" >
+			</activity>
+			<leg mode="walk" dep_time="08:00:00" trav_time="02:29:01">
+				<attributes>
+					<attribute name="routingMode" class="java.lang.String">walk</attribute>
+				</attributes>
+				<route type="generic" start_link="5588960_AB" end_link="5576203_AB" trav_time="02:29:01" distance="894.140289924845"></route>
+			</leg>
+			<activity type="work" link="5576203_AB" x="674778.2503369034" y="6580593.956881495" end_time="12:00:00" >
+			</activity>
+			<leg mode="walk" dep_time="12:00:00" trav_time="02:29:01">
+				<attributes>
+					<attribute name="routingMode" class="java.lang.String">walk</attribute>
+				</attributes>
+				<route type="generic" start_link="5576203_AB" end_link="5588960_AB" trav_time="02:29:01" distance="894.140289924845"></route>
+			</leg>
+			<activity type="home" link="5588960_AB" x="674835.4809052752" y="6579908.541818319" >
+			</activity>
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+</population>

@@ -1,0 +1,21 @@
+2020-10-02T10:59:03,487  WARN PrepareForSimImpl:222 'usePersonIdForMissingVehicleId' is deprecated. It will be removed soon.
+2020-10-02T10:59:03,538  WARN RandomizingTimeDistanceTravelDisutilityFactory:117 There will be no routing randomness. The randomization of the travel disutility requires the travel time cost rate to be different than zero. Continuing anyway.
+2020-10-02T10:59:03,876  WARN ObjectAttributesConverter:77 No AttributeConverter found for class java.util.Collections$UnmodifiableMap. Not all attribute values can be converted.
+2020-10-02T10:59:04,216  WARN FreespeedTravelTimeAndDisutility:69 The travel cost in org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility under normal circumstances should be > 0. Currently, it is 0.0.That is the sum of the costs for traveling and the opportunity costs. Please adjust the parameters'traveling' and 'performing' in the module 'planCalcScore' in your config file to be lower or equal than 0 when added.
+2020-10-02T10:59:04,217  WARN FreespeedTravelTimeAndDisutility:75  This message given only once.
+2020-10-02T10:59:04,298  WARN QueueWithBuffer:390 Link tr_0 too small: enlarge storage capacity from: 27.77777777777778 Vehicles to: 362.70789779346865 Vehicles.  This is not fatal, but modifies the traffic flow dynamics.
+2020-10-02T10:59:04,299  WARN QueueWithBuffer:390 Link tr_1 too small: enlarge storage capacity from: 28.596476340920127 Vehicles to: 1191.5198475383388 Vehicles.  This is not fatal, but modifies the traffic flow dynamics.
+2020-10-02T10:59:04,299  WARN QueueWithBuffer:390 Link tr_2 too small: enlarge storage capacity from: 53.0998495759676 Vehicles to: 2212.4937323319837 Vehicles.  This is not fatal, but modifies the traffic flow dynamics.
+2020-10-02T10:59:08,739  WARN ObjectAttributesConverter:77 No AttributeConverter found for class java.util.Collections$UnmodifiableMap. Not all attribute values can be converted.
+2020-10-02T10:59:08,839  WARN QueueWithBuffer:390 Link tr_0 too small: enlarge storage capacity from: 27.77777777777778 Vehicles to: 362.70789779346865 Vehicles.  This is not fatal, but modifies the traffic flow dynamics.
+2020-10-02T10:59:08,839  WARN QueueWithBuffer:390 Link tr_1 too small: enlarge storage capacity from: 28.596476340920127 Vehicles to: 1191.5198475383388 Vehicles.  This is not fatal, but modifies the traffic flow dynamics.
+2020-10-02T10:59:08,840  WARN QueueWithBuffer:390 Link tr_2 too small: enlarge storage capacity from: 53.0998495759676 Vehicles to: 2212.4937323319837 Vehicles.  This is not fatal, but modifies the traffic flow dynamics.
+2020-10-02T10:59:12,582  WARN QueueWithBuffer:390 Link tr_0 too small: enlarge storage capacity from: 27.77777777777778 Vehicles to: 362.70789779346865 Vehicles.  This is not fatal, but modifies the traffic flow dynamics.
+2020-10-02T10:59:12,582  WARN QueueWithBuffer:390 Link tr_1 too small: enlarge storage capacity from: 28.596476340920127 Vehicles to: 1191.5198475383388 Vehicles.  This is not fatal, but modifies the traffic flow dynamics.
+2020-10-02T10:59:12,583  WARN QueueWithBuffer:390 Link tr_2 too small: enlarge storage capacity from: 53.0998495759676 Vehicles to: 2212.4937323319837 Vehicles.  This is not fatal, but modifies the traffic flow dynamics.
+2020-10-02T10:59:15,531  WARN QueueWithBuffer:390 Link tr_0 too small: enlarge storage capacity from: 27.77777777777778 Vehicles to: 362.70789779346865 Vehicles.  This is not fatal, but modifies the traffic flow dynamics.
+2020-10-02T10:59:15,531  WARN QueueWithBuffer:390 Link tr_1 too small: enlarge storage capacity from: 28.596476340920127 Vehicles to: 1191.5198475383388 Vehicles.  This is not fatal, but modifies the traffic flow dynamics.
+2020-10-02T10:59:15,531  WARN QueueWithBuffer:393 Additional warnings of this type are suppressed.
+2020-10-02T10:59:18,125  WARN ObjectAttributesConverter:77 No AttributeConverter found for class java.util.Collections$UnmodifiableMap. Not all attribute values can be converted.
+2020-10-02T10:59:18,559 ERROR DumpDataAtEndImpl:187 writing output trips did not work; probably parameters were such that no trips CSV were generated in the final iteration
+2020-10-02T10:59:18,559 ERROR DumpDataAtEndImpl:202 writing output trips did not work; probably parameters were such that no trips CSV were generated in the final iteration

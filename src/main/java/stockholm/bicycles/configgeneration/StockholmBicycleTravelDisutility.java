@@ -8,6 +8,8 @@ import org.matsim.vehicles.Vehicle;
 
 public class StockholmBicycleTravelDisutility implements TravelDisutility {
 
+
+	@SuppressWarnings("unused")
 	private final TravelTime timeCalculator;
 	
 	

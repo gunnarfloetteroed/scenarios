@@ -119,12 +119,6 @@
 			<artifactId>roadpricing</artifactId>
 			<version>${matsim.version}</version>
 		</dependency>
-
-		<dependency>
-     		<groupId>ch.sbb</groupId>
-     		<artifactId>matsim-sbb-extensions</artifactId>
-     		<version>12.10</version>
- 		</dependency>
 			
 		<dependency>
 			<!-- This is the matsim "core": -->
@@ -132,6 +126,13 @@
 			<artifactId>matsim</artifactId>
 			<version>${matsim.version}</version>
 		</dependency>
+		
+		<!-- Move matsim-sbb-extensions down below matsim "core" so the built-in sbb-extention will be called.: -->
+		<dependency>
+     		<groupId>ch.sbb</groupId>
+     		<artifactId>matsim-sbb-extensions</artifactId>
+     		<version>12.10</version>
+ 		</dependency>
 
 		<dependency>
 			<!-- Include the JUnit testing library.  Not transitive. -->
