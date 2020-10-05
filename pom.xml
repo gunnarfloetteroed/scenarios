@@ -54,19 +54,19 @@
 		<dependency>
 			<groupId>com.github.gunnarfloetteroed.java</groupId>
 			<artifactId>utilities</artifactId>
-			<version>2020-08-25</version>
+			<version>2020-08-27_snapshot</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.github.gunnarfloetteroed.java</groupId>
 			<artifactId>experimental</artifactId>
-			<version>2020-08-25</version>
+			<version>2020-08-27_snapshot</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.github.gunnarfloetteroed.java</groupId>
 			<artifactId>opdyts</artifactId>
-			<version>2020-08-25</version>
+			<version>2020-08-27_snapshot</version>
 		</dependency>
 
         <dependency>

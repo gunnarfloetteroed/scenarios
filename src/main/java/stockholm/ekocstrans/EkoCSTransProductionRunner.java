@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Gunnar Flötteröd
+ * Copyright 2018 Gunnar Fl�tter�d
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,14 +19,10 @@
  */
 package stockholm.ekocstrans;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -42,6 +38,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 import org.matsim.core.population.PersonUtils;
@@ -57,19 +56,26 @@ import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import ch.sbb.matsim.mobsim.qsim.SBBTransitModule;
 import ch.sbb.matsim.mobsim.qsim.pt.SBBTransitEngineQSimModule;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-import floetteroed.utilities.FractionalIterable;
+import modalsharecalibrator.CalibrationModeExtractor;
+import modalsharecalibrator.ModalShareCalibrationConfigGroup;
 import modalsharecalibrator.ModeASCContainer;
+import modalsharecalibrator.WireModalShareCalibratorIntoMATSimControlerListener;
 import stockholm.ihop4.sampersutilities.SampersDifferentiatedPTScoringFunctionModule;
 import stockholm.wum.WUMASCInstaller;
+import stockholm.wum.WUMModeExtractor;
+import stockholm.wum.WUMProductionRunner;
+import stockholm.wum.utils.PTInteractionsRemover;
 
 /**
  *
- * @author Gunnar Flötteröd
+ * @author Gunnar Fl�tter�d
  *
  */
 public class EkoCSTransProductionRunner {
 
-	static final String temporaryPath = "/Users/GunnarF/NoBackup/data-workspace/ekocs-trans/";
+	static final String temporaryPath = "/Users/GunnarF/NoBackup/data-workspace/wum/";
+	// static final String archivePath = "/Users/GunnarF/OneDrive - VTI/My
+	// Data/wum/";
 
 	public static void scaleTransitCapacities(final Scenario scenario, final double factor) {
 		for (VehicleType vehicleType : scenario.getTransitVehicles().getVehicleTypes().values()) {
@@ -99,30 +105,6 @@ public class EkoCSTransProductionRunner {
 		}
 	}
 
-	public static void resetNetworkInformationInPopulation(final Scenario scenario) {
-		for (Person person : scenario.getPopulation().getPersons().values()) {
-			for (Plan plan : person.getPlans()) {
-				for (PlanElement planElement : plan.getPlanElements()) {
-					if (planElement instanceof Activity) {
-						final Activity act = (Activity) planElement;
-						act.setLinkId(null);
-					} else if (planElement instanceof Leg) {
-						final Leg leg = (Leg) planElement;
-						leg.setMode(TransportMode.car);
-						leg.setRoute(null);
-					}
-				}
-			}
-		}
-	}
-
-	public static void downsamplePopulation(final Scenario scenario, final double fraction) {
-		Set<Id<Person>> all = new LinkedHashSet<>(scenario.getPopulation().getPersons().keySet());
-		for (Id<Person> id : new FractionalIterable<Id<Person>>(all, 1.0 - fraction)) {
-			scenario.getPopulation().getPersons().remove(id);
-		}
-	}
-
 	static void fixCarAvailability(final Scenario scenario) {
 		int drivers = 0;
 		int nonDrivers = 0;
@@ -135,42 +117,47 @@ public class EkoCSTransProductionRunner {
 				nonDrivers++;
 			}
 		}
-		Logger.getLogger(EkoCSTransProductionRunner.class).info(drivers + " drivers, " + nonDrivers + " non-drivers");
+		Logger.getLogger(WUMProductionRunner.class).info(drivers + " drivers, " + nonDrivers + " non-drivers");
 	}
 
 	static void runProductionScenarioWithSampersDynamics(final String configFileName) {
 
 		final boolean terminateUponBoardingDenied = false;
-		final boolean removeModeInformation = false;
-		final boolean resetNetworkInformationInPopulation = true;
-		final double populationFraction = 0.01;
+		final boolean useGreedo = true;
 
 		final Config config = ConfigUtils.loadConfig(configFileName, new SwissRailRaptorConfigGroup(),
-				new SBBTransitConfigGroup(), new RoadPricingConfigGroup(),
-				// new ModalShareCalibrationConfigGroup(),
+				new SBBTransitConfigGroup(), new RoadPricingConfigGroup(), new ModalShareCalibrationConfigGroup(),
 				new GreedoConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		final Greedo greedo = new Greedo();
-		greedo.meet(config);
+		final Greedo greedo;
+		if (useGreedo) {
+			greedo = new Greedo();
+			greedo.meet(config);
+		}
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		downsamplePopulation(scenario, populationFraction);
-		if (removeModeInformation) {
-			removeModeInformation(scenario);
+
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			PTInteractionsRemover.run(person, false);
 		}
-		if (resetNetworkInformationInPopulation) {
-			resetNetworkInformationInPopulation(scenario);
-		}
+
 		scaleTransitCapacities(scenario, config.qsim().getStorageCapFactor());
 		fixCarAvailability(scenario);
 		new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "tr_").createNetwork();
-		greedo.meet(scenario);
+		if (useGreedo) {
+			greedo.meet(scenario);
+		}
+
+		// {
+		// ValidationResult result =
+		// TransitScheduleValidator.validateAll(scenario.getTransitSchedule(),
+		// scenario.getNetwork());
+		// TransitScheduleValidator.printResult(result);
+		// }
 
 		final Controler controler = new Controler(scenario);
 
-		// 2020-08-14: changed while moving to MATSim 12
-		// OLD: controler.setModules(new ControlerDefaultsWithRoadPricingModule());
 		controler.addOverridingModule(new RoadPricingModule());
 
 		controler.addOverridingModule(new SampersDifferentiatedPTScoringFunctionModule());
@@ -190,7 +177,9 @@ public class EkoCSTransProductionRunner {
 			}
 		});
 
-		greedo.meet(controler);
+		if (useGreedo) {
+			greedo.meet(controler);
+		}
 
 		if (terminateUponBoardingDenied) {
 			controler.addOverridingModule(new AbstractModule() {
@@ -210,17 +199,36 @@ public class EkoCSTransProductionRunner {
 			});
 		}
 
-//		controler.addOverridingModule(new AbstractModule() {
-//			@Override
-//			public void install() {
-//				bind(ModeASCContainer.class);
-//			}
-//		});
+		// the following for modal share calibration
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(ModeASCContainer.class);
+			}
+		});
+		if (ConfigUtils.addOrGetModule(config, ModalShareCalibrationConfigGroup.class).isOn()) {
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bind(CalibrationModeExtractor.class).toInstance(new WUMModeExtractor(
+							ConfigUtils.addOrGetModule(getConfig(), ModalShareCalibrationConfigGroup.class), "home",
+							"work", "other", "intermediate_home"));
+					addControlerListenerBinding().to(WireModalShareCalibratorIntoMATSimControlerListener.class);
+				}
+			});
+		}
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
 				addControlerListenerBinding().to(WUMASCInstaller.class);
+			}
+		});
+
+		controler.addControlerListener(new StartupListener() {
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				Logger.getLogger(EventsManagerImpl.class).setLevel(Level.OFF);
 			}
 		});
 
