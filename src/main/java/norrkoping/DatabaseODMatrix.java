@@ -25,6 +25,7 @@ import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 
+
 public class DatabaseODMatrix implements ODMatrix 
 {
 
@@ -38,6 +39,15 @@ public class DatabaseODMatrix implements ODMatrix
 	HashSet<String> zoneIds;
 	int numberOfTimeBins = 24; // TODO: Load from the database?
 	SimpleFeatureCollection odMatrix;
+	
+	ArrayList<Integer> idList = new ArrayList<Integer>();
+	ArrayList<String> origList = new ArrayList<String>();
+	ArrayList<String> destList = new ArrayList<String>();
+	ArrayList<Integer> hourList = new ArrayList<Integer>();
+	ArrayList<Double> demandList = new ArrayList<Double>();
+	
+	int numberOfID;
+	int demand;
 	
 	/**
 	 * This is the constructor for the DatabaseODMatrix class.
@@ -86,8 +96,8 @@ public class DatabaseODMatrix implements ODMatrix
 		    params.put( "passwd", password);
 		    params.put( "host", host);
 		    params.put( "port", port);
-		    params.put( "database", "mode");
-		    params.put( "schema", "norrkoping");
+		    params.put( "database", "norrkoping");
+		    params.put( "schema", "sfs");
 		    params.put( "Expose primary keys", "true");
 	
 		    try
@@ -161,8 +171,8 @@ public class DatabaseODMatrix implements ODMatrix
 			    params.put( "passwd", password);
 			    params.put( "host", host);
 			    params.put( "port", port);
-			    params.put( "database", "mode");
-			    params.put( "schema", "norrkoping");
+			    params.put( "database", "norrkoping");
+			    params.put( "schema", "sfs");
 			    params.put( "Expose primary keys", "true");
 		
 			    // Creates a datasource to the database.
@@ -173,14 +183,14 @@ public class DatabaseODMatrix implements ODMatrix
 			    ArrayList<Filter> filters = new ArrayList<Filter>();
 			    filters.add(CQL.toFilter("matrix = 'stop'"));
 			    filters.add(CQL.toFilter("dow = 2"));
-			    Query query = new Query("od", factory.and(filters));
+			    Query query = new Query("od-trucksTest", factory.and(filters));
 			    
 			    query.setSortBy(new SortBy[] {factory.sort("origin", SortOrder.ASCENDING),
 			    							  factory.sort("destination", SortOrder.ASCENDING),
 			    							  factory.sort("hour", SortOrder.ASCENDING)});
 			    
 			    // Getting a feature source to the OD table
-			    SimpleFeatureSource source = dataStore.getFeatureSource("od");
+			    SimpleFeatureSource source = dataStore.getFeatureSource("od-trucksTest");
 			    
 			    // Extracting the features into a collection.
 				odMatrix = source.getFeatures(query);
@@ -222,6 +232,124 @@ public class DatabaseODMatrix implements ODMatrix
 		
 		return demand;
 	}
+	
+	public void createArrayListsFromDatabase() 
+	{
+		// Checking if the zones has been loaded.				
+					numberOfID = 0;
+					
+					
+					// Setting parameters for the database connection.
+					Map<String,Object> params = new HashMap<String,Object>();
+				    params.put( "dbtype", "postgis");
+				    params.put( "user", username);
+				    params.put( "passwd", password);
+				    params.put( "host", host);
+				    params.put( "port", port);
+				    params.put( "database", "norrkoping");
+				    params.put( "schema", "sfs");
+				    params.put( "Expose primary keys", "true");
+			
+				    try
+				    {
+				    	// Creates a data source to the database.
+					    DataStore dataStore = DataStoreFinder.getDataStore(params);
+					    
+					    // Creating data filter.
+					    FilterFactory2 factory = new FilterFactoryImpl();
+					    ArrayList<Filter> filters = new ArrayList<Filter>();
+					    Query query = new Query("od-trucksTest", factory.and(filters));
+					    
+					    //query.setSortBy(new SortBy[] {factory.sort("od-trucksTest", SortOrder.ASCENDING)});
+					    
+					    // Getting a feature source to the zone table.
+						SimpleFeatureSource source = dataStore.getFeatureSource("od-trucksTest");
+					    
+						// Extracting the features into a collection.
+						SimpleFeatureCollection collection = source.getFeatures(query);
+						
+						// Loops through the collection and caches the zone ids.
+						SimpleFeatureIterator it = collection.features();
+						try
+						{
+							while(it.hasNext())
+							{
+								
+								SimpleFeature feature = it.next();								
+								
+								idList.add(Integer.valueOf(feature.getAttribute("id").toString()));
+								origList.add(feature.getAttribute("origin").toString());
+								destList.add(feature.getAttribute("destination").toString());
+								hourList.add(Integer.valueOf(feature.getAttribute("hour").toString()));
+								demandList.add(Double.parseDouble(feature.getAttribute("flow").toString()));
+								numberOfID +=1; 
+								
+							}
+						}
+						
+						// Releasing the database connection.
+						finally
+						{
+							it.close();
+							
+							if(source.getDataStore() != null)
+							{
+								source.getDataStore().dispose();
+							}
+						}
+						
+				    }
+				    catch (IOException e)
+				    {
+				    	throw new RuntimeException(e);
+				    }				
+				
+				
+	}
+	
+	 public ArrayList<Integer> getIdList() {
+		 
+	       return idList;
+	  }
+	 
+	 public ArrayList<String> getOriginList() {
+		 
+	       return origList;
+	  }
+	 
+	 public ArrayList<String> getDestList() {
+		 
+	       return destList;
+	  }
+	 
+	 public ArrayList<Integer> getHourList() {
+		 
+	       return hourList;
+	  }	 
+	 
+	 public ArrayList<Double> getDemandList() {
+		 
+	       return demandList;
+	  }	
+	 
+	 public int getTotalDemand() {
+		 for(int i = 0; i<demandList.size(); i++) {
+			 
+			 demand += Math.ceil(demandList.get(i));
+		 }
+		 
+		 
+		 
+	       return demand;
+	  }	
+	 
+	 public int getNumberOfIDrows() {
+		 return numberOfID;
+	 }
+
+
+	
+	
 
 	public static void main(String[] args) 
 	{
@@ -264,5 +392,7 @@ public class DatabaseODMatrix implements ODMatrix
 		tock = LocalTime.now();
 		System.out.println("Loading demand (second time) took " + java.time.temporal.ChronoUnit.MILLIS.between(tick, tock) + " ms");
 		System.out.println(String.format("Demand between 1 and 2 at time bin 8 is %.2f.\n", demand));
+		
+		
 	}
 }
