@@ -251,14 +251,13 @@ public class NorrkopingProductionRunner {
 				
 		final ZonalSystem zonalSystem = new ZonalSystem(norrkopingZoneShapeFile, StockholmTransformationFactory.WGS84_SWEREF99, "id");
 
-		//final Scanner scanner = new Scanner(System.in);
-		//System.out.println("DB user name: ");
-		//final String user = scanner.nextLine();
-		//System.out.println("password: ");
-		//final String passwd = scanner.nextLine();
-		//String scanner.close();
-		final String user = "rudolfs";
-		final String passwd ="RuZe200514";
+		final Scanner scanner = new Scanner(System.in);
+		System.out.println("DB user name: ");
+		final String user = scanner.nextLine();
+		System.out.println("password: ");
+		final String passwd = scanner.nextLine();
+		scanner.close();
+		
 		final DatabaseODMatrix od = new DatabaseODMatrix(user, passwd, "localhost", 5432); // 5455);
 		System.out.println("DATABASE LOG IN OK");
 		
