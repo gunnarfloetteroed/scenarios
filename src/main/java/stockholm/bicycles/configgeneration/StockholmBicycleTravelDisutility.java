@@ -30,7 +30,7 @@ public class StockholmBicycleTravelDisutility implements TravelDisutility {
 		if (bicycleSpeedForGeneralizedCostCalculation<=0) {
 			generalizedCostTravelTime =link.getLength()/(14.6/3.6);
 		} else {
-			generalizedCostTravelTime =link.getLength()/link.getFreespeed();
+			generalizedCostTravelTime =link.getLength()/bicycleSpeedForGeneralizedCostCalculation;
 		}
 		return generalizedCostTravelTime;
 	}

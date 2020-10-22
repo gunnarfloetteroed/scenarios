@@ -90,7 +90,7 @@ public class RunBicyclePTTest {
 				// addTravelDisutilityFactoryBinding(TransportMode.walk).toInstance(new StockholmWalkTravelDisutilityFactory());
 			}
 		});
-
+		
 //		RaptorParameters check = RaptorUtils.createParameters(config);
 //		System.out.println(check.toString());
 		// PlansCalcRouteConfigGroup params = config.plansCalcRoute();
