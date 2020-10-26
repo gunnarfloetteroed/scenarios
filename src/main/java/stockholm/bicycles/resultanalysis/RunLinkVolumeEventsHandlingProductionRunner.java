@@ -19,7 +19,7 @@ import org.matsim.core.events.MatsimEventsReader;
 
 import com.opencsv.CSVWriter;
 
-public class RunEventsHandlingProductionRunner {
+public class RunLinkVolumeEventsHandlingProductionRunner {
 
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		// TODO Auto-generated method stub
