@@ -1346,14 +1346,9 @@ public class NorrkopingProductionRunner {
 		doCalcualtions(eventFile1, eventFile2);
 		*/
 
-		
+		//testing
 
 		System.out.println("END OF SIMULATION");
-
-		
-		 
-		
-
 		System.out.println("PROGRAM IS FINISHED");
 
 	}
