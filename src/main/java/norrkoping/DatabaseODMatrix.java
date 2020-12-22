@@ -3,12 +3,15 @@ package norrkoping;
  * @author Rasmus Ringdahl @ Link�ping University (rasmus.ringdahl@liu.se)
  */
 import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
@@ -25,7 +28,6 @@ import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 
-
 public class DatabaseODMatrix implements ODMatrix 
 {
 
@@ -39,15 +41,37 @@ public class DatabaseODMatrix implements ODMatrix
 	HashSet<String> zoneIds;
 	int numberOfTimeBins = 24; // TODO: Load from the database?
 	SimpleFeatureCollection odMatrix;
+	SimpleFeatureCollection odMatrixSize;
+	
+	SimpleFeatureCollection siteInfo;
 	
 	ArrayList<Integer> idList = new ArrayList<Integer>();
 	ArrayList<String> origList = new ArrayList<String>();
 	ArrayList<String> destList = new ArrayList<String>();
 	ArrayList<Integer> hourList = new ArrayList<Integer>();
 	ArrayList<Double> demandList = new ArrayList<Double>();
+	ArrayList<Integer> siteId = new ArrayList<Integer>();
+	
+	ArrayList<String> workerZone = new ArrayList<String>();
+	ArrayList<String> workerTransport = new ArrayList<String>();
+	ArrayList<Double> workerToWork = new ArrayList<Double>();
+	ArrayList<Double> workerToHome = new ArrayList<Double>();
+	
+	
+	ArrayList<Integer> originWorker = new ArrayList<Integer>();
+	ArrayList<Integer> destWorker = new ArrayList<Integer>();
+	ArrayList<Integer> flowWorker = new ArrayList<Integer>();
+	
+	HashMap<String, Double> siteX = new HashMap<String, Double>();
+	HashMap<String, Double> siteY = new HashMap<String, Double>();
+	
+	HashMap<String, Double> storeX = new HashMap<String, Double>();
+	HashMap<String, Double> storeY = new HashMap<String, Double>();
+
 	
 	int numberOfID;
 	int demand;
+	int size;
 	
 	/**
 	 * This is the constructor for the DatabaseODMatrix class.
@@ -233,6 +257,152 @@ public class DatabaseODMatrix implements ODMatrix
 		return demand;
 	}
 	
+	
+	public ArrayList getDemandFromDatabase(int idRow) 
+	{
+		double demand = 0;
+		ArrayList<String> fromDatabase = new ArrayList<String>();
+		fromDatabase.clear();
+		
+		try
+		{
+			// Checking if the OD matrix has been loaded.
+			if(odMatrix == null)
+			{
+				// Setting parameters for the database connection.
+				Map<String,Object> params = new HashMap<String,Object>();
+			    params.put( "dbtype", "postgis");
+			    params.put( "user", username);
+			    params.put( "passwd", password);
+			    params.put( "host", host);
+			    params.put( "port", port);
+			    params.put( "database", "norrkoping");
+			    params.put( "schema", "odnrkpg");
+			    params.put( "Expose primary keys", "true");
+		
+			    // Creates a datasource to the database.
+			    DataStore dataStore = DataStoreFinder.getDataStore(params);
+			    
+			    // Creating data filter.
+			    FilterFactory2 factory = new FilterFactoryImpl();
+			    
+			    ArrayList<Filter> filters = new ArrayList<Filter>();
+			    //filters.add(CQL.toFilter(String.format("id = %s",idRow)));
+			    
+			    Query query = new Query("od_hourly_visum", factory.and(filters));
+			    
+			    
+			    // Getting a feature source to the OD table
+			    SimpleFeatureSource source = dataStore.getFeatureSource("od_hourly_visum");
+			    
+			    // Extracting the features into a collection.
+				odMatrix = source.getFeatures(query);
+				System.out.println("ONLY ONCE");
+			}
+			
+			
+			// Creating data filter with the requested OD and time bin..
+			FilterFactory2 factory = new FilterFactoryImpl();
+			ArrayList<Filter> filters = new ArrayList<Filter>();
+		    filters.add(CQL.toFilter(String.format("id = %s",idRow)));
+		    
+			SimpleFeatureCollection filteredOD = odMatrix.subCollection(factory.and(filters));
+			
+			// Extracts the flow from the first feature (assuming 1 row).
+			SimpleFeatureIterator it = filteredOD.features();
+			try
+			{
+				if(it.hasNext())
+				{
+					SimpleFeature feature = it.next();
+					
+					fromDatabase.add(feature.getAttribute("origin").toString());
+					fromDatabase.add(feature.getAttribute("destination").toString());
+					fromDatabase.add(feature.getAttribute("h").toString());
+					fromDatabase.add(feature.getAttribute("mean").toString());
+				}
+			}
+			finally
+			{
+				it.close();
+			}
+		}		
+		catch (IOException e)
+	    {
+			throw new RuntimeException(e);
+	    } 
+		catch (CQLException e) 
+		{
+			throw new RuntimeException(e);
+		}
+		
+		return fromDatabase;
+	}
+	
+	
+	
+	public int getOdSize() 
+	{
+		int size = 0;
+		
+		try
+		{
+			// Checking if the OD matrix has been loaded.
+			if(odMatrixSize == null)
+			{
+				// Setting parameters for the database connection.
+				Map<String,Object> params = new HashMap<String,Object>();
+			    params.put( "dbtype", "postgis");
+			    params.put( "user", username);
+			    params.put( "passwd", password);
+			    params.put( "host", host);
+			    params.put( "port", port);
+			    params.put( "database", "norrkoping");
+			    params.put( "schema", "odnrkpg");
+			    params.put( "Expose primary keys", "true");
+			    
+			    // Creates a datasource to the database.
+			    DataStore dataStore = DataStoreFinder.getDataStore(params);
+			    
+			    // Creating data filter.
+			    FilterFactory2 factory = new FilterFactoryImpl();
+			    
+			    ArrayList<Filter> filters = new ArrayList<Filter>();
+			    
+			    Query query = new Query("od_hourly_visum", factory.and(filters));
+			    query.setSortBy(new SortBy[] {factory.sort("id", SortOrder.ASCENDING)});
+			  
+			    
+			    // Getting a feature source to the OD table
+			    SimpleFeatureSource source = dataStore.getFeatureSource("od_hourly_visum");
+			    
+			    // Extracting the features into a collection.
+			    odMatrixSize = source.getFeatures(query);
+			
+				
+			    
+				SimpleFeatureCollection filteredOD = odMatrixSize;
+				size = filteredOD.size();
+				System.out.println("SIZE CRAZY" + size);
+				
+			}
+			
+
+		}		
+		catch (IOException e)
+	    {
+			throw new RuntimeException(e);
+	    }
+		
+		return size;
+	}
+	
+	
+	
+	
+	
+	
+	
 	public void createArrayListsFromDatabase() 
 	{
 		// Checking if the zones has been loaded.				
@@ -280,6 +450,7 @@ public class DatabaseODMatrix implements ODMatrix
 								idList.add(Integer.valueOf(feature.getAttribute("id").toString()));
 								origList.add(feature.getAttribute("origin").toString());
 								destList.add(feature.getAttribute("destination").toString());
+								siteId.add(Integer.valueOf(feature.getAttribute("siteId").toString()));
 								hourList.add(Integer.valueOf(feature.getAttribute("hour").toString()));
 								demandList.add(Double.parseDouble(feature.getAttribute("flow").toString()));
 								numberOfID +=1; 
@@ -307,6 +478,271 @@ public class DatabaseODMatrix implements ODMatrix
 				
 	}
 	
+	public void createArrayListsWorkers() 
+	{
+		// Checking if the zones has been loaded.				
+					numberOfID = 0;
+					
+					// Setting parameters for the database connection.
+					Map<String,Object> params = new HashMap<String,Object>();
+				    params.put( "dbtype", "postgis");
+				    params.put( "user", username);
+				    params.put( "passwd", password);
+				    params.put( "host", host);
+				    params.put( "port", port);
+				    params.put( "database", "norrkoping");
+				    params.put( "schema", "sfs");
+				    params.put( "Expose primary keys", "true");
+			
+				    try
+				    {
+				    	// Creates a data source to the database.
+					    DataStore dataStore = DataStoreFinder.getDataStore(params);
+					    
+					    // Creating data filter.
+					    FilterFactory2 factory = new FilterFactoryImpl();
+					    ArrayList<Filter> filters = new ArrayList<Filter>();
+					    Query query = new Query("odWorkers", factory.and(filters));
+					    
+					    // Getting a feature source to the zone table.
+						SimpleFeatureSource source = dataStore.getFeatureSource("odWorkers");
+					    
+						// Extracting the features into a collection.
+						SimpleFeatureCollection collection = source.getFeatures(query);
+						
+						// Loops through the collection and caches the zone ids.
+						SimpleFeatureIterator it = collection.features();
+						try
+						{
+							while(it.hasNext())
+							{
+								SimpleFeature feature = it.next();							
+								
+								originWorker.add(Integer.valueOf(feature.getAttribute("origin").toString()));
+								destWorker.add(Integer.valueOf(feature.getAttribute("destination").toString()));
+								flowWorker.add(Integer.valueOf(feature.getAttribute("flow").toString()));
+					
+							}
+						}
+						
+						// Releasing the database connection.
+						finally
+						{
+							it.close();
+							
+							if(source.getDataStore() != null)
+							{
+								source.getDataStore().dispose();
+							}
+						}
+						
+				    }
+				    catch (IOException e)
+				    {
+				    	throw new RuntimeException(e);
+				    }				
+				
+				
+	}
+	
+	public void workerInformation() 
+	{
+
+					// Setting parameters for the database connection.
+					Map<String,Object> params = new HashMap<String,Object>();
+				    params.put( "dbtype", "postgis");
+				    params.put( "user", username);
+				    params.put( "passwd", password);
+				    params.put( "host", host);
+				    params.put( "port", port);
+				    params.put( "database", "norrkoping");
+				    params.put( "schema", "sfs");
+				    params.put( "Expose primary keys", "true");
+			
+				    try
+				    {
+				    	// Creates a data source to the database.
+					    DataStore dataStore = DataStoreFinder.getDataStore(params);
+					    
+					    
+					    // Getting a feature source to the zone table.
+						SimpleFeatureSource source = dataStore.getFeatureSource("workers_info");
+					    
+						// Extracting the features into a collection.
+						SimpleFeatureCollection collection = source.getFeatures();
+						
+						// Loops through the collection and caches the zone ids.
+						SimpleFeatureIterator it = collection.features();
+						try
+						{
+							while(it.hasNext())
+							{
+								SimpleFeature feature = it.next();							
+								
+								workerZone.add(feature.getAttribute("zone_type").toString());
+								workerTransport.add(feature.getAttribute("transport_mode").toString());
+								workerToWork.add(Double.parseDouble(feature.getAttribute("departure_home").toString()));
+								workerToHome.add(Double.parseDouble(feature.getAttribute("departure_work").toString()));
+					
+							}
+						}
+						
+						// Releasing the database connection.
+						finally
+						{
+							it.close();
+							
+							if(source.getDataStore() != null)
+							{
+								source.getDataStore().dispose();
+							}
+						}
+						
+				    }
+				    catch (IOException e)
+				    {
+				    	throw new RuntimeException(e);
+				    }				
+				
+				
+	}
+	
+	public void getSiteCoordinatesFromDatabase() 
+	{
+		
+		// Setting parameters for the database connection.
+		Map<String,Object> params = new HashMap<String,Object>();
+	    params.put( "dbtype", "postgis");
+	    params.put( "user", username);
+	    params.put( "passwd", password);
+	    params.put( "host", host);
+	    params.put( "port", port);
+	    params.put( "database", "norrkoping");
+	    params.put( "schema", "sfs");
+	    params.put( "Expose primary keys", "true");
+
+	    try
+	    {
+	    	// Creates a data source to the database.
+		    DataStore dataStore = DataStoreFinder.getDataStore(params);
+		    
+		    // Creating data filter.
+		    
+		    
+		    // Getting a feature source to the zone table.
+			SimpleFeatureSource source = dataStore.getFeatureSource("site");
+			
+			SimpleFeatureCollection collection1 = source.getFeatures();
+			// Extracting the features into a collection.
+			
+			// Loops through the collection and caches the zone ids.
+			SimpleFeatureIterator it = collection1.features();
+			try
+			{
+				while(it.hasNext())
+				{
+					SimpleFeature feature = it.next();	
+					String s = feature.getAttribute("point_geom").toString();
+					Pattern regex = Pattern.compile("(\\d+(?:\\.\\d+)?)");
+					 Matcher matcher = regex.matcher(s);
+					 int counter = 0;
+					 while(matcher.find()){
+						 if(counter == 0) {
+							 siteX.put(feature.getAttribute("id").toString(), Double.parseDouble(matcher.group(1)));
+							 counter = counter +1;
+						 } 
+						 if(counter == 1) {
+							 siteY.put(feature.getAttribute("id").toString(), Double.parseDouble(matcher.group(1)));
+						 }
+			 
+					}
+					 
+				
+					//siteCoordinates.add(feature.getAttribute("point_geom").toString());
+				
+		
+				}
+			}
+			
+			// Releasing the database connection.
+			finally
+			{
+				it.close();
+				
+				if(source.getDataStore() != null)
+				{
+					source.getDataStore().dispose();
+				}
+			}
+			
+	    }
+	    catch (IOException e)
+	    {
+	    	throw new RuntimeException(e);
+	    }				
+	
+	}
+	
+	
+	public void getStoreCoordinates() 
+	{
+		
+		// Setting parameters for the database connection.
+		Map<String,Object> params = new HashMap<String,Object>();
+	    params.put( "dbtype", "postgis");
+	    params.put( "user", username);
+	    params.put( "passwd", password);
+	    params.put( "host", host);
+	    params.put( "port", port);
+	    params.put( "database", "norrkoping");
+	    params.put( "schema", "sfs");
+	    params.put( "Expose primary keys", "true");
+
+	    try
+	    {
+	    	// Creates a data source to the database.
+		    DataStore dataStore = DataStoreFinder.getDataStore(params);
+		    
+		    // Getting a feature source to the zone table.
+			SimpleFeatureSource source = dataStore.getFeatureSource("suppliers");
+			
+			SimpleFeatureCollection collection = source.getFeatures();
+			// Extracting the features into a collection.
+			
+			// Loops through the collection and caches the zone ids.
+			SimpleFeatureIterator it = collection.features();
+			try
+			{
+				while(it.hasNext())
+				{
+					//System.out.println("worksss");
+					SimpleFeature feature = it.next();	
+					storeX.put(feature.getAttribute("id").toString(), Double.parseDouble(feature.getAttribute("x-coord").toString()));
+					storeY.put(feature.getAttribute("id").toString(), Double.parseDouble(feature.getAttribute("y-coord").toString()));
+						
+		
+				}
+			}
+			
+			// Releasing the database connection.
+			finally
+			{
+				it.close();
+				
+				if(source.getDataStore() != null)
+				{
+					source.getDataStore().dispose();
+				}
+			}
+			
+	    }
+	    catch (IOException e)
+	    {
+	    	throw new RuntimeException(e);
+	    }				
+	
+	}
+	
 	 public ArrayList<Integer> getIdList() {
 		 
 	       return idList;
@@ -332,6 +768,42 @@ public class DatabaseODMatrix implements ODMatrix
 	       return demandList;
 	  }	
 	 
+	 public ArrayList<Integer> getSiteIDList() {
+		 return siteId;
+	 }
+		 
+	 public ArrayList<Integer> getoriginWorker() {
+		 return originWorker;
+	 }
+	 
+	 public ArrayList<Integer> getDestWorker() {
+		 return destWorker;
+	 }
+	 
+	 public ArrayList<Integer> getFlowWorker() {
+		 return flowWorker;
+	 }
+	 
+	 public HashMap<String,Double> getSiteCoordinatesX() {
+		 
+	       return siteX;
+	  }
+	 
+	 public  HashMap<String,Double> getSiteCoordinatesY() {
+		 
+	       return siteY;
+	  }
+	      
+	 public  HashMap<String,Double> getStoreCoordinatesX() {
+		 
+	       return storeX;
+	  } 
+	  	
+	 public  HashMap<String,Double> getStoreCoordinatesY() {
+		 
+	       return storeY;
+	  } 
+	 
 	 public int getTotalDemand() {
 		 for(int i = 0; i<demandList.size(); i++) {
 			 
@@ -348,17 +820,35 @@ public class DatabaseODMatrix implements ODMatrix
 	 }
 
 
+	 public ArrayList<String> getWorkerZoneType() {
+		 return workerZone;
+	 }
+	 
+	 public ArrayList<String> getWorkerTransportMode() {
+		 return workerTransport;
+	 }
+	 
+	 public ArrayList<Double> getWorkerHomeDeparture() {
+		 return workerToWork;
+	 }
 	
+	 public ArrayList<Double> getWorkerWorkDeparture() {
+		 return workerToHome;
+	 }
+	 
 	
 
 	public static void main(String[] args) 
 	{
-		// Creating a DatabaseODMatrix object with credentials.  
-		DatabaseODMatrix od = new DatabaseODMatrix(args[0], args[1], "localhost", 5432); // 5455);
+		// Creating a DatabaseODMatrix object with credentials. 
+		//String user="";
+		//String passwd="";
+		//DatabaseODMatrix od = new DatabaseODMatrix(user, passwd, "localhost", 5432); // 5455);
+		//od.workerInformation();
 		
 		
 		LocalTime tick = LocalTime.now();
-		
+		/*
 		// Getting all zone ids.
 		Collection<String> allZones = od.getAllZoneIds();
 		
@@ -392,7 +882,7 @@ public class DatabaseODMatrix implements ODMatrix
 		tock = LocalTime.now();
 		System.out.println("Loading demand (second time) took " + java.time.temporal.ChronoUnit.MILLIS.between(tick, tock) + " ms");
 		System.out.println(String.format("Demand between 1 and 2 at time bin 8 is %.2f.\n", demand));
-		
+		*/
 		
 	}
 }

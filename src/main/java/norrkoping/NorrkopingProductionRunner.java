@@ -21,14 +21,20 @@ package norrkoping;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ThreadLocalRandom;
+
 
 import org.apache.commons.math3.ml.distance.EuclideanDistance;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -46,6 +52,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.greedo.Greedo;
 import org.matsim.contrib.greedo.GreedoConfigGroup;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -58,6 +65,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 import org.matsim.core.network.NetworkUtils;
@@ -79,6 +88,8 @@ import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.vehicles.MatsimVehicleWriter;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
+
 
 import com.google.inject.Provides;
 
@@ -103,97 +114,359 @@ import stockholm.wum.creation.DetailPTVehicles;
  */
 public class NorrkopingProductionRunner {
 
-	//static final String swedenNetworkFile = "/Users/GunnarF/OneDrive - VTI/My Data/sweden/sweden-latest.xml.gz";
-	//static final String swedenScheduleFile = "/Users/GunnarF/OneDrive - VTI/My Data/sweden/transitSchedule-sweden-20190214.xml.gz";
-	//static final String swedenTransitVehicleFile = "/Users/GunnarF/OneDrive - VTI/My Data/sweden/transitVehicles-sweden-20190214.xml.gz";
-	
-	//static final String transitVehicleTypeDefinitionsFileName = "C:\\Users\\GunnarF\\OneDrive - VTI\\My Data\\wum\\data\\input\\transitVehicles_only-types.xml";
 
-	static final String norrkopingZoneShapeFile = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\OD\\od_zone_norrk.shp";
-	
+	static final String norrkopingZoneShapeFile = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\od_zone_norrk.shp";
+
 	static final String configFile = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\norrkoping-config.xml";
 	static final String configFileUpdated = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\ConfigUpdated.xml";
-
-	static final String norrkopingNetworkFile = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\networkUpdated.xml";
 	
-	static final String norrkopingNetwork = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\networkTest.xml";
+	static final String norrkopingNetwork = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\networkUpdated.xml";
+	static final String norrkopingPlansNew = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\nrkpPlans.xml";
+	static final String vehiclesFile = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\vehicleTypes.xml";
+	static final String populationMerged = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\popMerged.xml";
+	
 	static final String norrkopingTransitScheduleFile = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\transitSchedule-norrkoping-20190214.xml.gz";
 	static final String norrkopingTransitVehicleFile = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\transitVehicles-norrkoping-20190214.xml.gz";
-	
-	static final String norrkopingPopulationFile = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\norrkoping-plansSmall.xml";
-	//static final String norrkoping1PctPopulationFile = "/Users/GunnarF/OneDrive - VTI/My Data/norrkoping/norrkoping-plans.1pct.xml.gz";
-	//static final String norrkoping25PctPopulationFile = "/Users/GunnarF/OneDrive - VTI/My Data/norrkoping/norrkoping-plans.25pct.xml.gz";
-	
-	//Coordinates of construction sites
+
+
+	// Coordinates of construction sites
 	static final Coord Soderporten2 = new Coord(569942.8, 6493546.6);
 	static final Coord HotellSvea = new Coord(568874, 6495632);
-	
+
 	static final Coord Spinnhuset = new Coord(569239, 6495635);
 	static final Coord InreHamnen = new Coord(569671, 6495637);
-	
+
 	static final Coord Soderporten1 = new Coord(569888.2, 6493503.9);
 	static final Coord Tingsratten = new Coord(569211, 6495717);
 	
-	static final String vehiclesFile = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\outputTest\\vehicleTypes.xml";
+	static final Coord centrum = new Coord(569092.878,6495008.141);
 	
-	static final String populationMerged = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\outputTest\\popMerged.xml";
-	static final String populationFile = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\outputTest\\popMergedWithLinks.xml";
+	static final Coord fromLinkoping = new Coord(542656.7185038754, 6478707.856454755);
+	static final Coord toLinkoping = new Coord(542649.8589400095, 6478720.787579953);
+	
+
+	// static final Coord E4Linkoping = new Coord(569671, 6495637);
+	// static final Coord E4Stockholm = new Coord(569888.2, 6493503.9);
+	// static final Coord E22Soderkoping = new Coord(569211, 6495717);
+
+	static final Coord Renall = new Coord(566701.128,6497985.715);
+	static final Coord Optimera = new Coord(568192.68, 6497629.862);
+	static final Coord Bejer = new Coord(570675.082,6494539.083);
+	
+
+	public static HashMap<String, Double> delay = new HashMap<>();
+	public static HashMap<String, Double> delayTrucks = new HashMap<>();
+	public static HashMap<String, Double> delayWorkers = new HashMap<>();
+	
+	public static HashMap<Integer, Double> hourlyDelay = new HashMap<>();
+	public static HashMap<Integer, Double> hourlyDelayTrucks = new HashMap<>();
+	public static HashMap<Integer, Double> hourlyDelayWorkers = new HashMap<>();
+	
+	public static HashMap<String, Double> numberOfCars = new HashMap<>();
+	public static HashMap<String, Double> numberOfTrucks = new HashMap<>();
+	public static HashMap<String, Double> numberOfWorkers = new HashMap<>();
+	public static HashMap<String, Double> speedLinks = new HashMap<>();
+	public static HashMap<String, String> zoneType = new HashMap<>();
 
 	
-	/*static void cutFromSwedenCarOnly(final double xMin, final double xMax, final double yMin, final double yMax) {
-
-		final Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(swedenNetworkFile);
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		System.out.println("raw data: " + scenario.getNetwork().getNodes().size());
-
-		final NetworkFilterManager filters = new NetworkFilterManager(scenario.getNetwork());
-		final NetworkNodeFilter nodeFilter = new NetworkNodeFilter() {
-			@Override
-			public boolean judgeNode(Node n) {
-				final double x = n.getCoord().getX();
-				final double y = n.getCoord().getY();
-				return ((xMin <= x) && (x <= xMax) && (yMin <= y) && (y <= yMax));
-			}
-		};
-		filters.addNodeFilter(nodeFilter);
-		filters.addLinkFilter(new NetworkLinkFilter() {
-			@Override
-			public boolean judgeLink(Link l) {
-				return (nodeFilter.judgeNode(l.getFromNode()) && nodeFilter.judgeNode(l.getToNode()));
-			}
-		});
-		final Network net = filters.applyFilters();
-		System.out.println("after filtering: " + net.getNodes().size());
-
-		new NetworkCleaner().run(net);
-		System.out.println("after cleaning: " + net.getNodes().size());
-
-		new NetworkWriter(net).write(norrkopingNetworkFile);
+	public static ArrayList<String> workerZone = new ArrayList<>();
+	public static ArrayList<Double> workerToWork = new ArrayList<>();
+	public static ArrayList<Double> workerToHome = new ArrayList<>();
+	public static ArrayList<String> workerTransport = new ArrayList<>();
+	
+	public static ArrayList<Integer> xCoord = new ArrayList<>();
+	public static ArrayList<Integer> yCoord = new ArrayList<>();
+	public static ArrayList<Integer> idNumber = new ArrayList<>();
+	
+	public static int totalNumber;
+	public static int sites106 = 0;
+	public static int sites21 = 0;
+	
+	public static String user;
+	public static String passwd;
+	
+	/*
+	 * static void cutFromSwedenCarOnly(final double xMin, final double xMax, final
+	 * double yMin, final double yMax) {
+	 * 
+	 * final Config config = ConfigUtils.createConfig();
+	 * config.network().setInputFile(swedenNetworkFile); final Scenario scenario =
+	 * ScenarioUtils.loadScenario(config); System.out.println("raw data: " +
+	 * scenario.getNetwork().getNodes().size());
+	 * 
+	 * final NetworkFilterManager filters = new
+	 * NetworkFilterManager(scenario.getNetwork()); final NetworkNodeFilter
+	 * nodeFilter = new NetworkNodeFilter() {
+	 * 
+	 * @Override public boolean judgeNode(Node n) { final double x =
+	 * n.getCoord().getX(); final double y = n.getCoord().getY(); return ((xMin <=
+	 * x) && (x <= xMax) && (yMin <= y) && (y <= yMax)); } };
+	 * filters.addNodeFilter(nodeFilter); filters.addLinkFilter(new
+	 * NetworkLinkFilter() {
+	 * 
+	 * @Override public boolean judgeLink(Link l) { return
+	 * (nodeFilter.judgeNode(l.getFromNode()) &&
+	 * nodeFilter.judgeNode(l.getToNode())); } }); final Network net =
+	 * filters.applyFilters(); System.out.println("after filtering: " +
+	 * net.getNodes().size());
+	 * 
+	 * new NetworkCleaner().run(net); System.out.println("after cleaning: " +
+	 * net.getNodes().size());
+	 * 
+	 * new NetworkWriter(net).write(norrkopingNetworkFile); }
+	 * 
+	 * static void cutFromSwedenPTOnly() {
+	 * 
+	 * final ZonalSystem zonalSystem = new ZonalSystem(norrkopingZoneShapeFile,
+	 * StockholmTransformationFactory.WGS84_SWEREF99, "id");
+	 * 
+	 * final CropTransitSystem cropTransit = new CropTransitSystem(zonalSystem,
+	 * swedenScheduleFile, swedenTransitVehicleFile,
+	 * StockholmTransformationFactory.getCoordinateTransformation(
+	 * StockholmTransformationFactory.WGS84_SWEREF99,
+	 * StockholmTransformationFactory.WGS84_SWEREF99));
+	 * cropTransit.run(norrkopingTransitScheduleFile, norrkopingTransitVehicleFile);
+	 * 
+	 * final DetailPTVehicles detailPT = new
+	 * DetailPTVehicles(transitVehicleTypeDefinitionsFileName,
+	 * norrkopingTransitScheduleFile, swedenTransitVehicleFile);
+	 * detailPT.run(norrkopingTransitVehicleFile); }
+	 */
+	
+	public static void createZoneTypes() {
+		
+			System.out.println("Zones");
+				
+		final ZonalSystem zonalSystem = new ZonalSystem(norrkopingZoneShapeFile, StockholmTransformationFactory.WGS84_SWEREF99, "id");
+		
+		double x1 = centrum.getX();
+		double x2 = 0.0;
+		double y1 = centrum.getY();
+		double y2 = 0.0;
+		
+		
+		for (Zone fromZone : zonalSystem.getId2zoneView().values()) {
+			
+			final Point point = fromZone.getGeometry().getCentroid();
+			
+			x2 = point.getX();
+			y2 = point.getY();
+				
+				double distance = Math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
+				
+				if(distance < 2000) {
+					zoneType.put(fromZone.getId().toString(), "staden");					
+				} else if(distance < 10000) {
+					zoneType.put(fromZone.getId().toString(), "utkanten");					
+				} else if(fromZone.getId().toString().equals("167")) {
+					System.out.println("WORKS ");
+					zoneType.put(fromZone.getId().toString(), "outside");
+				} else {
+					zoneType.put(fromZone.getId().toString(), "landet");
+				}
+			
+		}
+		
+		//String outPath = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\ProjectData\\zoneTypeRight.csv";
+		//ResultWriter writer = new ResultWriter(outPath, zoneType);
+		//writer.main();
+		
+		
+		
 	}
+	
+	
+	public static void createDemandWorkers(String configFile, double upScale, int nrSites) {
 
-	static void cutFromSwedenPTOnly() {
+		System.out.println("WORKERS");
+		createZoneTypes();
+		
+		final Config config = ConfigUtils.loadConfig(configFile);
+		
+		config.network().setInputFile(norrkopingNetwork);
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		final ZonalSystem zonalSystem = new ZonalSystem(norrkopingZoneShapeFile, StockholmTransformationFactory.WGS84_SWEREF99, "id");
+		
+		final DatabaseODMatrix od = new DatabaseODMatrix(user, passwd, "localhost", 5432); // 5455);
+		od.createArrayListsWorkers();
+		
+		// Save into lists
+		ArrayList<Integer> oWorker = od.getoriginWorker();
+		ArrayList<Integer> dWorker = od.getDestWorker();
+		ArrayList<Integer> flowWorker = od.getFlowWorker();
+		
+		for(int i = 0; i < nrSites; i++) {
+			od.workerInformation();
+			workerZone = od.getWorkerZoneType();
+			workerTransport = od.getWorkerTransportMode();
+			workerToWork = od.getWorkerHomeDeparture();
+			workerToHome = od.getWorkerWorkDeparture();
+			
+		}
+		
+		
+		ArrayList<String> copyWorkerZone = new ArrayList<>(workerZone);
+		ArrayList<Double> copyWokerToWork = new ArrayList<>(workerToWork);
+		ArrayList<Double> copyWorkerToHome = new ArrayList<>(workerToHome);
+		ArrayList<String> copyWorkerTransport = new ArrayList<>(workerTransport);
+		
+		
+		int person = 1;
+		int sites = 0;
+		
+		for(int i = 0; i< oWorker.size(); i++) {
 
-		final ZonalSystem zonalSystem = new ZonalSystem(norrkopingZoneShapeFile,
-				StockholmTransformationFactory.WGS84_SWEREF99, "id");
+			
+			int flow = flowWorker.get(i);
+			String type = zoneType.get(oWorker.get(i).toString());			
+						
+				for (int j = 0; j < flow; j++) {
+					
+					int index = copyWorkerZone.indexOf(type);
+					
+					Zone fromZone1 = zonalSystem.getZone(oWorker.get(i).toString());
+					
+					addTripWorkers(scenario, Id.createPersonId("worker"+(person++)), zonalSystem, fromZone1, dWorker.get(i), 
+							(copyWokerToWork.get(index)*3600 + (ThreadLocalRandom.current().nextDouble(-0.08, 0.08))*3600), (copyWorkerToHome.get(index)*3600 + (ThreadLocalRandom.current().nextDouble(-0.16, 0.16)*3600)), 
+							copyWorkerTransport.get(index),sites);
+					
+					
+					copyWorkerZone.remove(index);
+					copyWokerToWork.remove(index);
+					copyWorkerToHome.remove(index);
+					copyWorkerTransport.remove(index);
+					
+					
+				}
+		}
+		
+		createDemandTrucks(scenario, upScale);
+		
+	}
+	
+	
+	private static void addTripWorkers(Scenario scenario, Id<Person> personId, ZonalSystem zonalSystem, Zone fromZone, Integer toZone, 
+			double departureHome, double departureWork, String transport, int sites) {
+		
+		final Coord fromCoord = ShapeUtils.drawPointFromGeometry(fromZone.getGeometry());
+		final Person person = scenario.getPopulation().getFactory().createPerson(personId);
+		
+		if(transport.equals("pt")){
+			
+		}else {
+			person.getAttributes().putAttribute("subpopulation", "workers");
+		}
+		
+		
+		final Plan plan = scenario.getPopulation().getFactory().createPlan();
+		person.addPlan(plan);
+		
+		if(fromZone.getId().equals("167")) {
+			
+			final Activity start = scenario.getPopulation().getFactory().createActivityFromCoord("start", fromLinkoping);
+			start.setEndTime(departureHome);
+			plan.addActivity(start);
+			plan.addLeg(scenario.getPopulation().getFactory().createLeg(transport));
+			
+		}else {
 
-		final CropTransitSystem cropTransit = new CropTransitSystem(zonalSystem, swedenScheduleFile,
-				swedenTransitVehicleFile, StockholmTransformationFactory.getCoordinateTransformation(
-						StockholmTransformationFactory.WGS84_SWEREF99, StockholmTransformationFactory.WGS84_SWEREF99));
-		cropTransit.run(norrkopingTransitScheduleFile, norrkopingTransitVehicleFile);
+			final Activity start = scenario.getPopulation().getFactory().createActivityFromCoord("start", fromCoord);
+		
+			if(transport.equals("pt")){
+				start.setEndTime(departureHome-(3600));
+				plan.addActivity(start);
+				plan.addLeg(scenario.getPopulation().getFactory().createLeg(transport));
+			}else {
+				start.setEndTime(departureHome);
+				plan.addActivity(start);
+				plan.addLeg(scenario.getPopulation().getFactory().createLeg(transport));
+			}
+			
+		}
+		
+		
+		if(toZone == 106){
+			
+			if(sites106 == 0) {
+				sites106++;
+				final Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("end", Soderporten1);
+				end.setStartTime(departureHome+1800);
+				end.setEndTime(departureWork);				
+				plan.addActivity(end);
+			} else {
+				final Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("end", Soderporten2);
+				end.setStartTime(departureHome+1800);
+				end.setEndTime(departureWork);
+				plan.addActivity(end);
+				sites106 = 0;
+			}
+			
+		} else if(toZone == 21) {
+			if(sites21 == 0) {
+				sites21++;
+				final Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("end", Spinnhuset);
+				end.setStartTime(departureHome+1800);
+				end.setEndTime(departureWork);				
+				plan.addActivity(end);
+			} else if(sites21 == 1) {
+				sites21++;
+				final Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("end", Tingsratten);
+				end.setStartTime(departureHome+1800);
+				end.setEndTime(departureWork);
+				plan.addActivity(end);
+				
+			}else {
+				final Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("end", HotellSvea);
+				end.setStartTime(departureHome+1800);
+				end.setEndTime(departureWork);
+				plan.addActivity(end);
+				sites21 = 0;
+				
+			}
+			
+		} else if(toZone == 22) {
+			
+			final Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("end", InreHamnen);
+			end.setStartTime(departureHome+1800);
+			end.setEndTime(departureWork);
+			plan.addActivity(end);
+			
+		}
+		
+		
+		if(fromZone.getId().equals("167")) {
+			
+			plan.addLeg(scenario.getPopulation().getFactory().createLeg(transport));
+			final Activity start1 = scenario.getPopulation().getFactory().createActivityFromCoord("start", toLinkoping);
+			plan.addActivity(start1);
+			
+		}else {
+			
+	
+				plan.addLeg(scenario.getPopulation().getFactory().createLeg(transport));
+				Activity start1 = scenario.getPopulation().getFactory().createActivityFromCoord("start", fromCoord);
+				plan.addActivity(start1);
 
-		final DetailPTVehicles detailPT = new DetailPTVehicles(transitVehicleTypeDefinitionsFileName,
-				norrkopingTransitScheduleFile, swedenTransitVehicleFile);
-		detailPT.run(norrkopingTransitVehicleFile);
-	}*/
+
+		}
+		
+		scenario.getPopulation().addPerson(person);
+	}
+	
+	
+	
+	
+	
+	
+	
 
 	public static void createDemand(final double demandUpscale) {
-
+		/*
 		System.out.println("Comment this out -- danger to overwrite existing population.");
 		System.exit(0);
 
 		final Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(norrkopingNetworkFile);
+		config.network().setInputFile(norrkopingNetwork);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		final ZonalSystem zonalSystem = new ZonalSystem(norrkopingZoneShapeFile,
@@ -207,7 +480,7 @@ public class NorrkopingProductionRunner {
 		scanner.close();
 		final DatabaseODMatrix od = new DatabaseODMatrix(user, passwd, "localhost", 5432); // 5455);
 
-		final int timeBinCnt = od.getNumberOfTimeBins(); //24h
+		final int timeBinCnt = od.getNumberOfTimeBins(); // 24h
 		final double timeBinSize_s = Units.S_PER_D / timeBinCnt;
 
 		final int zoneCnt = zonalSystem.getId2zoneView().size();
@@ -217,7 +490,8 @@ public class NorrkopingProductionRunner {
 			System.out.println(((100 * processedOriginZones++) / zoneCnt) + "% DONE");
 			for (Zone toZone : zonalSystem.getId2zoneView().values()) {
 				for (int timeBin = 0; timeBin < timeBinCnt; timeBin++) {
-					final double demand = demandUpscale*od.getDemandPerHour(fromZone.getId(), toZone.getId(), timeBin);
+					final double demand = demandUpscale
+							* od.getDemandPerHour(fromZone.getId(), toZone.getId(), timeBin);
 					if (demand > 0) {
 						for (int i = 0; i < demand; i++) {
 							addTripMaker(scenario, Id.createPersonId(personCnt++), zonalSystem, fromZone, toZone,
@@ -234,198 +508,379 @@ public class NorrkopingProductionRunner {
 
 		final PopulationWriter writer = new PopulationWriter(scenario.getPopulation());
 		writer.writeV6(norrkopingPopulationFile);
+		*/
 	}
 	
 	
 	
-	
-	
-	public static void createDemandTrucks(final String configFileName) {
-			
-		System.out.println("Truck Method.");
+	public static void createDemandNorrkoping(final double demandUpscale) {
 
-		final Config config = ConfigUtils.loadConfig(configFileName);
+		final Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(norrkopingNetwork);
-		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-				
+		
+		Network network = scenario.getNetwork();
+		NetworkFactory netF = network.getFactory();
+
+		
 		final ZonalSystem zonalSystem = new ZonalSystem(norrkopingZoneShapeFile, StockholmTransformationFactory.WGS84_SWEREF99, "id");
 
-		final Scanner scanner = new Scanner(System.in);
-		System.out.println("DB user name: ");
-		final String user = scanner.nextLine();
-		System.out.println("password: ");
-		final String passwd = scanner.nextLine();
-		scanner.close();
-		
 		final DatabaseODMatrix od = new DatabaseODMatrix(user, passwd, "localhost", 5432); // 5455);
-		System.out.println("DATABASE LOG IN OK");
+	
 		
-		//Create information form database to arrays 
-		od.createArrayListsFromDatabase();
+		int persons = od.getOdSize()-1;
+		//int persons = 400;
 		
-		//Save into lists
-		ArrayList<Integer> idList = od.getIdList();
-		ArrayList<String> oList = od.getOriginList();
-		ArrayList<String> dList = od.getDestList();
-		ArrayList<Integer> hourList = od.getHourList();
-		ArrayList<Double> demandList = od.getDemandList();
+		Coord toCoord = new Coord();
+		Coord fromCoord = new Coord();
+		int counter = 1;
+		double percent= 5.0;
+		int testV = 1;
+		double value;
 		
-		//number of trucks to add in the transport system
-		int rowsInOD = od.getNumberOfIDrows();
-		int totalDemand = od.getTotalDemand();
-		int person = 1;
+		List<Node> nodesList = new ArrayList<Node>();
+		nodesList = NetworkUtils.getNodes(network, "373701 373700 313501 653882137 319036 319037 3244867309 3244867314 120524 4525217764");
+		Coord fromLinkoping = nodesList.get(0).getCoord();
+		Coord toLinkoping = nodesList.get(1).getCoord();
 		
+		Coord toKatrineholm = nodesList.get(2).getCoord();
+		Coord fromKatrineholm = nodesList.get(3).getCoord();
 
-		final int timeBinCnt = 24; //24h
-		final double timeBinSize_s = Units.S_PER_D / timeBinCnt; //24h = 3600 seconds 
+		Coord fromNykoping = nodesList.get(4).getCoord();
+		Coord toNykoping = nodesList.get(5).getCoord();
 		
-		for(int i = 0; i < rowsInOD; i++) {				
+		Coord toFinspang = nodesList.get(6).getCoord();
+		Coord fromFinspang = nodesList.get(7).getCoord();
+		
+		Coord fromSoderkoping = nodesList.get(8).getCoord();
+		Coord toSoderkoping = nodesList.get(9).getCoord();
+		
+		
+		for(int i = 0; i< persons; i++) {
+			value = (double) i/2100;
+			if(value > testV ) {
+				testV = testV + 1;
+				System.out.println("DONE WITH " + percent + " %");
+				percent = percent + 5;
+			}
 			
-			int counter = 0;
 			
-			for(int j = 0; j < demandList.get(i); j++) {				
-				counter = counter + 1;				
-			addTripMakerTrucks(scenario, Id.createPersonId(person++), zonalSystem, 
-					zonalSystem.getZone(oList.get(i)), dList.get(i),((Math.random()+hourList.get(i))*timeBinSize_s), demandList.get(i), counter);
-		}}
+			ArrayList<String> input = new ArrayList<String>();
+			input = od.getDemandFromDatabase(i+1);
 			
-		//Create new population file by merging norrkoping travellers with trucks in norrkoping
+			double flow = demandUpscale*Double.parseDouble(input.get(3));
+			int demand = (int) Math.round(flow);
+			
+			if(Integer.valueOf(input.get(0)) != Integer.valueOf(input.get(1))) {
+			
+			for(int j = 0; j<demand; j++) {
+				if(Integer.valueOf(input.get(0)) < 168) {
+					Zone fromZone = zonalSystem.getZone(input.get(0));
+					fromCoord = ShapeUtils.drawPointFromGeometry(fromZone.getGeometry());
+				}else {
+					int fromZone = Integer.valueOf(input.get(0));
+					
+					
+					if(fromZone==172 || fromZone==171) {
+						fromCoord = fromKatrineholm;
+					} else if(fromZone==174 || fromZone==175 || fromZone==176) {
+						fromCoord = fromFinspang;
+					} else if(fromZone==177 || fromZone==178 || fromZone==179 || fromZone == 180 || fromZone == 181 || fromZone == 182 || fromZone == 183) {
+						fromCoord = fromLinkoping;
+					} else if(fromZone==189) {
+						//Special zone on island
+						fromCoord = new Coord(597442, 6476524);
+					} else if(fromZone==184 || fromZone==185 || fromZone==186 || fromZone==187 || fromZone==188) {
+						fromCoord = fromSoderkoping;
+					} else if(fromZone==169 || fromZone==170 || fromZone==168 || fromZone==171) {
+						fromCoord = fromNykoping;
+					}
+						
+				}
+				
+				if(Integer.valueOf(input.get(1)) < 168) {
+					Zone toZone = zonalSystem.getZone(input.get(1));
+					toCoord = ShapeUtils.drawPointFromGeometry(toZone.getGeometry());
+				}else {
+					int toZone = Integer.valueOf(input.get(1));
+					
+					if(toZone==172 || toZone==171) {
+						toCoord = toKatrineholm;
+					} else if(toZone==174 || toZone==175 || toZone==176) {
+						toCoord = toFinspang;
+					} else if(toZone==177 || toZone==178 || toZone==179 || toZone == 180 || toZone == 181 || toZone == 182 || toZone == 183) {
+						toCoord = toLinkoping;
+					} else if(toZone==189) {
+						//Special zone on island
+						toCoord = new Coord(597442, 6476524);
+					} else if(toZone==184 || toZone==185 || toZone==186 || toZone==187 || toZone==188) {
+						toCoord = toSoderkoping;
+					} else if(toZone==169 || toZone==170 || toZone==168 || toZone==171) {
+						toCoord = toNykoping;
+					}
+				}
+				
+				double departure = Double.parseDouble(input.get(2));
+				
+				
+				
+				addTripMakerPersons(scenario, Id.createPersonId(counter), fromCoord, toCoord, (departure + Math.random())*3600);
+				counter = counter +1;
+			}
+			} 
+			
+			input.clear();
+			
+		}
+
+
 		final PopulationWriter writer = new PopulationWriter(scenario.getPopulation());
-		writer.writeV6(populationMerged);
-		
-		
+		writer.writeV6(norrkopingPlansNew);
 	}
 	
-	
-	
-	private static void addTripMakerTrucks(Scenario scenario, Id<Person> personId, ZonalSystem zonalSystem, Zone fromZone, String toZone, double dptTime_s, double demand, int counter) {
-		//Demand to zone
-		int demandToZone = (int) Math.ceil(demand);
+	private static void addTripMakerPersons(Scenario scenario, Id<Person> personId, Coord fromCoord, Coord toCoord, double dptTime_s) {
 		
-		//Distribution to several sites in one zone
-		double toSoderporten1 = 0.7*demandToZone;		
-		double toSpinnhuset = 0.5*demandToZone;
-		double toTingsratten = 0.2*demandToZone;	
-		
-		//Exact origin for trucks
-		Coord fromCoord;				
-		
-		//Create person, add to sub-population, create/add plan
 		final Person person = scenario.getPopulation().getFactory().createPerson(personId);
-		person.getAttributes().putAttribute("subpopulation", "heavyVeh");
-		
 		final Plan plan = scenario.getPopulation().getFactory().createPlan();
 		person.addPlan(plan);
 		
-		Population population = scenario.getPopulation();
-		PopulationFactory pop = population.getFactory();
-		Network network = scenario.getNetwork();
 		
 		
-		
-		if(fromZone.getId().equals("20") && toZone.equals("22")) {
-			//Exact origin for route implementation
-			//Now only test route between two zones
-			List<Node> nodesList = new ArrayList<Node>();			
-			nodesList = NetworkUtils.getNodes(network, "298500341");			
-			fromCoord = nodesList.get(0).getCoord();		
-			
-			
-		}else {
-			//Origin for zones
-			fromCoord = ShapeUtils.drawPointFromGeometry(fromZone.getGeometry());
+		{
+			final Activity start = scenario.getPopulation().getFactory().createActivityFromCoord("start", fromCoord);
+			start.setEndTime(dptTime_s);
+			plan.addActivity(start);
 		}
-		
-	
-		if(fromZone.getId().equals("20") && toZone.equals("22")) {			
-			//Create exact route for a truck agent		
-			RouteFactories route = pop.getRouteFactories();
-			
-			List<Link> linkList = new ArrayList<Link>();
-			//Route
-			linkList = NetworkUtils.getLinks(network, "617831 206276 255576 946938 1476445 206289 59308 59309 22138 22137 736126 1242933 213741 953711 953687 1242913 953709 953708 984251 1395269 1242914 196059 704898 1389535 1389536 1389537 1273824 736106 736108 736110 594765 594763 101 1");
-			
-			ArrayList<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-			for(int i = 1; i<linkList.size()-1; i++) {					
-				linkIds.add(linkList.get(i).getId());
-			}
-			//Still Route...
-			NetworkRoute routeTo = route.createRoute(NetworkRoute.class, linkList.get(0).getId(), linkList.get(linkList.size()-1).getId());
-			routeTo.setLinkIds(linkList.get(0).getId(), linkIds, linkList.get(linkList.size()-1).getId());
-			
-			//Activity with times
-			Activity start = scenario.getPopulation().getFactory().createActivityFromCoord("start", fromCoord);
-			start.setLinkId(linkList.get(0).getId());						
-			start.setEndTime(dptTime_s);
-			plan.addActivity(start);
-			
-			//Add mode and route to agent
-			Leg leg = pop.createLeg(TransportMode.truck);
-			leg.setDepartureTime(dptTime_s);
-			leg.setTravelTime(900);
-			leg.setRoute(routeTo);
-			plan.addLeg(leg);			
-			
-		}else {
-			//All other agents
-			Activity start = scenario.getPopulation().getFactory().createActivityFromCoord("start", fromCoord);
-			start.setEndTime(dptTime_s);
-			plan.addActivity(start);
-			Leg leg = pop.createLeg(TransportMode.truck);
-			leg.setTravelTime(900);
-			plan.addLeg(leg);
-			
-		}				
-		
-		
-			if(toZone.equals("22")){			
-					//Destination activity with possible latest arrival time
-					Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("end", InreHamnen);					
-					end.setLinkId(Id.get("1", Link.class));		
-					end.setEndTime(dptTime_s + 2400);
-					plan.addActivity(end);		
-							
-			} else if(toZone.equals("106")) {				
-				if(counter <  toSoderporten1) {
-					Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("end", Soderporten1);
-					end.setEndTime(dptTime_s + 2400);
-					
-					plan.addActivity(end);
-				} else {
-					Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("end", Soderporten2);
-					end.setEndTime(dptTime_s + 2400);
-					plan.addActivity(end);
-				}
-				
-					
-			} else if(toZone.equals("21")) {
-				if(counter <  toSpinnhuset) {
-					Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("end", Spinnhuset);
-					end.setEndTime(dptTime_s + 2400);
-					plan.addActivity(end);
-					
-				} else if(counter <  (toSpinnhuset + toTingsratten)) {
-					Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("end", Tingsratten);
-					end.setEndTime(dptTime_s + 2400);
-					plan.addActivity(end);
-					
-				} else {
-					Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("end", HotellSvea);
-					end.setEndTime(dptTime_s + 2400);
-					plan.addActivity(end);
-				}											
-				
-			}							
-			
-			
-			scenario.getPopulation().addPerson(person);
+		plan.addLeg(scenario.getPopulation().getFactory().createLeg("car"));
+		{
+
+			final Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("end", toCoord);
+			plan.addActivity(end);
+		}
+		scenario.getPopulation().addPerson(person);
 	}
 	
 	
+	
+
+	public static void createDemandTrucks(Scenario scenario, double upScale) {
+
+		System.out.println("Truck Method.");
+
+		final ZonalSystem zonalSystem = new ZonalSystem(norrkopingZoneShapeFile,
+				StockholmTransformationFactory.WGS84_SWEREF99, "id");
+
+
+		final DatabaseODMatrix od = new DatabaseODMatrix(user, passwd, "localhost", 5432); // 5455);
+
+		// Create information form database to arrays
+		od.createArrayListsFromDatabase();
+
+		// Save into lists
+		ArrayList<String> oList = od.getOriginList();
+		ArrayList<String> dList = od.getDestList();
+		ArrayList<Integer> siteId = od.getSiteIDList();
+		ArrayList<Integer> hourList = od.getHourList();
+		ArrayList<Double> demandList = od.getDemandList();
+
+		// number of trucks to add in the transport system
+		int rowsInOD = od.getNumberOfIDrows();
+		int person = 1;
+
+		final int timeBinCnt = 24; // 24h
+		final double timeBinSize_s = Units.S_PER_D / timeBinCnt; // 24h = 3600 seconds
+
+		for (int i = 0; i < rowsInOD; i++) {
+
+			int counter = 0;
+			
+			double demand = upScale*demandList.get(i);
+			
+			for (int j = 0; j < demand; j++) {
+				counter = counter + 1;
+				
+				addTripMakerTrucks(scenario, Id.createPersonId("truck"+(person++)), zonalSystem,
+						zonalSystem.getZone(oList.get(i)), dList.get(i),
+						(hourList.get(i)+Math.random())*timeBinSize_s, siteId.get(i));
+			}
+		}
+
+		// Create new population file by merging norrkoping travellers with trucks and workers in
+		// norrkoping
+		final PopulationWriter writer = new PopulationWriter(scenario.getPopulation());
+		writer.writeV6(populationMerged);
+
+	}
+
+	private static void addTripMakerTrucks(Scenario scenario, Id<Person> personId, ZonalSystem zonalSystem,
+			Zone fromZone, String toZone, double dptTime_s, int siteID) {
+
+		// Exact origin for trucks
+		final Coord fromCoord;
+		final Coord homeCoord;
+		final Coord middleCoord;
+
+		// Create person, add to sub-population, create/add plan
+		final Person person = scenario.getPopulation().getFactory().createPerson(personId);
+		person.getAttributes().putAttribute("subpopulation", "heavyVeh");
+
+		final Plan plan = scenario.getPopulation().getFactory().createPlan();
+		person.addPlan(plan);
+
+		Population population = scenario.getPopulation();
+		PopulationFactory pop = population.getFactory();
+		Network network = scenario.getNetwork();
+
+		if (fromZone.getId().equals("140")) {
+			// Origin for zones
+			List<Node> nodesList = new ArrayList<Node>();
+			nodesList = NetworkUtils.getNodes(network, "294212 128846");
+			fromCoord = nodesList.get(0).getCoord();
+			homeCoord = nodesList.get(1).getCoord();
+		} else if (fromZone.getId().equals("57")) {
+			// Origin for zones
+			List<Node> nodesList = new ArrayList<Node>();
+			nodesList = NetworkUtils.getNodes(network, "165030 165039");
+			fromCoord = nodesList.get(0).getCoord();
+			homeCoord = nodesList.get(1).getCoord();
+			
+		} else if (fromZone.getId().equals("120")) {
+			// Origin for zones
+			List<Node> nodesList = new ArrayList<Node>();
+			nodesList = NetworkUtils.getNodes(network, "1041738188 1041737204");
+			fromCoord = nodesList.get(0).getCoord();
+			homeCoord = nodesList.get(1).getCoord();
+			
+		} else if (fromZone.getId().equals("81")) {
+			fromCoord = Bejer;			
+			homeCoord = Bejer;
+
+		} else if (fromZone.getId().equals("19")) {
+			fromCoord = Renall;
+			homeCoord = Renall;
+
+		} else if (fromZone.getId().equals("20")) {
+			fromCoord = Optimera;
+			homeCoord = Optimera;
+
+		} else {
+			System.out.println("WRONG PLACE");
+			fromCoord = ShapeUtils.drawPointFromGeometry(fromZone.getGeometry());
+			homeCoord = ShapeUtils.drawPointFromGeometry(fromZone.getGeometry());
+		}
+
+			// All other agents
+			Activity start = scenario.getPopulation().getFactory().createActivityFromCoord("truckStart", fromCoord);
+			if(fromZone.getId().equals("81") && toZone.equals("106")) {
+				start.setLinkId(Id.get("564468", Link.class));
+			}
+			start.setEndTime(dptTime_s);
+			plan.addActivity(start);
+			
+			Leg leg = pop.createLeg(TransportMode.truck);
+
+			plan.addLeg(leg);
+			
+			if (fromZone.getId().equals("81") && toZone.equals("21")) {
+				List<Node> nodesList = new ArrayList<Node>();
+				nodesList = NetworkUtils.getNodes(network, "251899658");
+				middleCoord = nodesList.get(0).getCoord();
+				
+				Activity middlePoint = scenario.getPopulation().getFactory().createActivityFromCoord("middlePoint", middleCoord);
+				middlePoint.setLinkId(Id.get("314867", Link.class));					
+				middlePoint.setEndTime(dptTime_s + 20);
+				plan.addActivity(middlePoint);
+				
+				Leg leg1 = pop.createLeg(TransportMode.truck);
+				leg1.setDepartureTime(dptTime_s+20);
+				plan.addLeg(leg1);			
+				
+			}
+			
+		
+		
+		if (toZone.equals("22")) {
+			Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("construction", InreHamnen);
+			end.setLinkId(Id.get("1", Link.class));
+			end.setStartTime(dptTime_s + 900);
+			end.setEndTime(dptTime_s + 900 + 3600);
+			plan.addActivity(end);
+			plan.addLeg(leg);
+			Activity start1 = scenario.getPopulation().getFactory().createActivityFromCoord("truckHome", homeCoord);
+			start1.setStartTime(dptTime_s + 900 + 3600 + 600);
+			leg.setTravelTime(900);
+			plan.addActivity(start1);
+
+		} else if (toZone.equals("106")) {
+			if (siteID == 2) {
+				
+				Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("construction", Soderporten1);
+				end.setStartTime(dptTime_s + 900);
+				end.setEndTime(dptTime_s + 900 + 3600);
+				plan.addActivity(end);
+				plan.addLeg(leg);
+				Activity start1 = scenario.getPopulation().getFactory().createActivityFromCoord("truckHome", homeCoord);
+				start1.setStartTime(dptTime_s + 900 + 3600 + 600);
+				leg.setTravelTime(900);
+				plan.addActivity(start1);
+				
+
+			} else {
+				Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("construction", Soderporten2);
+				end.setStartTime(dptTime_s + 900);
+				end.setEndTime(dptTime_s + 900 + 3600);
+				plan.addActivity(end);
+				leg.setTravelTime(900);
+				plan.addLeg(leg);
+				Activity start1 = scenario.getPopulation().getFactory().createActivityFromCoord("truckHome", homeCoord);
+				start1.setStartTime(dptTime_s + 900 + 3600 + 600);
+				plan.addActivity(start1);
+			}
+
+		} else if (toZone.equals("21")) {
+			if (siteID == 4) {
+				Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("construction", Spinnhuset);
+				end.setStartTime(dptTime_s + 900);
+				end.setEndTime(dptTime_s + 900 + 3600);
+				plan.addActivity(end);
+				leg.setTravelTime(900);
+				plan.addLeg(leg);
+				Activity start1 = scenario.getPopulation().getFactory().createActivityFromCoord("truckHome", homeCoord);
+				start1.setStartTime(dptTime_s + 900 + 3600 + 600);
+				plan.addActivity(start1);
+
+			} else if (siteID == 7) {
+				Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("construction", Tingsratten);
+				end.setStartTime(dptTime_s + 900);
+				end.setEndTime(dptTime_s + 900 + 3600);
+				plan.addActivity(end);
+				leg.setTravelTime(900);
+				plan.addLeg(leg);
+				Activity start1 = scenario.getPopulation().getFactory().createActivityFromCoord("truckHome", homeCoord);
+				start1.setStartTime(dptTime_s + 900 + 3600 + 600);
+				plan.addActivity(start1);
+
+			} else {
+				Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("construction", HotellSvea);
+				end.setStartTime(dptTime_s + 900);
+				end.setEndTime(dptTime_s + 900 + 3600);
+				plan.addActivity(end);
+				leg.setTravelTime(900);
+				plan.addLeg(leg);
+				Activity start1 = scenario.getPopulation().getFactory().createActivityFromCoord("truckHome", homeCoord);
+				start1.setStartTime(dptTime_s + 900 + 3600 + 600);
+			
+				plan.addActivity(start1);
+			}
+
+		}
+
+		scenario.getPopulation().addPerson(person);
+	}
 
 	private static void addTripMaker(Scenario scenario, Id<Person> personId, ZonalSystem zonalSystem, Zone fromZone,
 			Zone toZone, double dptTime_s) {
+		/*
 		final Person person = scenario.getPopulation().getFactory().createPerson(personId);
 		final Plan plan = scenario.getPopulation().getFactory().createPlan();
 		person.addPlan(plan);
@@ -435,48 +890,45 @@ public class NorrkopingProductionRunner {
 			start.setEndTime(dptTime_s);
 			plan.addActivity(start);
 		}
-		plan.addLeg(scenario.getPopulation().getFactory().createLeg("car"));		
-		{					
-			
+		plan.addLeg(scenario.getPopulation().getFactory().createLeg("car"));
+		{
+
 			final Coord toCoord = ShapeUtils.drawPointFromGeometry(toZone.getGeometry());
 			final Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("end", toCoord);
 			plan.addActivity(end);
 		}
 		scenario.getPopulation().addPerson(person);
+		*/
 	}
 
-	static void runXY2Links() {
-		//final Config config = ConfigUtils.createConfig();
-		final Config config = ConfigUtils.loadConfig(configFile);
-		config.network().setInputFile(norrkopingNetwork);
-		config.plans().setInputFile(populationMerged);
-		//config.plans().setInputFile(norrkopingPopulationFile);
+	static void runXY2Links(final String configFileName, final String networkFileName, final String popFileName) {
+	
+		final Config config = ConfigUtils.loadConfig(configFileName);
+		config.network().setInputFile(networkFileName);
+		config.plans().setInputFile(popFileName);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		// new NetworkCleaner().run(scenario.getNetwork());
 
 		final XY2Links xy2links = new XY2Links(scenario);
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			
 			xy2links.run(person);
 		}
 		final PopulationWriter writer = new PopulationWriter(scenario.getPopulation());
-		//writer.writeV6(norrkopingPopulationFile);
-		writer.writeV6(populationFile);
+		writer.writeV6(popFileName);
 	}
 
-	//static void reducePopulation() {
-	//	PopulationSampler.main(new String[] { norrkopingPopulationFile, norrkoping25PctPopulationFile, "0.25" });
-	//}
+	// static void reducePopulation() {
+	// PopulationSampler.main(new String[] { norrkopingPopulationFile,
+	// norrkoping25PctPopulationFile, "0.25" });
+	// }
 
 	static void runSimulation(final String configFileName) {
 
 		final Config config = ConfigUtils.loadConfig(configFileName, new SwissRailRaptorConfigGroup(),
 				new SBBTransitConfigGroup(), new GreedoConfigGroup());
-		
-		config.network().setInputFile(norrkopingNetwork);
-		config.plans().setInputFile(populationFile);
-		
+
+
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		final Greedo greedo = new Greedo();
@@ -488,7 +940,7 @@ public class NorrkopingProductionRunner {
 		greedo.meet(scenario);
 
 		final Controler controler = new Controler(scenario);
-
+		
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -512,8 +964,10 @@ public class NorrkopingProductionRunner {
 			}
 		});
 
+		
 		greedo.meet(controler);
-
+		
+		
 		controler.run();
 	}
 
@@ -538,228 +992,318 @@ public class NorrkopingProductionRunner {
 			}
 		}
 	}
+
 	
-	private static void updateNetworkConstructionSites(final String configFile) {
+
+	private static void createVehicleTypes(String configFileName) {
+
+		Config config = ConfigUtils.loadConfig(configFileName);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		VehicleType car = scenario.getVehicles().getFactory().createVehicleType(Id.create(TransportMode.car, VehicleType.class));
+		car.setMaximumVelocity(90 / 3.6);
+		scenario.getVehicles().addVehicleType(car);
+
+		VehicleType truck = scenario.getVehicles().getFactory().createVehicleType(Id.create(TransportMode.truck, VehicleType.class));
+		truck.setMaximumVelocity(50 / 3.6);
+		truck.setLength(10);
+		truck.setPcuEquivalents(3);
+		truck.setWidth(2.5);
+		truck.setNetworkMode(TransportMode.truck);
+		scenario.getVehicles().addVehicleType(truck);
+
+		new MatsimVehicleWriter(scenario.getVehicles()).writeFile(vehiclesFile);
+
+	}
+
+	private static void updateConfiguration(String configFileName, String networkFileName, String popFileName) {
+
+		Config config = ConfigUtils.loadConfig(configFileName);
 		
-		final Config config = ConfigUtils.loadConfig(configFile);
+		config.controler().setLastIteration(2);
 		
-		Scenario scenario = ScenarioUtils.loadScenario(config) ;
+		config.network().setInputFile(networkFileName);
+		config.plans().setInputFile(popFileName);
+
+		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+		//config.qsim().setPcuThresholdForFlowCapacityEasing(0.5);
+		config.qsim().setFlowCapFactor(0.2);
+		config.qsim().setStorageCapFactor(0.4);
+		config.vehicles().setVehiclesFile(vehiclesFile);
+
+		List<String> mainModes = Arrays.asList(new String[] { TransportMode.car, TransportMode.truck });
+		config.qsim().setMainModes(mainModes);
+		config.plansCalcRoute().setNetworkModes(mainModes);
+		config.travelTimeCalculator().setAnalyzedModesAsString("car,truck");
+		config.travelTimeCalculator().setSeparateModes(true); // change maybe to true
+
+		PlanCalcScoreConfigGroup.ModeParams truck1 = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.truck);
+		truck1.setMonetaryDistanceRate(0); // all to zero
+		truck1.setMarginalUtilityOfTraveling(-2.34);
+		truck1.setConstant(0.0);
+		truck1.setMarginalUtilityOfDistance(0.0);
 		
-		Network network = scenario.getNetwork();
-		NetworkFactory netF = network.getFactory();
-		
-		//network.removeLink(Id.get(12, Link.class));	
-		
-		//Node n1 = NetworkUtils.getNearestNode(network,new Coord((double) 0, (double) 0));
-		
-	
-		//Soderporten2 with id2 and coordinates
-		Node node2 = netF.createNode(Id.create("2", Node.class), Soderporten2);
-		//HotellSvea with id3 and coordinates
-		Node node3 = netF.createNode(Id.create("3", Node.class), HotellSvea);
-		//Spinnhuset with id4 and coordinates
-		Node node4 = netF.createNode(Id.create("4", Node.class), Spinnhuset);
-		//InreHamnen with id5 and coordinates
-		Node node5 = netF.createNode(Id.create("5", Node.class), InreHamnen);
-		//Soderporten1 with id6 and coordinates
-		Node node6 = netF.createNode(Id.create("6", Node.class), Soderporten1);
-		//Tingsratten with id7 and coordinates
-		Node node7 = netF.createNode(Id.create("7", Node.class), Tingsratten);
-		
-		network.addNode(node2);
-		network.addNode(node3);
-		network.addNode(node4);
-		network.addNode(node5);
-		network.addNode(node6);
-		network.addNode(node7);
-		
-		//Koordinat av grinden/infart in till bygget
-		Node node8 = netF.createNode(Id.create("8", Node.class), new Coord(569683.620, 6495699.188));
-		network.addNode(node8);
-		//Grinden till Spinnhuset och Tingsratten
-		Node node9 = netF.createNode(Id.create("9", Node.class), new Coord(569228.424, 6495657.435)); 
-		network.addNode(node9);
-		//Grinden Hotell Svea
-		Node node10 = netF.createNode(Id.create("10", Node.class), new Coord(568981.739, 6495701.063)); 
-		network.addNode(node10);
-		//Grinden Soderporten1
-		Node node11 = netF.createNode(Id.create("11", Node.class), new Coord(569864.479,6493532.280)); 
-		network.addNode(node11);
-		//Grinden Soderporten2
-		Node node12 = netF.createNode(Id.create("12", Node.class), new Coord(569923.786,6493568.580)); 
-		network.addNode(node12);
+		config.planCalcScore().addModeParams(truck1);
 				
-		
-		
-		
-		network.removeLink(Id.get("295322", Link.class));	
-		network.removeLink(Id.get("295323", Link.class));	
-		
-		network.removeLink(Id.get("595202", Link.class));	
-		network.removeLink(Id.get("595203", Link.class));	
-		
-		network.removeLink(Id.get("230054", Link.class));	
-		network.removeLink(Id.get("230055", Link.class));	
-			
-		network.removeLink(Id.get("589686", Link.class));	
-		network.removeLink(Id.get("589687", Link.class));	
+		StrategyConfigGroup.StrategySettings keepRoute = new StrategyConfigGroup.StrategySettings();
+		keepRoute.setSubpopulation("heavyVeh");
+		keepRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.KeepLastSelected);
+		keepRoute.setWeight(1);
 
+		config.strategy().addStrategySettings(keepRoute);
+		
+		StrategyConfigGroup.StrategySettings workers = new StrategyConfigGroup.StrategySettings();
+		workers.setSubpopulation("workers");
+		workers.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute);
+		workers.setWeight(0.2);
 
+		config.strategy().addStrategySettings(workers);
 		
-		Link link1 = netF.createLink(Id.create("1", Link.class), node8, node5);
-		network.addLink(link1);		
-		Link link2 = netF.createLink(Id.create("2", Link.class), node9, node4);
-		network.addLink(link2);
-		Link link3 = netF.createLink(Id.create("3", Link.class), node9, node7);
-		network.addLink(link3);
-		Link link4 = netF.createLink(Id.create("4", Link.class), node10, node3);
-		network.addLink(link4);
-		Link link5 = netF.createLink(Id.create("5", Link.class), node11, node6);
-		network.addLink(link5);
-		Link link6 = netF.createLink(Id.create("6", Link.class), node12, node2);
-		network.addLink(link6);
-		
-		
-		List<Node> nodesList = new ArrayList<Node>();		
-		nodesList = NetworkUtils.getNodes(network, "303762687 303762688 1100585367 1072465763 1072465818 1186585455 266517353");
-		
-		
-		//Node n1 = NetworkUtils.getNearestNode(network,new Coord((double) 569645.4896960644, (double) 6495688.909616182));
-		//Node n2 = NetworkUtils.getNearestNode(network,new Coord((double) 569744.6208874913, (double) 6495715.4377413215));
-		
-		Link link101 = netF.createLink(Id.create("101", Link.class), nodesList.get(0), node8);
-		Link link102 = netF.createLink(Id.create("102", Link.class), node8, nodesList.get(0));
-		Link link103 = netF.createLink(Id.create("103", Link.class), nodesList.get(1), node8);
-		Link link104 = netF.createLink(Id.create("104", Link.class), node8, nodesList.get(1));
-		link101.setFreespeed(40.0 / 3.6);
-		link102.setFreespeed(40.0 / 3.6);
-		link103.setFreespeed(40.0 / 3.6);
-		link104.setFreespeed(40.0 / 3.6);
-		link101.setCapacity(600); // veh / hour
-		link102.setCapacity(600); // veh / hour
-		link103.setCapacity(600); // veh / hour
-		link104.setCapacity(600); // veh / hour
-		link101.setNumberOfLanes(1);
-		link102.setNumberOfLanes(1);
-		link103.setNumberOfLanes(1);
-		link104.setNumberOfLanes(1);
-		link101.setAllowedModes(CollectionUtils.stringToSet("car"));	
-		link102.setAllowedModes(CollectionUtils.stringToSet("car"));
-		link103.setAllowedModes(CollectionUtils.stringToSet("car"));
-		link104.setAllowedModes(CollectionUtils.stringToSet("car"));
-		
-		Link link105 = netF.createLink(Id.create("105", Link.class), nodesList.get(2), node9);
-		
-		Link link106 = netF.createLink(Id.create("106", Link.class), nodesList.get(3), node10);
-		Link link107 = netF.createLink(Id.create("107", Link.class), node10, nodesList.get(3));
-		Link link108 = netF.createLink(Id.create("108", Link.class), nodesList.get(4), node10);
-		Link link109 = netF.createLink(Id.create("109", Link.class), node10, nodesList.get(4));
-		
-		Link link110 = netF.createLink(Id.create("110", Link.class), nodesList.get(5), node11);
-		Link link111 = netF.createLink(Id.create("111", Link.class), node11, nodesList.get(5));
-		Link link112 = netF.createLink(Id.create("112", Link.class), node11, node12);
-		Link link113 = netF.createLink(Id.create("113", Link.class), node12, node11);
-		Link link114 = netF.createLink(Id.create("114", Link.class), nodesList.get(6), node12);
-		Link link115 = netF.createLink(Id.create("115", Link.class), node12, nodesList.get(6));
-		
-		network.addLink(link101);
-		network.addLink(link102);
-		network.addLink(link103);
-		network.addLink(link104);
-		network.addLink(link105);
-		network.addLink(link106);
-		network.addLink(link107);
-		network.addLink(link108);
-		network.addLink(link109);
-		network.addLink(link110);
-		network.addLink(link111);
-		network.addLink(link112);
-		network.addLink(link113);
-		network.addLink(link114);
-		network.addLink(link115);
+		new ConfigWriter(config).write(configFileUpdated);
 
-		
-		List<Link> linkList = new ArrayList<Link>();		
-		linkList = NetworkUtils.getLinks(network, "1 2 3 4 5 6 105 106 107 108 109 110 111 112 113 114 115");		
-		
-		for(Link link: linkList) {			
-			link.setFreespeed(30.0 / 3.6); // 50 km/h in m/s			
-			link.setCapacity(600); // veh / hour
-			link.setNumberOfLanes(1);
-			link.setAllowedModes(CollectionUtils.stringToSet("car"));					
+	}
+
+	private static void resultCreator(String configFileName, String eventFile) {
+
+		Config config = ConfigUtils.loadConfig(configFileName);
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		Network network = scenario.getNetwork();
+
+		HashMap<Integer, Double> hourCars = new HashMap<>();
+		for(int i = 0; i<24; i++) {
+			hourCars.put(i, 0.0);
 		}
 		
 		
-		//link.setFreespeed(50.0 / 3.6); // 50 km/h in m/s
-		//link.setLength(300); // meter
-		//link.setCapacity(800); // veh / hour
-		//link.setNumberOfLanes(1);
-		//link.setAllowedModes(CollectionUtils.stringToSet("heavy"));
-		//network.addLink(link);
-		
-		new NetworkWriter(network).write("C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\outputTest\\networkTest.xml");
-		
+		for (Link l : network.getLinks().values()) {
 
+			delay.put(l.getId().toString(), 0.0);
+			delayTrucks.put(l.getId().toString(), 0.0);
+			delayWorkers.put(l.getId().toString(), 0.0);
+			numberOfCars.put(l.getId().toString(), 0.0);
+			numberOfTrucks.put(l.getId().toString(), 0.0);
+			numberOfWorkers.put(l.getId().toString(), 0.0);
+			speedLinks.put(l.getId().toString(), 0.0);
+
+		}
+
+		
+		EventsManager events = EventsUtils.createEventsManager();
+
+		CongestionHandler congestion = new CongestionHandler(network, delay, numberOfCars, numberOfTrucks, numberOfWorkers, speedLinks, delayTrucks, delayWorkers);
+		events.addHandler(congestion);
+
+		new MatsimEventsReader(events).readFile(eventFile);
+
+		delay = congestion.getDelayTable();
+		numberOfCars = congestion.getCarsOnLinks();
+		numberOfTrucks = congestion.getTrucksOnLinks();
+		numberOfWorkers = congestion.getWorkersksOnLinks();
+		speedLinks = congestion.getLinkSpeed();
+		hourlyDelay = congestion.getHourDelay();
+		delayTrucks = congestion.getDelayTrucks();
+		delayWorkers = congestion.getDelayWorkers();
+		hourlyDelayTrucks = congestion.getHourTruckDelay();
+		hourlyDelayWorkers = congestion.getHourWorkerskDelay();
+		
+		hourCars = congestion.getHourCars();
+		
+		// NetworkToShape dataToSHP = new NetworkToShape(delay, numberOfCars);
+		// dataToSHP.doEverything();
+
+		for (HashMap.Entry<Integer, Double> entry : hourCars.entrySet()) {
+		  System.out.println(entry.getValue()*5);
+		    
+		}
+		
 	}
 	
-	private static void createVehicleTypes(String configFileName) {
-		
-		Config config = ConfigUtils.loadConfig(configFileName);		
-		Scenario scenario = ScenarioUtils.loadScenario(config) ;
-		
-		VehicleType car = scenario.getVehicles().getFactory().createVehicleType(Id.create(TransportMode.car, VehicleType.class));
-        car.setMaximumVelocity(120 / 3.6);
-        scenario.getVehicles().addVehicleType(car);
-		
-		
-        VehicleType truck = scenario.getVehicles().getFactory().createVehicleType(Id.create(TransportMode.truck, VehicleType.class));
-        truck.setMaximumVelocity(10 / 3.6);
-        truck.setLength(40);
-        truck.setPcuEquivalents(6);
-        truck.setWidth(4);
-        truck.setNetworkMode(TransportMode.truck);
-        scenario.getVehicles().addVehicleType(truck);
-
-        new MatsimVehicleWriter(scenario.getVehicles()).writeFile(vehiclesFile);
-		
-
-	}
 	
-	private static void updateConfiguration(String configFileName) {
+	private static void doCalcualtions(String event1, String event2) {
 		
-		Config config = ConfigUtils.loadConfig(configFileName);		
+		resultCreator(configFileUpdated, event1);
+		 
+		 HashMap<String, Double> copyDelay1 = new HashMap<String,Double>(delay);
+		 HashMap<String, Double> copyDelayTrucks1 = new HashMap<String,Double>(delayTrucks);
+		 HashMap<String, Double> copyDelayWorkers1 = new HashMap<String,Double>(delayWorkers);
+		 HashMap<String, Double> copyCars1 = new HashMap<String,Double>(numberOfCars);
+		 HashMap<String, Double> copyTrucks1 = new HashMap<String,Double>(numberOfTrucks);
+		 HashMap<String, Double> copyWorkers1 = new HashMap<String,Double>(numberOfWorkers);
+		 
+		 HashMap<String, Double> copySpeedLinks1 = new HashMap<String,Double>(speedLinks);
+		 
+		 HashMap<Integer, Double> hourlyDelay1 = new HashMap<Integer,Double>(hourlyDelay);
+		 HashMap<Integer, Double> hourlyDelayTrucks1 = new HashMap<Integer,Double>(hourlyDelayTrucks);
+		 HashMap<Integer, Double> hourlyDelayWorkers1 = new HashMap<Integer,Double>(hourlyDelayWorkers);
+		 				
+		 resultCreator(configFileUpdated, event2);
+		 
+		 HashMap<String, Double> copyDelay2 = new HashMap<String,Double>(delay);
+		 HashMap<String, Double> copyDelayTrucks2 = new HashMap<String,Double>(delayTrucks);
+		 HashMap<String, Double> copyDelayWorkers2 = new HashMap<String,Double>(delayWorkers);
+		 HashMap<String, Double> copyCars2 = new HashMap<String,Double>(numberOfCars);
+		 HashMap<String, Double> copyTrucks2 = new HashMap<String,Double>(numberOfTrucks);
+		 HashMap<String, Double> copyWorkers2 = new HashMap<String,Double>(numberOfWorkers);
+		 HashMap<String, Double> copySpeedLinks2 = new HashMap<String,Double>(speedLinks);
+		 
+		 HashMap<Integer, Double> hourlyDelay2 = new HashMap<Integer,Double>(hourlyDelay);
+		 HashMap<Integer, Double> hourlyDelayTrucks2 = new HashMap<Integer,Double>(hourlyDelayTrucks);
+		 HashMap<Integer, Double> hourlyDelayWorkers2 = new HashMap<Integer,Double>(hourlyDelayWorkers);
+		 
+		 HashMap<String, Double> diffDelay = new HashMap<String,Double>(delay);
+		 HashMap<String, Double> diffDelayTrucks = new HashMap<String,Double>(delay);
+		 HashMap<String, Double> diffDelayWorkers = new HashMap<String,Double>(delay);
+		 HashMap<String, Double> diffCars = new HashMap<String,Double>(numberOfCars);
+		 HashMap<String, Double> diffTrucks = new HashMap<String,Double>(numberOfTrucks);
+		 HashMap<String, Double> diffLinksSpeed = new HashMap<String,Double>(speedLinks);
+		 HashMap<Integer, Double> diffHours = new HashMap<Integer,Double>(hourlyDelay);
+		 
+		 
+		 double totalCarsDelay1 = 0.0;
+		 double totalCarsDelay2 = 0.0;
+		 
+		 double totalTrucksDelay1 = 0.0;
+		 double totalTrucksDelay2 = 0.0;
+		 
+		 double totalWorkersDelay1 = 0.0;
+		 double totalWorkersDelay2 = 0.0;
+		 
+		 double totalCars = 0.0;
+		 double totalTrucks = 0.0;
+		 
+		 HashMap<String, Double> avgDelay1 = new HashMap<String,Double>(delay);
+		 HashMap<String, Double> avgDelay2 = new HashMap<String,Double>(delay);
+		 
+		 HashMap<String, Double> avgSpeed1 = new HashMap<String,Double>(speedLinks);
+		 HashMap<String, Double> avgSpeed2 = new HashMap<String,Double>(speedLinks);
+		 
+		 HashMap<String, Double> diffAvgDelay = new HashMap<String,Double>(delay);
+		 
+		 HashMap<String, Double> copyWorkers = new HashMap<String,Double>(numberOfWorkers);
+		 
+		 HashMap<String, Double> constructionTransport = new HashMap<String,Double>(numberOfWorkers);
+		 double total = 0.0;
+		 System.out.println("");
+		 System.out.println("HOURLY CARS VOLUME WITHOUT CONSTRUCTION");
+			for (int i = 0; i < 24; i++) {
 				
+				System.out.println("HOURLY CARS BEFORE " + i + " DELAY " + hourlyDelay1.get(i));
+				total += hourlyDelay1.get(i);
+			}
+			System.out.println("total " + total);
+			System.out.println("HOURLY CARS VOLUME AFTER CONSTRUCTION");
+			for (int i = 0; i < 24; i++) {
+				
+				System.out.println("HOURLY CARS AFTER " + i + " DELAY " + hourlyDelay2.get(i));
+			}
+			
+			System.out.println("DIFFENCE CARS AFTER - BEFORE ");
+			for (int i = 0; i < 24; i++) {
+				diffHours.put(i, hourlyDelay2.get(i)-hourlyDelay1.get(i));
+				System.out.println("DIFF HOURLY " + i + " DELAY " + diffHours.get(i));
+			}
+			
+			System.out.println("");
+			System.out.println("HOURLY WITHOUR CONSTRUCTION TRUCKS");
+			for (int i = 0; i < 24; i++) {
+				
+				System.out.println("HOURLY  Trucks Before " + i + " DELAY " + hourlyDelayTrucks1.get(i));
+			}
+			System.out.println("HOURLY AFTER CONSTRUCTION TRUCKS");
+			for (int i = 0; i < 24; i++) {
+				
+				System.out.println("DIFF HOURLY Trucks AFTER " + i + " DELAY " + hourlyDelayTrucks2.get(i));
+			}
+		 
+			System.out.println("DIFFERENCE HOURLY TRUCKS");
+			for (int i = 0; i < 24; i++) {
+				System.out.println("DIFF HOURLY TRUCKS " + i + " DELAY " + (hourlyDelayTrucks2.get(i)-hourlyDelayTrucks1.get(i)));
+			}
+		 
 	
-		config.plans().setInputFile(populationFile);			
-		
-		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);       
-        config.vehicles().setVehiclesFile(vehiclesFile);	
- 
-		
-        List<String> mainModes = Arrays.asList(new String[]{TransportMode.car, TransportMode.truck});
-        config.qsim().setMainModes(mainModes);
-        config.plansCalcRoute().setNetworkModes(mainModes);
-        config.travelTimeCalculator().setAnalyzedModesAsString("car,truck");
-        config.travelTimeCalculator().setSeparateModes(false);
-        
-        PlanCalcScoreConfigGroup.ModeParams truck1 = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.truck);
-        truck1.setMonetaryDistanceRate(-0.00185);
-        truck1.setMarginalUtilityOfTraveling(-2.34);
-        truck1.setConstant(0.0);
-        truck1.setMarginalUtilityOfDistance(0.0);
-        config.planCalcScore().addModeParams(truck1); 
-    
-        
-        StrategyConfigGroup.StrategySettings keepRoute = new StrategyConfigGroup.StrategySettings();   
-        keepRoute.setSubpopulation("heavyVeh");        
-        keepRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.KeepLastSelected);
-        keepRoute.setWeight(1);
-        
-       config.strategy().addStrategySettings(keepRoute);
-        
-        new ConfigWriter(config).write(configFileUpdated);
-        
+			System.out.println("");
+			System.out.println("HOURLY BEFORE WORKERS");
+			for (int i = 0; i < 24; i++) {
+				
+				System.out.println("HOURLY  WORKERS WORKERS " + i + " DELAY " + hourlyDelayWorkers1.get(i));
+			}
+			System.out.println("DIFF HOURLY AFTER WORKERS ");
+			for (int i = 0; i < 24; i++) {
+				
+				System.out.println("HOURLY  WORKERS AFTER " + i + " DELAY " + hourlyDelayWorkers2.get(i));
+			}
+		 
+			System.out.println("DIFF HOURLY DIFFERENCE WORKERS");
+			for (int i = 0; i < 24; i++) {
+				System.out.println("DIFF HOURLY WORKERS" + i + " DELAY " + (hourlyDelayWorkers2.get(i)-hourlyDelayWorkers1.get(i)));
+			}
+		 
+			int counter = 0;
+		 
+		 for (HashMap.Entry<String, Double> row : diffDelay.entrySet()) {
+			 
+			 if(copyCars1.get(row.getKey())==0.0){
+				 avgSpeed1.put(row.getKey(), 0.0);
+				 avgDelay1.put(row.getKey(), 0.0);
+			 } else {
+	
+				 avgDelay1.put(row.getKey(), copyDelay1.get(row.getKey())/copyCars1.get(row.getKey()));
+				 avgSpeed1.put(row.getKey(), 3.6*copySpeedLinks1.get(row.getKey())/copyCars1.get(row.getKey()));
+			 }
+			 
+			 if(copyCars2.get(row.getKey())==0.0) {
+				 avgSpeed2.put(row.getKey(), 0.0);
+				 avgDelay2.put(row.getKey(), 0.0);
+			 } else {
+				 
+				 avgDelay2.put(row.getKey(), copyDelay2.get(row.getKey())/copyCars2.get(row.getKey()));			 
+				 avgSpeed2.put(row.getKey(), 3.6*copySpeedLinks2.get(row.getKey())/copyCars2.get(row.getKey()));
+				 
+			 }
+			 
 
+		 diffDelay.put(row.getKey(), (copyDelay2.get(row.getKey())-copyDelay1.get(row.getKey()))/60);
+		 diffDelayTrucks.put(row.getKey(), (copyDelayTrucks2.get(row.getKey())-copyDelayTrucks1.get(row.getKey()))/60);
+		 diffDelayWorkers.put(row.getKey(), (copyDelayWorkers2.get(row.getKey())-copyDelayWorkers1.get(row.getKey()))/60);
+		 
+		 diffCars.put(row.getKey(), (copyCars2.get(row.getKey())-copyCars1.get(row.getKey())));
+		 diffTrucks.put(row.getKey(), (copyTrucks2.get(row.getKey())-copyTrucks1.get(row.getKey())));
+		 
+		 diffLinksSpeed.put(row.getKey(), (avgSpeed2.get(row.getKey())-avgSpeed1.get(row.getKey())));
+		 diffAvgDelay.put(row.getKey(), (avgDelay2.get(row.getKey())-avgDelay1.get(row.getKey())));
+		 
+		 totalCarsDelay1 += copyDelay1.get(row.getKey());
+		 totalCarsDelay2 += copyDelay2.get(row.getKey());
+		 
+		 totalTrucksDelay1 += copyDelayTrucks1.get(row.getKey());
+		 totalTrucksDelay2 += copyDelayTrucks2.get(row.getKey());
+		 
+		 totalWorkersDelay1 += copyDelayWorkers1.get(row.getKey());
+		 totalWorkersDelay2 += copyDelayWorkers2.get(row.getKey());
+		 
+		 
+		 }		
+		
+		 totalCarsDelay1 = totalCarsDelay1/3600;
+		 totalCarsDelay2 = totalCarsDelay2/3600;
+		
+		 
+		 System.out.println("DELAY CARS BEFORE HOURS " + totalCarsDelay1);
+		 System.out.println("DELAY CARS AFTER HOURS " + totalCarsDelay2);
+		 
+		 System.out.println("DELAY Trucks BEFORE HOURS " + totalTrucksDelay1/3600);
+		 System.out.println("DELAY Trucks AFTER HOURS " + totalTrucksDelay2/3600);
+		 
+		 System.out.println("DELAY Workers BEFORE HOURS " + totalWorkersDelay1/3600);
+		 System.out.println("DELAY Workers AFTER HOURS " + totalWorkersDelay2/3600);
+		 
+		 
+		NetworkToShape dataToSHP = new NetworkToShape(diffDelay, diffCars, diffTrucks, copyWorkers, diffAvgDelay, diffLinksSpeed); 
+		dataToSHP.doEverything();
+
+		
 	}
 	
 	
@@ -767,34 +1311,51 @@ public class NorrkopingProductionRunner {
 	public static void main(String[] args) {
 
 		System.out.println("START OF MAIN");
-
-//		final double xMin = 531377;
-//		final double xMax = 622208;
-//		final double yMin = 6474497;
-//		final double yMax = 6524013;
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("DB user name: ");
+		user = scanner.nextLine();
+		System.out.println("password: ");
+		passwd = scanner.nextLine();
+		scanner.close();
 		
+		//Update network with construction sites
+		NetworkEditor edit = new NetworkEditor(configFile, user, passwd);
+		edit.editNework();
 		
-//DEMAND UPSCALE???
-		// final double demandUpscale = 100.0 / 18.0;
-
-		//final double demandUpscale = 1;
-		// cutFromSwedenCarOnly(xMin, xMax, yMin, yMax);
-		// cutFromSwedenPTOnly(xMin, xMax, yMin, yMax);
+		//Use only once to create general population in Norrkoping. 
+		//createDemandNorrkoping(1.0);
+		//runXY2Links(configFileUpdated,norrkopingNetwork,norrkopingPlansNew);
 		
-		//updateNetworkConstructionSites(configFile);
+		//Create agents based on databse demand for consruction workers and transports
+		createDemandWorkers(configFile, 1.0, 6);
 		
-		createDemandTrucks(configFile);
-		 //createDemand(demandUpscale);
-		runXY2Links();
+		runXY2Links(configFile,norrkopingNetwork,populationMerged);
 		
 		createVehicleTypes(configFile);
-		// reducePopulation();			
-		updateConfiguration(configFile);		
+		updateConfiguration(configFile,norrkopingNetwork, populationMerged);
+		
+		runSimulation(configFileUpdated);
+		
+		
+		
+		//Compare two event files
+		/*
+		String eventFile1 = "C:\\Users\\TOPO-O\\Desktop\\outputOD\\OD_fixed\\ITERS\\it.5\\5.events.xml.gz";
+		String eventFile2 ="C:\\Users\\TOPO-O\\Desktop\\outputOD\\OD_trucksWorkers\\ITERS\\it.5\\5.events.xml.gz";
+		//String eventFile2 ="C:\\Users\\TOPO-O\\Desktop\\outputOD\\OD_trucks2000\\ITERS\\it.5\\5.events.xml.gz";
+		doCalcualtions(eventFile1, eventFile2);
+		*/
+
 		
 
-		runSimulation(configFileUpdated);
+		System.out.println("END OF SIMULATION");
 
-		System.out.println("END OF CODE");
+		
+		 
+		
+
+		System.out.println("PROGRAM IS FINISHED");
+
 	}
 
 }
