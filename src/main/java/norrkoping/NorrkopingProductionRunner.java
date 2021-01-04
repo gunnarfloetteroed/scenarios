@@ -1263,13 +1263,16 @@ public class NorrkopingProductionRunner {
 
 	public static void main(String[] args) {
 
-		System.out.println("START OF MAIN");
-		Scanner scanner = new Scanner(System.in);
-		System.out.println("DB user name: ");
-		user = scanner.nextLine();
-		System.out.println("password: ");
-		passwd = scanner.nextLine();
-		scanner.close();
+		//System.out.println("START OF MAIN");
+		//Scanner scanner = new Scanner(System.in);
+		//System.out.println("DB user name: ");
+		//user = scanner.nextLine();
+		/*
+		user = "rudolfs";
+		//System.out.println("password: ");
+		//passwd = scanner.nextLine();
+		passwd = "RuZe200514";
+		//scanner.close();
 
 		// Update network with construction sites
 		NetworkEditor edit = new NetworkEditor(configFile, user, passwd);
@@ -1288,7 +1291,12 @@ public class NorrkopingProductionRunner {
 		updateConfiguration(configFile, norrkopingNetwork, populationMerged);
 
 		runSimulation(configFileUpdated);
-
+		*/
+		
+		odCalculationTrucks trucks = new odCalculationTrucks("","", 100.0);
+		trucks.createODTrucks();
+		
+		
 		// Compare two event files
 		/*
 		 * String eventFile1 =
