@@ -50,6 +50,8 @@ public class NetworkToShape {
 				"C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\ResultFile\\networkTest.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Network network = scenario.getNetwork();
+		
+		//CHANGE COORDIANTE SYSTEM
 
 		CoordinateReferenceSystem crs = MGC.getCRS("EPSG:21781"); // EPSG Code for Swiss CH1903_LV03 coordinate system
 

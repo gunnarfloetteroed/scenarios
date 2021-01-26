@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 
+import javax.print.attribute.standard.Destination;
+
 import org.apache.commons.math3.ml.distance.EuclideanDistance;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -118,7 +120,8 @@ public class NorrkopingProductionRunner {
 	static final String configFileUpdated = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\ConfigUpdated.xml";
 
 	static final String norrkopingNetwork = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\networkUpdated.xml";
-	static final String norrkopingPlansNew = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\nrkpPlans.xml";
+	static final String nrkpPlans = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\nrkpPlans.xml";
+	static final String nrkpPlans50 = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\nrkpPlans50.xml";
 	static final String vehiclesFile = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\vehicleTypes.xml";
 	static final String populationMerged = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\popMerged.xml";
 
@@ -600,7 +603,7 @@ public class NorrkopingProductionRunner {
 		}
 
 		final PopulationWriter writer = new PopulationWriter(scenario.getPopulation());
-		writer.writeV6(norrkopingPlansNew);
+		//writer.writeV6(norrkopingPlansNew);
 	}
 
 	private static void addTripMakerPersons(Scenario scenario, Id<Person> personId, Coord fromCoord, Coord toCoord,
@@ -624,6 +627,207 @@ public class NorrkopingProductionRunner {
 		scenario.getPopulation().addPerson(person);
 	}
 
+	
+	
+	
+	public static void createDemandTrucksFromOD(String configFile) {
+
+		System.out.println("Truck Method OD OFFILNE.");
+
+		final Config config = ConfigUtils.loadConfig(configFile);
+
+		config.network().setInputFile(norrkopingNetwork);
+		
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		user = "rudolfs";
+		passwd = "RuZe200514";
+		final DatabaseODMatrix od = new DatabaseODMatrix(user, passwd, "localhost", 5432); // 5455);
+		
+		od.getSiteCoordinatesFromDatabase();
+		HashMap<String, Double> xCoord = od.getSiteCoordinatesX();
+		HashMap<String, Double> yCoord = od.getSiteCoordinatesY();
+
+		od.getStoreCoordinates();
+		HashMap<String, Double> xCoordStore = od.getStoreCoordinatesX();
+		HashMap<String, Double> yCoordStore = od.getStoreCoordinatesY();
+
+		odCalculationTrucks odTrucks = new odCalculationTrucks("a", "s", 243); 
+		odTrucks.createODTrucks();
+		ArrayList<Integer> origin = odTrucks.getOriginHGV();
+		ArrayList<Integer> destination = odTrucks.getDestinationHGV();
+		ArrayList<Integer> departure = odTrucks.getDepartureHGV();
+		
+
+		final int timeBinCnt = 24; // 24h
+		final double timeBinSize_s = Units.S_PER_D / timeBinCnt; // 24h = 3600 seconds
+		
+		boolean specialCase = false;
+
+		int person = 1;
+		int transports = origin.size();
+		
+		double truck23 = Math.round(transports*0.2);
+		int count = 0;
+		int var = 0;
+		String truck;
+		
+		Coord fromCoord;
+		Coord homeCoord;
+		
+		Coord coordConstruction;
+		
+		Network network = scenario.getNetwork();
+		
+		for (int i = 0; i < origin.size(); i++) {
+			
+			if (origin.get(i)== 11) {
+				// E4Linkoping
+				List<Node> nodesList = new ArrayList<Node>();
+				nodesList = NetworkUtils.getNodes(network, "294212 128846");
+				fromCoord = nodesList.get(0).getCoord();
+				homeCoord = nodesList.get(1).getCoord();
+				
+			} else if(origin.get(i)== 12) {
+				//E4Stockholm
+				List<Node> nodesList = new ArrayList<Node>();
+				nodesList = NetworkUtils.getNodes(network, "165030 165039");
+				fromCoord = nodesList.get(0).getCoord();
+				homeCoord = nodesList.get(1).getCoord();
+
+			} else if (origin.get(i)== 13) {
+				//E22Soderkoping
+				List<Node> nodesList = new ArrayList<Node>();
+				nodesList = NetworkUtils.getNodes(network, "1041738188 1041737204");
+				fromCoord = nodesList.get(0).getCoord();
+				homeCoord = nodesList.get(1).getCoord();
+
+			} else if (origin.get(i)== 1 && destination.get(i)== 3) {
+				System.out.println("special case");
+				specialCase = true;
+				fromCoord = new Coord(xCoordStore.get(origin.get(i).toString()), yCoordStore.get(origin.get(i).toString()));
+				homeCoord = new Coord(xCoordStore.get(origin.get(i).toString()), yCoordStore.get(origin.get(i).toString()));
+
+
+			} else {
+				// Origin for zones
+				fromCoord = new Coord(xCoordStore.get(origin.get(i).toString()), yCoordStore.get(origin.get(i).toString()));
+				homeCoord = new Coord(xCoordStore.get(origin.get(i).toString()), yCoordStore.get(origin.get(i).toString()));
+			}
+				
+				
+			coordConstruction =  new Coord(xCoord.get(destination.get(i).toString()), yCoord.get(destination.get(i).toString()));
+			
+			
+			if(var == 0) {
+				truck = "truck";
+				var = 1;
+			} else if(var == 1 || count <= truck23) {
+				
+				truck = "truck23";
+				count = count +1;
+				var = 0;
+				
+			} else {
+				truck = "truck";
+			}
+				
+
+				addTripTrucksOD(scenario, Id.createPersonId("truck" + (person++)), fromCoord, homeCoord, coordConstruction, (departure.get(i) + Math.random()) * timeBinSize_s, truck, specialCase);
+				specialCase = false;
+		}
+
+		// Create new population file by merging norrkoping travellers with trucks and
+		// workers in
+		// norrkoping
+		final PopulationWriter writer = new PopulationWriter(scenario.getPopulation());
+		writer.writeV6(populationMerged);
+
+	}
+	
+	
+	
+	private static void addTripTrucksOD(Scenario scenario, Id<Person> personId, Coord fromCoord, Coord homeCoord, Coord coordConstruction, double dptTime_s, String truck, boolean specialCase) {
+
+		// Exact origin for trucks
+		//final Coord fromCoord;
+		//final Coord homeCoord;
+		int unloadTime = 3600;
+		int travelTime = 900;
+		
+		
+		final Coord middleCoord;
+
+		// Create person, add to sub-population, create/add plan
+		final Person person = scenario.getPopulation().getFactory().createPerson(personId);
+		person.getAttributes().putAttribute("subpopulation", "heavyVeh");
+
+		final Plan plan = scenario.getPopulation().getFactory().createPlan();
+		person.addPlan(plan);
+
+		Population population = scenario.getPopulation();
+		PopulationFactory pop = population.getFactory();
+		Network network = scenario.getNetwork();
+
+
+		// All other agents
+		Activity start = scenario.getPopulation().getFactory().createActivityFromCoord("truckStart", fromCoord);		
+		start.setEndTime(dptTime_s);
+		plan.addActivity(start);
+
+		Leg leg;
+		
+		if(truck.equals("truck")) {
+			leg = pop.createLeg(TransportMode.truck);
+		} else {
+			
+			leg = pop.createLeg("truck23");
+		}
+			
+		plan.addLeg(leg);
+
+		
+		if (specialCase == true) {
+			List<Node> nodesList = new ArrayList<Node>();
+			nodesList = NetworkUtils.getNodes(network, "251899658");
+			middleCoord = nodesList.get(0).getCoord();
+
+			Activity middlePoint = scenario.getPopulation().getFactory().createActivityFromCoord("middlePoint",	middleCoord);
+			middlePoint.setLinkId(Id.get("314867", Link.class));
+			middlePoint.setEndTime(dptTime_s + 20);
+			plan.addActivity(middlePoint);
+
+			leg.setDepartureTime(dptTime_s + 20);
+			plan.addLeg(leg);
+			
+
+		}
+	
+		
+		
+		Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("construction", coordConstruction);
+		end.setStartTime(dptTime_s + travelTime);
+		end.setEndTime(dptTime_s + travelTime + unloadTime);
+		leg.setTravelTime(travelTime);
+		plan.addActivity(end);
+		plan.addLeg(leg);
+		Activity start1 = scenario.getPopulation().getFactory().createActivityFromCoord("truckHome", homeCoord);
+		start1.setStartTime(dptTime_s + travelTime + unloadTime + travelTime);
+		leg.setTravelTime(travelTime);
+		plan.addActivity(start1);
+		
+		
+	
+
+		scenario.getPopulation().addPerson(person);
+	}
+	
+
+	
+
+	
+	
+	
 	public static void createDemandTrucks(Scenario scenario, double upScale) {
 
 		System.out.println("Truck Method.");
@@ -926,7 +1130,7 @@ public class NorrkopingProductionRunner {
 		});
 
 		greedo.meet(controler);
-
+		
 		controler.run();
 	}
 
@@ -956,6 +1160,9 @@ public class NorrkopingProductionRunner {
 
 		Config config = ConfigUtils.loadConfig(configFileName);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Network network = scenario.getNetwork();
+		NetworkFactory netF = network.getFactory();
+		
 
 		VehicleType car = scenario.getVehicles().getFactory()
 				.createVehicleType(Id.create(TransportMode.car, VehicleType.class));
@@ -964,13 +1171,23 @@ public class NorrkopingProductionRunner {
 
 		VehicleType truck = scenario.getVehicles().getFactory()
 				.createVehicleType(Id.create(TransportMode.truck, VehicleType.class));
-		truck.setMaximumVelocity(50 / 3.6);
+		truck.setMaximumVelocity(60 / 3.6);
 		truck.setLength(10);
-		truck.setPcuEquivalents(3);
+		truck.setPcuEquivalents(1);
 		truck.setWidth(2.5);
 		truck.setNetworkMode(TransportMode.truck);
 		scenario.getVehicles().addVehicleType(truck);
-
+		
+		
+		VehicleType truck23 = scenario.getVehicles().getFactory()
+				.createVehicleType(Id.create("truck23", VehicleType.class));
+		truck23.setMaximumVelocity(40 / 3.6);
+		truck23.setLength(23);
+		truck23.setPcuEquivalents(1);
+		truck23.setWidth(2.5);
+		truck23.setNetworkMode("truck23");
+		scenario.getVehicles().addVehicleType(truck23);
+		
 		new MatsimVehicleWriter(scenario.getVehicles()).writeFile(vehiclesFile);
 
 	}
@@ -979,21 +1196,21 @@ public class NorrkopingProductionRunner {
 
 		Config config = ConfigUtils.loadConfig(configFileName);
 
-		config.controler().setLastIteration(2);
+		config.controler().setLastIteration(3);
 
 		config.network().setInputFile(networkFileName);
 		config.plans().setInputFile(popFileName);
 
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		// config.qsim().setPcuThresholdForFlowCapacityEasing(0.5);
-		config.qsim().setFlowCapFactor(0.2);
-		config.qsim().setStorageCapFactor(0.4);
+		config.qsim().setFlowCapFactor(0.1);
+		config.qsim().setStorageCapFactor(0.2);
 		config.vehicles().setVehiclesFile(vehiclesFile);
 
-		List<String> mainModes = Arrays.asList(new String[] { TransportMode.car, TransportMode.truck });
+		List<String> mainModes = Arrays.asList(new String[] { TransportMode.car, TransportMode.truck, "truck23" });
 		config.qsim().setMainModes(mainModes);
 		config.plansCalcRoute().setNetworkModes(mainModes);
-		config.travelTimeCalculator().setAnalyzedModesAsString("car,truck");
+		config.travelTimeCalculator().setAnalyzedModesAsString("car,truck, truck23");
 		config.travelTimeCalculator().setSeparateModes(true); // change maybe to true
 
 		PlanCalcScoreConfigGroup.ModeParams truck1 = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.truck);
@@ -1003,6 +1220,17 @@ public class NorrkopingProductionRunner {
 		truck1.setMarginalUtilityOfDistance(0.0);
 
 		config.planCalcScore().addModeParams(truck1);
+		
+		
+		PlanCalcScoreConfigGroup.ModeParams truck23 = new PlanCalcScoreConfigGroup.ModeParams("truck23");
+		truck1.setMonetaryDistanceRate(0); // all to zero
+		truck1.setMarginalUtilityOfTraveling(-2.34);
+		truck1.setConstant(0.0);
+		truck1.setMarginalUtilityOfDistance(0.0);
+		
+		config.planCalcScore().addModeParams(truck23);
+		
+
 
 		StrategyConfigGroup.StrategySettings keepRoute = new StrategyConfigGroup.StrategySettings();
 		keepRoute.setSubpopulation("heavyVeh");
@@ -1267,7 +1495,7 @@ public class NorrkopingProductionRunner {
 		//Scanner scanner = new Scanner(System.in);
 		//System.out.println("DB user name: ");
 		//user = scanner.nextLine();
-		/*
+		
 		user = "rudolfs";
 		//System.out.println("password: ");
 		//passwd = scanner.nextLine();
@@ -1275,26 +1503,35 @@ public class NorrkopingProductionRunner {
 		//scanner.close();
 
 		// Update network with construction sites
-		NetworkEditor edit = new NetworkEditor(configFile, user, passwd);
-		edit.editNework();
+		//NetworkEditor edit = new NetworkEditor(configFile, user, passwd);
+		//edit.editNework();
 
 		// Use only once to create general population in Norrkoping.
 		// createDemandNorrkoping(1.0);
 		// runXY2Links(configFileUpdated,norrkopingNetwork,norrkopingPlansNew);
 
 		// Create agents based on databse demand for consruction workers and transports
-		createDemandWorkers(configFile, 1.0, 6);
+		//createDemandWorkers(configFile, 1.0, 6);
 
+		NetworkEditor edit = new NetworkEditor(configFile, user, passwd);
+		edit.editNework();
+		createDemandTrucksFromOD(configFile);
+		
 		runXY2Links(configFile, norrkopingNetwork, populationMerged);
-
 		createVehicleTypes(configFile);
 		updateConfiguration(configFile, norrkopingNetwork, populationMerged);
 
 		runSimulation(configFileUpdated);
-		*/
 		
-		odCalculationTrucks trucks = new odCalculationTrucks("","", 100.0);
-		trucks.createODTrucks();
+		
+		
+		
+		
+		//Create od pairs for trucks based on input number
+		
+		//odCalculationTrucks trucks = new odCalculationTrucks("","", 100.0);
+		//trucks.createODTrucks();
+		
 		
 		
 		// Compare two event files
