@@ -28,6 +28,7 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 	private Map<Id<Vehicle>, Double> enterTime = new HashMap<>();
 
 	private HashMap<String, Double> delay = new HashMap<>();
+	private HashMap<String, Double> delayProcent = new HashMap<>();
 	private HashMap<String, Double> delayWorkers = new HashMap<>();
 	private HashMap<String, Double> delayTrucks = new HashMap<>();
 	private HashMap<String, Double> numberOfCars = new HashMap<>();
@@ -41,9 +42,9 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 	private HashMap<Integer, Double> hourDelayWorkers = new HashMap<>();
 
 	private HashMap<String, Double> linkSpeed = new HashMap<>();
+	private HashMap<String, Double> linkSpeedPercent = new HashMap<>();
 
 	private Network network;
-	private Scenario scenario;
 
 	private Id<Vehicle> vehId;
 	double time = 0;
@@ -51,7 +52,7 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 
 	public CongestionHandler(Network network, HashMap<String, Double> inTable, HashMap<String, Double> inTable2,
 			HashMap<String, Double> inTable3, HashMap<String, Double> inTable4, HashMap<String, Double> inTable5,
-			HashMap<String, Double> inTable7, HashMap<String, Double> inTable8) {
+			HashMap<String, Double> inTable7, HashMap<String, Double> inTable8, HashMap<String, Double> inTable9) {
 		this.network = network;
 		this.delay = inTable;
 		this.numberOfCars = inTable2;
@@ -61,6 +62,7 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 
 		this.delayTrucks = inTable7;
 		this.delayWorkers = inTable8;
+		this.delayProcent = inTable9;
 
 		for (int i = 0; i < 24; i++) {
 			hourDelay.put(i, 0.0);
@@ -68,7 +70,22 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 			hourDelayWorkers.put(i, 0.0);
 			hourCars.put(i, 0.0);
 		}
+		
+		for (Link l : network.getLinks().values()) {
+
+			linkSpeedPercent.put(l.getId().toString(), 0.0);
+
+		}
 	}
+	
+	
+
+	
+	
+	
+	
+	
+	
 
 	@Override
 	public void reset(int iteration) {
@@ -84,8 +101,10 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 
 			Link link = network.getLinks().get(event.getLinkId());
 
-			if (event.getVehicleId().toString().contains("truck")) {
-				linkTravelTime = link.getLength() / (25 / 3.6);
+			if (event.getVehicleId().toString().contains("_truck23")) {
+				linkTravelTime = link.getLength() / (link.getFreespeed(event.getTime()) * 0.7);
+			} else if (event.getVehicleId().toString().contains("_truck")) {
+				linkTravelTime = link.getLength() / (link.getFreespeed(event.getTime()) * 0.8);
 			} else {
 				linkTravelTime = link.getLength() / link.getFreespeed(event.getTime());
 
@@ -104,7 +123,12 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 			double excessTravelTime;
 			double travelTime;
 			double speed;
-
+			double delayPercent;
+			double linkFreeTravel;
+			double delayTime;
+			double speedPercent;
+			
+					
 			if ((this.earliestLinkExitTime.get(event.getVehicleId()) == 0.0)) {
 				excessTravelTime = 0.0;
 
@@ -124,7 +148,7 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 						delayTrucks.get(event.getLinkId().toString()) + excessTravelTime);
 
 				if (h < 24) {
-					hourDelayTrucks.put(h, (hourDelayTrucks.get(h) + excessTravelTime / 60));
+					hourDelayTrucks.put(h, (hourDelayTrucks.get(h) + excessTravelTime));
 				}
 
 			} else if (event.getVehicleId().toString().contains("worker")) {
@@ -134,7 +158,7 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 						delayWorkers.get(event.getLinkId().toString()) + excessTravelTime);
 
 				if (h < 24) {
-					hourDelayWorkers.put(h, (hourDelayWorkers.get(h) + excessTravelTime / 60));
+					hourDelayWorkers.put(h, (hourDelayWorkers.get(h) + excessTravelTime));
 				}
 
 			} else {
@@ -142,21 +166,52 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 				delay.put(event.getLinkId().toString(), delay.get(event.getLinkId().toString()) + excessTravelTime);
 				numberOfCars.put(event.getLinkId().toString(), (numberOfCars.get(event.getLinkId().toString()) + 1));
 				if (h < 24) {
-					hourDelay.put(h, (hourDelay.get(h) + excessTravelTime / 60));
+					hourDelay.put(h, (hourDelay.get(h) + excessTravelTime));
 
 				}
 			}
 
-			travelTime = event.getTime() - this.enterTime.get(event.getVehicleId());
+			Link link = network.getLinks().get(event.getLinkId());
 
-			if (travelTime < 0) {
+			if (this.enterTime.get(event.getVehicleId()) <= 0.0) {
+				travelTime = 0.0;
+				delayTime = 0.0;
+				speed = 0.0;
 
 			} else {
-
-				Link link = network.getLinks().get(event.getLinkId());
+				travelTime = event.getTime() - this.enterTime.get(event.getVehicleId());
+				linkFreeTravel = link.getLength() / link.getFreespeed(event.getTime());
+				delayTime = travelTime - linkFreeTravel;
 				speed = link.getLength() / travelTime;
+			}
+
+			if (travelTime <= 1.0 && delayTime <= 1.0) {
+				speed = 0.7*link.getFreespeed();
+				linkSpeed.put(event.getLinkId().toString(), linkSpeed.get(event.getLinkId().toString()) + speed);
+				
+				speedPercent = (speed - link.getFreespeed(event.getTime()))/link.getFreespeed(event.getTime());
+				linkSpeedPercent.put(event.getLinkId().toString(), linkSpeedPercent.get(event.getLinkId().toString()) + speedPercent);
+
+			} else if (delayTime <= 1.0) {
+				
+				linkSpeed.put(event.getLinkId().toString(), linkSpeed.get(event.getLinkId().toString()) + speed);
+				
+				speedPercent = (speed - link.getFreespeed(event.getTime()))/link.getFreespeed(event.getTime());
+				linkSpeedPercent.put(event.getLinkId().toString(), linkSpeedPercent.get(event.getLinkId().toString()) + speedPercent);
+				
+			} else {
+
 
 				linkSpeed.put(event.getLinkId().toString(), linkSpeed.get(event.getLinkId().toString()) + speed);
+
+				linkFreeTravel = link.getLength() / link.getFreespeed(event.getTime());
+
+				delayPercent = (travelTime - linkFreeTravel) / linkFreeTravel;
+
+				delayProcent.put(event.getLinkId().toString(), delayProcent.get(event.getLinkId().toString()) + (delayPercent * 100));
+				
+				speedPercent = (speed - link.getFreespeed(event.getTime()))/link.getFreespeed(event.getTime());
+				linkSpeedPercent.put(event.getLinkId().toString(), linkSpeedPercent.get(event.getLinkId().toString()) + speedPercent);
 
 			}
 
@@ -190,9 +245,21 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 				System.out.println("do nothing");
 
 			} else {
-				if (event.getPersonId().toString().contains("truck")) {
+				if (event.getLegMode().contains("truck23")) {
+					
+					vehId = Id.create(event.getPersonId() + "_truck23", Vehicle.class);
+					this.earliestLinkExitTime.put(vehId, 0.0);
+					this.enterTime.put(vehId, 0.0);
+
+				} else if (event.getLegMode().contains("truck")) {
 
 					vehId = Id.create(event.getPersonId() + "_truck", Vehicle.class);
+					this.earliestLinkExitTime.put(vehId, 0.0);
+					this.enterTime.put(vehId, 0.0);
+
+				} else if (event.getLegMode().contains("carW")) {
+
+					vehId = Id.create(event.getPersonId() + "_carW", Vehicle.class);
 					this.earliestLinkExitTime.put(vehId, 0.0);
 					this.enterTime.put(vehId, 0.0);
 
@@ -278,6 +345,16 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 	public HashMap<Integer, Double> getHourCars() {
 
 		return hourCars;
+	}
+
+	public HashMap<String, Double> getDelayProcentLinks() {
+
+		return delayProcent;
+	}
+	
+	public HashMap<String, Double> getSpeedProcentLinks() {
+
+		return linkSpeedPercent;
 	}
 
 }

@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -43,12 +44,15 @@ public class NetworkEditor {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
+		Network netOriginal = NetworkUtils.createNetwork();
+		new MatsimNetworkReader(netOriginal).readFile(networkOriginal);
+		
 		Network network = scenario.getNetwork();
 		NetworkFactory netF = network.getFactory();
 
 		for (Link l : network.getLinks().values()) {
 
-			l.setAllowedModes(CollectionUtils.stringToSet("car, truck"));
+			l.setAllowedModes(CollectionUtils.stringToSet("car, truck, truck23, carW"));
 			if (l.getId().toString().equals("1412451") || l.getId().toString().equals("1412450")) {
 				l.setAllowedModes(CollectionUtils.stringToSet("walk"));
 				l.setCapacity(1);
@@ -76,12 +80,14 @@ public class NetworkEditor {
 		od.getStoreCoordinates();
 		HashMap<String, Double> xCoordStore = od.getStoreCoordinatesX();
 		HashMap<String, Double> yCoordStore = od.getStoreCoordinatesY();
+		
+		//CreareLong Haul coordinate
 
 		for (HashMap.Entry<String, Double> entry : xCoord.entrySet()) {
 
 			Node siteNode = netF.createNode(Id.create("node" + entry.getKey(), Node.class),
 					new Coord(entry.getValue(), yCoord.get(entry.getKey())));
-			Node entrySite = NetworkUtils.getNearestNode(network,
+			Node entrySite = NetworkUtils.getNearestNode(netOriginal,
 					new Coord(entry.getValue(), yCoord.get(entry.getKey())));
 			network.addNode(siteNode);
 			Link linkIn = netF.createLink(Id.create("in" + entry.getKey(), Link.class), entrySite, siteNode);
@@ -90,8 +96,8 @@ public class NetworkEditor {
 			linkOut.setCapacity(50000);
 			linkIn.setFreespeed(50);
 			linkOut.setFreespeed(50);
-			linkIn.setAllowedModes(CollectionUtils.stringToSet("car, truck"));
-			linkOut.setAllowedModes(CollectionUtils.stringToSet("car, truck"));
+			linkIn.setAllowedModes(CollectionUtils.stringToSet("car, truck, truck23, carW"));
+			linkOut.setAllowedModes(CollectionUtils.stringToSet("car, truck, truck23, carW"));
 			network.addLink(linkIn);
 			network.addLink(linkOut);
 
@@ -110,8 +116,8 @@ public class NetworkEditor {
 			linkOut.setCapacity(50000);
 			linkIn.setFreespeed(50);
 			linkOut.setFreespeed(50);
-			linkIn.setAllowedModes(CollectionUtils.stringToSet("car, truck"));
-			linkOut.setAllowedModes(CollectionUtils.stringToSet("car, truck"));
+			linkIn.setAllowedModes(CollectionUtils.stringToSet("car, truck, truck23, carW"));
+			linkOut.setAllowedModes(CollectionUtils.stringToSet("car, truck, truck23, carW"));
 			network.addLink(linkIn);
 			network.addLink(linkOut);
 

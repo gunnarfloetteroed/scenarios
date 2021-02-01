@@ -29,10 +29,11 @@ public class NetworkToShape {
 	public static HashMap<String, Double> numWork = new HashMap<>();
 	public static HashMap<String, Double> avgDelay = new HashMap<>();
 	public static HashMap<String, Double> speed = new HashMap<>();
+	public static HashMap<String, Double> delayPrc = new HashMap<>();
 
 	public NetworkToShape(HashMap<String, Double> inTable1, HashMap<String, Double> inTable2,
 			HashMap<String, Double> inTable3, HashMap<String, Double> inTable4, HashMap<String, Double> inTable5,
-			HashMap<String, Double> inTable6) {
+			HashMap<String, Double> inTable6, HashMap<String, Double> inTable7) {
 
 		this.delay = inTable1;
 		this.numCars = inTable2;
@@ -40,20 +41,20 @@ public class NetworkToShape {
 		this.numWork = inTable4;
 		this.avgDelay = inTable5;
 		this.speed = inTable6;
+		this.delayPrc = inTable7;
 
 	}
 
 	public static void doEverything() {
 
 		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(
-				"C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\ResultFile\\networkTest.xml");
+		config.network().setInputFile("C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\ResultFile\\networkUpdated.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Network network = scenario.getNetwork();
 		
 		//CHANGE COORDIANTE SYSTEM
 
-		CoordinateReferenceSystem crs = MGC.getCRS("EPSG:21781"); // EPSG Code for Swiss CH1903_LV03 coordinate system
+		CoordinateReferenceSystem crs = MGC.getCRS("EPSG:3006"); // EPSG Code SWEDEN SWEREF99 TM
 
 		Collection<SimpleFeature> features = new ArrayList<>();
 		PolylineFeatureFactory linkFactory = new PolylineFeatureFactory.Builder().setCrs(crs).setName("link")
@@ -63,7 +64,7 @@ public class NetworkToShape {
 				.addAttribute("freespeed", Double.class).addAttribute("delay", Double.class)
 				.addAttribute("cars", Double.class).addAttribute("trucks", Double.class)
 				.addAttribute("workers", Double.class).addAttribute("avgDelay", Double.class)
-				.addAttribute("avgSpeed", Double.class).create();
+				.addAttribute("avgSpeed", Double.class).addAttribute("delayPrc", Double.class).create();
 
 		for (Link link : network.getLinks().values()) {
 			Coordinate fromNodeCoordinate = new Coordinate(link.getFromNode().getCoord().getX(),
@@ -79,13 +80,15 @@ public class NetworkToShape {
 			String nrWorkers = (numWork.get(link.getId().toString())).toString();
 			String avgDelay1 = (avgDelay.get(link.getId().toString())).toString();
 			String avgSpeed = (speed.get(link.getId().toString())).toString();
+			
+			String delayPrc1 = (delayPrc.get(link.getId().toString())).toString();
 
 			SimpleFeature ft = linkFactory.createPolyline(
 					new Coordinate[] { fromNodeCoordinate, linkCoordinate, toNodeCoordinate },
 					new Object[] { link.getId().toString(), link.getFromNode().getId().toString(),
 							link.getToNode().getId().toString(), link.getLength(), NetworkUtils.getType(link),
 							link.getCapacity(), link.getFreespeed(), valueToInster, nrCars, nrTrucks, nrWorkers,
-							avgDelay1, avgSpeed },
+							avgDelay1, avgSpeed, delayPrc1},
 					null);
 			features.add(ft);
 		}

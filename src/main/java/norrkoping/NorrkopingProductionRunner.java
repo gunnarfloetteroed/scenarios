@@ -23,6 +23,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -68,8 +70,12 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultTurnAcceptanceLogic;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.filter.NetworkFilterManager;
@@ -159,10 +165,15 @@ public class NorrkopingProductionRunner {
 	public static HashMap<Integer, Double> hourlyDelayTrucks = new HashMap<>();
 	public static HashMap<Integer, Double> hourlyDelayWorkers = new HashMap<>();
 
+
 	public static HashMap<String, Double> numberOfCars = new HashMap<>();
 	public static HashMap<String, Double> numberOfTrucks = new HashMap<>();
 	public static HashMap<String, Double> numberOfWorkers = new HashMap<>();
 	public static HashMap<String, Double> speedLinks = new HashMap<>();
+	
+	public static HashMap<String, Double> avgDelay = new HashMap<>();
+	public static HashMap<String, Double> avglinkSpeed = new HashMap<>();
+	
 	public static HashMap<String, String> zoneType = new HashMap<>();
 
 	public static ArrayList<String> workerZone = new ArrayList<>();
@@ -306,10 +317,11 @@ public class NorrkopingProductionRunner {
 
 		int person = 1;
 		int sites = 0;
+		int scale = (int) upScale;
 
 		for (int i = 0; i < oWorker.size(); i++) {
 
-			int flow = flowWorker.get(i);
+			int flow = flowWorker.get(i)*scale;
 			String type = zoneType.get(oWorker.get(i).toString());
 
 			for (int j = 0; j < flow; j++) {
@@ -334,7 +346,7 @@ public class NorrkopingProductionRunner {
 			}
 		}
 
-		createDemandTrucks(scenario, upScale);
+		createDemandTrucksFromOD(scenario);
 
 	}
 
@@ -348,6 +360,11 @@ public class NorrkopingProductionRunner {
 
 		} else {
 			person.getAttributes().putAttribute("subpopulation", "workers");
+		}
+		
+		
+		if (transport.equals("car")) {
+			transport = "carW";
 		}
 
 		final Plan plan = scenario.getPopulation().getFactory().createPlan();
@@ -630,18 +647,16 @@ public class NorrkopingProductionRunner {
 	
 	
 	
-	public static void createDemandTrucksFromOD(String configFile) {
+	public static void createDemandTrucksFromOD(Scenario scenario) {
 
 		System.out.println("Truck Method OD OFFILNE.");
 
-		final Config config = ConfigUtils.loadConfig(configFile);
+		//final Config config = ConfigUtils.loadConfig(configFile);
 
-		config.network().setInputFile(norrkopingNetwork);
+		//config.network().setInputFile(norrkopingNetwork);
 		
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		//final Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		user = "rudolfs";
-		passwd = "RuZe200514";
 		final DatabaseODMatrix od = new DatabaseODMatrix(user, passwd, "localhost", 5432); // 5455);
 		
 		od.getSiteCoordinatesFromDatabase();
@@ -702,7 +717,7 @@ public class NorrkopingProductionRunner {
 				fromCoord = nodesList.get(0).getCoord();
 				homeCoord = nodesList.get(1).getCoord();
 
-			} else if (origin.get(i)== 1 && destination.get(i)== 3) {
+			} else if (origin.get(i)== 3 && destination.get(i)== 3) {
 				System.out.println("special case");
 				specialCase = true;
 				fromCoord = new Coord(xCoordStore.get(origin.get(i).toString()), yCoordStore.get(origin.get(i).toString()));
@@ -722,7 +737,7 @@ public class NorrkopingProductionRunner {
 			if(var == 0) {
 				truck = "truck";
 				var = 1;
-			} else if(var == 1 || count <= truck23) {
+			} else if(var == 1 && count <= truck23) {
 				
 				truck = "truck23";
 				count = count +1;
@@ -1105,6 +1120,21 @@ public class NorrkopingProductionRunner {
 		greedo.meet(scenario);
 
 		final Controler controler = new Controler(scenario);
+		
+		final EventsManager events = controler.getEvents();
+		
+		controler.addOverridingQSimModule( new AbstractQSimModule(){
+			@Override public void configureQSim() {
+				final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
+				factory.setLinkSpeedCalculator(new DefaultLinkSpeedCalculator()); // You would obviously set something else than the default
+				
+				//factory.setTurnAcceptanceLogic(new DefaultTurnAcceptanceLogic()); // You would obviously set something else than the default
+				bind(QNetworkFactory.class).toInstance(factory);
+				// NOTE: Other than when using a provider, this uses the same factory instance over all iterations, re-configuring
+				// it in every iteration via the initializeFactory(...) method. kai, mar'16
+			}
+		});
+		
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -1120,6 +1150,8 @@ public class NorrkopingProductionRunner {
 				SBBTransitEngineQSimModule.configure(components);
 				return components;
 			}
+			
+			
 		});
 
 		controler.addControlerListener(new StartupListener() {
@@ -1161,19 +1193,21 @@ public class NorrkopingProductionRunner {
 		Config config = ConfigUtils.loadConfig(configFileName);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Network network = scenario.getNetwork();
-		NetworkFactory netF = network.getFactory();
-		
+		NetworkFactory netF = network.getFactory();	
 
 		VehicleType car = scenario.getVehicles().getFactory()
 				.createVehicleType(Id.create(TransportMode.car, VehicleType.class));
-		car.setMaximumVelocity(90 / 3.6);
+		car.setMaximumVelocity(120 / 3.6);
+		//0.1 Better flow in Norrkoping, 1.0 represents 100% traffic based on 10% sample in Nrkp
+		car.setPcuEquivalents(1.0);
 		scenario.getVehicles().addVehicleType(car);
 
 		VehicleType truck = scenario.getVehicles().getFactory()
 				.createVehicleType(Id.create(TransportMode.truck, VehicleType.class));
-		truck.setMaximumVelocity(60 / 3.6);
+		truck.setMaximumVelocity(80/3.6);
 		truck.setLength(10);
-		truck.setPcuEquivalents(1);
+		//truck.setFlowEfficiencyFactor(1);
+		truck.setPcuEquivalents(0.25);
 		truck.setWidth(2.5);
 		truck.setNetworkMode(TransportMode.truck);
 		scenario.getVehicles().addVehicleType(truck);
@@ -1181,12 +1215,25 @@ public class NorrkopingProductionRunner {
 		
 		VehicleType truck23 = scenario.getVehicles().getFactory()
 				.createVehicleType(Id.create("truck23", VehicleType.class));
-		truck23.setMaximumVelocity(40 / 3.6);
+		truck23.setMaximumVelocity(80/3.6);
+		//truck23.setFlowEfficiencyFactor(1);
 		truck23.setLength(23);
-		truck23.setPcuEquivalents(1);
+		truck23.setPcuEquivalents(0.5);
 		truck23.setWidth(2.5);
 		truck23.setNetworkMode("truck23");
 		scenario.getVehicles().addVehicleType(truck23);
+		
+		
+		VehicleType carW = scenario.getVehicles().getFactory()
+				.createVehicleType(Id.create("carW", VehicleType.class));
+		carW.setMaximumVelocity(120/3.6);
+		carW.setLength(7.5);
+		carW.setPcuEquivalents(0.1);
+		carW.setWidth(2.5);
+		carW.setNetworkMode("carW");
+		scenario.getVehicles().addVehicleType(carW);
+		
+		
 		
 		new MatsimVehicleWriter(scenario.getVehicles()).writeFile(vehiclesFile);
 
@@ -1196,21 +1243,21 @@ public class NorrkopingProductionRunner {
 
 		Config config = ConfigUtils.loadConfig(configFileName);
 
-		config.controler().setLastIteration(3);
+		config.controler().setLastIteration(10);
 
 		config.network().setInputFile(networkFileName);
 		config.plans().setInputFile(popFileName);
 
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
-		// config.qsim().setPcuThresholdForFlowCapacityEasing(0.5);
+		//config.qsim().setPcuThresholdForFlowCapacityEasing(0.5);
 		config.qsim().setFlowCapFactor(0.1);
 		config.qsim().setStorageCapFactor(0.2);
 		config.vehicles().setVehiclesFile(vehiclesFile);
 
-		List<String> mainModes = Arrays.asList(new String[] { TransportMode.car, TransportMode.truck, "truck23" });
+		List<String> mainModes = Arrays.asList(new String[] { TransportMode.car, TransportMode.truck, "truck23", "carW" });
 		config.qsim().setMainModes(mainModes);
 		config.plansCalcRoute().setNetworkModes(mainModes);
-		config.travelTimeCalculator().setAnalyzedModesAsString("car,truck, truck23");
+		config.travelTimeCalculator().setAnalyzedModesAsString("car,truck, truck23, carW");
 		config.travelTimeCalculator().setSeparateModes(true); // change maybe to true
 
 		PlanCalcScoreConfigGroup.ModeParams truck1 = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.truck);
@@ -1223,14 +1270,21 @@ public class NorrkopingProductionRunner {
 		
 		
 		PlanCalcScoreConfigGroup.ModeParams truck23 = new PlanCalcScoreConfigGroup.ModeParams("truck23");
+		truck23.setMonetaryDistanceRate(0); // all to zero
+		truck23.setMarginalUtilityOfTraveling(-2.34);
+		truck23.setConstant(0.0);
+		truck23.setMarginalUtilityOfDistance(0.0);
+		
+		config.planCalcScore().addModeParams(truck23);
+		
+		PlanCalcScoreConfigGroup.ModeParams carW = new PlanCalcScoreConfigGroup.ModeParams("carW");
 		truck1.setMonetaryDistanceRate(0); // all to zero
 		truck1.setMarginalUtilityOfTraveling(-2.34);
 		truck1.setConstant(0.0);
 		truck1.setMarginalUtilityOfDistance(0.0);
 		
-		config.planCalcScore().addModeParams(truck23);
+		config.planCalcScore().addModeParams(carW);
 		
-
 
 		StrategyConfigGroup.StrategySettings keepRoute = new StrategyConfigGroup.StrategySettings();
 		keepRoute.setSubpopulation("heavyVeh");
@@ -1250,305 +1304,66 @@ public class NorrkopingProductionRunner {
 
 	}
 
-	private static void resultCreator(String configFileName, String eventFile) {
 
-		Config config = ConfigUtils.loadConfig(configFileName);
-
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		Network network = scenario.getNetwork();
-
-		HashMap<Integer, Double> hourCars = new HashMap<>();
-		for (int i = 0; i < 24; i++) {
-			hourCars.put(i, 0.0);
-		}
-
-		for (Link l : network.getLinks().values()) {
-
-			delay.put(l.getId().toString(), 0.0);
-			delayTrucks.put(l.getId().toString(), 0.0);
-			delayWorkers.put(l.getId().toString(), 0.0);
-			numberOfCars.put(l.getId().toString(), 0.0);
-			numberOfTrucks.put(l.getId().toString(), 0.0);
-			numberOfWorkers.put(l.getId().toString(), 0.0);
-			speedLinks.put(l.getId().toString(), 0.0);
-
-		}
-
-		EventsManager events = EventsUtils.createEventsManager();
-
-		CongestionHandler congestion = new CongestionHandler(network, delay, numberOfCars, numberOfTrucks,
-				numberOfWorkers, speedLinks, delayTrucks, delayWorkers);
-		events.addHandler(congestion);
-
-		new MatsimEventsReader(events).readFile(eventFile);
-
-		delay = congestion.getDelayTable();
-		numberOfCars = congestion.getCarsOnLinks();
-		numberOfTrucks = congestion.getTrucksOnLinks();
-		numberOfWorkers = congestion.getWorkersksOnLinks();
-		speedLinks = congestion.getLinkSpeed();
-		hourlyDelay = congestion.getHourDelay();
-		delayTrucks = congestion.getDelayTrucks();
-		delayWorkers = congestion.getDelayWorkers();
-		hourlyDelayTrucks = congestion.getHourTruckDelay();
-		hourlyDelayWorkers = congestion.getHourWorkerskDelay();
-
-		hourCars = congestion.getHourCars();
-
-		// NetworkToShape dataToSHP = new NetworkToShape(delay, numberOfCars);
-		// dataToSHP.doEverything();
-
-		for (HashMap.Entry<Integer, Double> entry : hourCars.entrySet()) {
-			System.out.println(entry.getValue() * 5);
-
-		}
-
-	}
-
-	private static void doCalcualtions(String event1, String event2) {
-
-		resultCreator(configFileUpdated, event1);
-
-		HashMap<String, Double> copyDelay1 = new HashMap<String, Double>(delay);
-		HashMap<String, Double> copyDelayTrucks1 = new HashMap<String, Double>(delayTrucks);
-		HashMap<String, Double> copyDelayWorkers1 = new HashMap<String, Double>(delayWorkers);
-		HashMap<String, Double> copyCars1 = new HashMap<String, Double>(numberOfCars);
-		HashMap<String, Double> copyTrucks1 = new HashMap<String, Double>(numberOfTrucks);
-		HashMap<String, Double> copyWorkers1 = new HashMap<String, Double>(numberOfWorkers);
-
-		HashMap<String, Double> copySpeedLinks1 = new HashMap<String, Double>(speedLinks);
-
-		HashMap<Integer, Double> hourlyDelay1 = new HashMap<Integer, Double>(hourlyDelay);
-		HashMap<Integer, Double> hourlyDelayTrucks1 = new HashMap<Integer, Double>(hourlyDelayTrucks);
-		HashMap<Integer, Double> hourlyDelayWorkers1 = new HashMap<Integer, Double>(hourlyDelayWorkers);
-
-		resultCreator(configFileUpdated, event2);
-
-		HashMap<String, Double> copyDelay2 = new HashMap<String, Double>(delay);
-		HashMap<String, Double> copyDelayTrucks2 = new HashMap<String, Double>(delayTrucks);
-		HashMap<String, Double> copyDelayWorkers2 = new HashMap<String, Double>(delayWorkers);
-		HashMap<String, Double> copyCars2 = new HashMap<String, Double>(numberOfCars);
-		HashMap<String, Double> copyTrucks2 = new HashMap<String, Double>(numberOfTrucks);
-		HashMap<String, Double> copyWorkers2 = new HashMap<String, Double>(numberOfWorkers);
-		HashMap<String, Double> copySpeedLinks2 = new HashMap<String, Double>(speedLinks);
-
-		HashMap<Integer, Double> hourlyDelay2 = new HashMap<Integer, Double>(hourlyDelay);
-		HashMap<Integer, Double> hourlyDelayTrucks2 = new HashMap<Integer, Double>(hourlyDelayTrucks);
-		HashMap<Integer, Double> hourlyDelayWorkers2 = new HashMap<Integer, Double>(hourlyDelayWorkers);
-
-		HashMap<String, Double> diffDelay = new HashMap<String, Double>(delay);
-		HashMap<String, Double> diffDelayTrucks = new HashMap<String, Double>(delay);
-		HashMap<String, Double> diffDelayWorkers = new HashMap<String, Double>(delay);
-		HashMap<String, Double> diffCars = new HashMap<String, Double>(numberOfCars);
-		HashMap<String, Double> diffTrucks = new HashMap<String, Double>(numberOfTrucks);
-		HashMap<String, Double> diffLinksSpeed = new HashMap<String, Double>(speedLinks);
-		HashMap<Integer, Double> diffHours = new HashMap<Integer, Double>(hourlyDelay);
-
-		double totalCarsDelay1 = 0.0;
-		double totalCarsDelay2 = 0.0;
-
-		double totalTrucksDelay1 = 0.0;
-		double totalTrucksDelay2 = 0.0;
-
-		double totalWorkersDelay1 = 0.0;
-		double totalWorkersDelay2 = 0.0;
-
-		double totalCars = 0.0;
-		double totalTrucks = 0.0;
-
-		HashMap<String, Double> avgDelay1 = new HashMap<String, Double>(delay);
-		HashMap<String, Double> avgDelay2 = new HashMap<String, Double>(delay);
-
-		HashMap<String, Double> avgSpeed1 = new HashMap<String, Double>(speedLinks);
-		HashMap<String, Double> avgSpeed2 = new HashMap<String, Double>(speedLinks);
-
-		HashMap<String, Double> diffAvgDelay = new HashMap<String, Double>(delay);
-
-		HashMap<String, Double> copyWorkers = new HashMap<String, Double>(numberOfWorkers);
-
-		HashMap<String, Double> constructionTransport = new HashMap<String, Double>(numberOfWorkers);
-		double total = 0.0;
-		System.out.println("");
-		System.out.println("HOURLY CARS VOLUME WITHOUT CONSTRUCTION");
-		for (int i = 0; i < 24; i++) {
-
-			System.out.println("HOURLY CARS BEFORE " + i + " DELAY " + hourlyDelay1.get(i));
-			total += hourlyDelay1.get(i);
-		}
-		System.out.println("total " + total);
-		System.out.println("HOURLY CARS VOLUME AFTER CONSTRUCTION");
-		for (int i = 0; i < 24; i++) {
-
-			System.out.println("HOURLY CARS AFTER " + i + " DELAY " + hourlyDelay2.get(i));
-		}
-
-		System.out.println("DIFFENCE CARS AFTER - BEFORE ");
-		for (int i = 0; i < 24; i++) {
-			diffHours.put(i, hourlyDelay2.get(i) - hourlyDelay1.get(i));
-			System.out.println("DIFF HOURLY " + i + " DELAY " + diffHours.get(i));
-		}
-
-		System.out.println("");
-		System.out.println("HOURLY WITHOUR CONSTRUCTION TRUCKS");
-		for (int i = 0; i < 24; i++) {
-
-			System.out.println("HOURLY  Trucks Before " + i + " DELAY " + hourlyDelayTrucks1.get(i));
-		}
-		System.out.println("HOURLY AFTER CONSTRUCTION TRUCKS");
-		for (int i = 0; i < 24; i++) {
-
-			System.out.println("DIFF HOURLY Trucks AFTER " + i + " DELAY " + hourlyDelayTrucks2.get(i));
-		}
-
-		System.out.println("DIFFERENCE HOURLY TRUCKS");
-		for (int i = 0; i < 24; i++) {
-			System.out.println(
-					"DIFF HOURLY TRUCKS " + i + " DELAY " + (hourlyDelayTrucks2.get(i) - hourlyDelayTrucks1.get(i)));
-		}
-
-		System.out.println("");
-		System.out.println("HOURLY BEFORE WORKERS");
-		for (int i = 0; i < 24; i++) {
-
-			System.out.println("HOURLY  WORKERS WORKERS " + i + " DELAY " + hourlyDelayWorkers1.get(i));
-		}
-		System.out.println("DIFF HOURLY AFTER WORKERS ");
-		for (int i = 0; i < 24; i++) {
-
-			System.out.println("HOURLY  WORKERS AFTER " + i + " DELAY " + hourlyDelayWorkers2.get(i));
-		}
-
-		System.out.println("DIFF HOURLY DIFFERENCE WORKERS");
-		for (int i = 0; i < 24; i++) {
-			System.out.println(
-					"DIFF HOURLY WORKERS" + i + " DELAY " + (hourlyDelayWorkers2.get(i) - hourlyDelayWorkers1.get(i)));
-		}
-
-		int counter = 0;
-
-		for (HashMap.Entry<String, Double> row : diffDelay.entrySet()) {
-
-			if (copyCars1.get(row.getKey()) == 0.0) {
-				avgSpeed1.put(row.getKey(), 0.0);
-				avgDelay1.put(row.getKey(), 0.0);
-			} else {
-
-				avgDelay1.put(row.getKey(), copyDelay1.get(row.getKey()) / copyCars1.get(row.getKey()));
-				avgSpeed1.put(row.getKey(), 3.6 * copySpeedLinks1.get(row.getKey()) / copyCars1.get(row.getKey()));
-			}
-
-			if (copyCars2.get(row.getKey()) == 0.0) {
-				avgSpeed2.put(row.getKey(), 0.0);
-				avgDelay2.put(row.getKey(), 0.0);
-			} else {
-
-				avgDelay2.put(row.getKey(), copyDelay2.get(row.getKey()) / copyCars2.get(row.getKey()));
-				avgSpeed2.put(row.getKey(), 3.6 * copySpeedLinks2.get(row.getKey()) / copyCars2.get(row.getKey()));
-
-			}
-
-			diffDelay.put(row.getKey(), (copyDelay2.get(row.getKey()) - copyDelay1.get(row.getKey())) / 60);
-			diffDelayTrucks.put(row.getKey(),
-					(copyDelayTrucks2.get(row.getKey()) - copyDelayTrucks1.get(row.getKey())) / 60);
-			diffDelayWorkers.put(row.getKey(),
-					(copyDelayWorkers2.get(row.getKey()) - copyDelayWorkers1.get(row.getKey())) / 60);
-
-			diffCars.put(row.getKey(), (copyCars2.get(row.getKey()) - copyCars1.get(row.getKey())));
-			diffTrucks.put(row.getKey(), (copyTrucks2.get(row.getKey()) - copyTrucks1.get(row.getKey())));
-
-			diffLinksSpeed.put(row.getKey(), (avgSpeed2.get(row.getKey()) - avgSpeed1.get(row.getKey())));
-			diffAvgDelay.put(row.getKey(), (avgDelay2.get(row.getKey()) - avgDelay1.get(row.getKey())));
-
-			totalCarsDelay1 += copyDelay1.get(row.getKey());
-			totalCarsDelay2 += copyDelay2.get(row.getKey());
-
-			totalTrucksDelay1 += copyDelayTrucks1.get(row.getKey());
-			totalTrucksDelay2 += copyDelayTrucks2.get(row.getKey());
-
-			totalWorkersDelay1 += copyDelayWorkers1.get(row.getKey());
-			totalWorkersDelay2 += copyDelayWorkers2.get(row.getKey());
-
-		}
-
-		totalCarsDelay1 = totalCarsDelay1 / 3600;
-		totalCarsDelay2 = totalCarsDelay2 / 3600;
-
-		System.out.println("DELAY CARS BEFORE HOURS " + totalCarsDelay1);
-		System.out.println("DELAY CARS AFTER HOURS " + totalCarsDelay2);
-
-		System.out.println("DELAY Trucks BEFORE HOURS " + totalTrucksDelay1 / 3600);
-		System.out.println("DELAY Trucks AFTER HOURS " + totalTrucksDelay2 / 3600);
-
-		System.out.println("DELAY Workers BEFORE HOURS " + totalWorkersDelay1 / 3600);
-		System.out.println("DELAY Workers AFTER HOURS " + totalWorkersDelay2 / 3600);
-
-		NetworkToShape dataToSHP = new NetworkToShape(diffDelay, diffCars, diffTrucks, copyWorkers, diffAvgDelay,
-				diffLinksSpeed);
-		dataToSHP.doEverything();
-
-	}
+	
 
 	public static void main(String[] args) {
 
-		//System.out.println("START OF MAIN");
+		System.out.println("START OF MAIN");
+		long start = System.currentTimeMillis();
+	
 		//Scanner scanner = new Scanner(System.in);
 		//System.out.println("DB user name: ");
 		//user = scanner.nextLine();
 		
-		user = "rudolfs";
+		
 		//System.out.println("password: ");
 		//passwd = scanner.nextLine();
-		passwd = "RuZe200514";
+		
 		//scanner.close();
 
+		user = "rudolfs";
+		passwd = "RuZe200514";
+		
 		// Update network with construction sites
 		//NetworkEditor edit = new NetworkEditor(configFile, user, passwd);
 		//edit.editNework();
 
+		
 		// Use only once to create general population in Norrkoping.
 		// createDemandNorrkoping(1.0);
 		// runXY2Links(configFileUpdated,norrkopingNetwork,norrkopingPlansNew);
 
 		// Create agents based on databse demand for consruction workers and transports
-		//createDemandWorkers(configFile, 1.0, 6);
-
-		NetworkEditor edit = new NetworkEditor(configFile, user, passwd);
-		edit.editNework();
-		createDemandTrucksFromOD(configFile);
 		
-		runXY2Links(configFile, norrkopingNetwork, populationMerged);
+		//createDemandTrucksFromOD(configFile);
+		
+		//createDemandWorkers(configFile, 1.0, 6);
+		//runXY2Links(configFile, norrkopingNetwork, populationMerged);
+		
 		createVehicleTypes(configFile);
 		updateConfiguration(configFile, norrkopingNetwork, populationMerged);
 
 		runSimulation(configFileUpdated);
 		
+
 		
-		
-		
-		
+
 		//Create od pairs for trucks based on input number
 		
 		//odCalculationTrucks trucks = new odCalculationTrucks("","", 100.0);
 		//trucks.createODTrucks();
 		
+		 
+	
 		
-		
-		// Compare two event files
-		/*
-		 * String eventFile1 =
-		 * "C:\\Users\\TOPO-O\\Desktop\\outputOD\\OD_fixed\\ITERS\\it.5\\5.events.xml.gz";
-		 * String eventFile2
-		 * ="C:\\Users\\TOPO-O\\Desktop\\outputOD\\OD_trucksWorkers\\ITERS\\it.5\\5.events.xml.gz";
-		 * //String eventFile2
-		 * ="C:\\Users\\TOPO-O\\Desktop\\outputOD\\OD_trucks2000\\ITERS\\it.5\\5.events.xml.gz";
-		 * doCalcualtions(eventFile1, eventFile2);
-		 */
-
-		// testing
-
 		System.out.println("END OF SIMULATION");
 		System.out.println("PROGRAM IS FINISHED");
+		
+		long end = System.currentTimeMillis();
+	      //finding the time difference and converting it into seconds
+	      float sec = (end - start) / 1000F; 
+		System.out.println("ELAPSED TIME Minutes " + (sec/60));
 
 	}
 
