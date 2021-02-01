@@ -1322,8 +1322,8 @@ public class NorrkopingProductionRunner {
 		
 		//scanner.close();
 
-		user = "rudolfs";
-		passwd = "RuZe200514";
+		user = "user";
+		passwd = "password";
 		
 		// Update network with construction sites
 		//NetworkEditor edit = new NetworkEditor(configFile, user, passwd);
