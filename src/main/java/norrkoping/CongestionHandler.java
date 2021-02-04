@@ -45,6 +45,9 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 	private HashMap<String, Double> linkSpeedPercent = new HashMap<>();
 
 	private Network network;
+	
+	double timeStart = 0*3600;
+	double timeEnd = 25*3600;
 
 	private Id<Vehicle> vehId;
 	double time = 0;
@@ -97,7 +100,10 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if ((!(event.getLinkId().toString().contains("tr")))) {
+			
+		//&& ((event.getTime() > timeStart && event.getTime() < timeEnd) )
+		
+		if ((!(event.getLinkId().toString().contains("tr"))) ) {
 
 			Link link = network.getLinks().get(event.getLinkId());
 
@@ -118,8 +124,15 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if ((!(event.getLinkId().toString().contains("tr")))) {
+			
+		
+		if ((!(event.getLinkId().toString().contains("tr"))) && ((event.getTime() > timeStart && event.getTime() < timeEnd) )) {
+			
 
+			int h = (int) Math.floor(event.getTime() / 3600);
+			
+			
+			
 			double excessTravelTime;
 			double travelTime;
 			double speed;
@@ -139,9 +152,10 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 				excessTravelTime = event.getTime() - this.earliestLinkExitTime.get(event.getVehicleId());
 			}
 
-			int h = (int) Math.floor(event.getTime() / 3600);
+			
 
 			if (event.getVehicleId().toString().contains("truck")) {
+				
 				numberOfTrucks.put(event.getLinkId().toString(),
 						(numberOfTrucks.get(event.getLinkId().toString()) + 1));
 				delayTrucks.put(event.getLinkId().toString(),
@@ -164,7 +178,7 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 			} else {
 
 				delay.put(event.getLinkId().toString(), delay.get(event.getLinkId().toString()) + excessTravelTime);
-				numberOfCars.put(event.getLinkId().toString(), (numberOfCars.get(event.getLinkId().toString()) + 1));
+				numberOfCars.put(event.getLinkId().toString(), (numberOfCars.get(event.getLinkId().toString())+1));
 				if (h < 24) {
 					hourDelay.put(h, (hourDelay.get(h) + excessTravelTime));
 
@@ -183,6 +197,14 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 				linkFreeTravel = link.getLength() / link.getFreespeed(event.getTime());
 				delayTime = travelTime - linkFreeTravel;
 				speed = link.getLength() / travelTime;
+				
+				if(event.getLinkId().toString().contains("230055")) {
+					//System.out.println("VEHICLE " + event.getVehicleId() + " SPPED " + speed);
+					
+					
+				}
+				
+				
 			}
 
 			if (travelTime <= 1.0 && delayTime <= 1.0) {
@@ -231,11 +253,15 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 			}
 
 		}
+		
 	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if ((!(event.getLinkId().toString().contains("tr")))) {
+		
+		//&& ((event.getTime() > timeStart && event.getTime() < timeEnd) )
+		
+		if ((!(event.getLinkId().toString().contains("tr"))) ) {
 
 			String personID = event.getPersonId().toString();
 
@@ -272,11 +298,13 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 			}
 
 		}
+		
 
 	}
 
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if ((!(event.getVehicleId().toString().contains("tr")))) {
+		//&& ((event.getTime() > timeStart && event.getTime() < timeEnd) )
+		if ((!(event.getVehicleId().toString().contains("tr"))) ) {
 
 			String personID = event.getPersonId().toString();
 			int lenghtString = personID.length();

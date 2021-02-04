@@ -843,223 +843,6 @@ public class NorrkopingProductionRunner {
 	
 	
 	
-	public static void createDemandTrucks(Scenario scenario, double upScale) {
-
-		System.out.println("Truck Method.");
-
-		final ZonalSystem zonalSystem = new ZonalSystem(norrkopingZoneShapeFile,
-				StockholmTransformationFactory.WGS84_SWEREF99, "id");
-
-		final DatabaseODMatrix od = new DatabaseODMatrix(user, passwd, "localhost", 5432); // 5455);
-
-		// Create information form database to arrays
-		od.createArrayListsFromDatabase();
-
-		// Save into lists
-		ArrayList<String> oList = od.getOriginList();
-		ArrayList<String> dList = od.getDestList();
-		ArrayList<Integer> siteId = od.getSiteIDList();
-		ArrayList<Integer> hourList = od.getHourList();
-		ArrayList<Double> demandList = od.getDemandList();
-
-		// number of trucks to add in the transport system
-		int rowsInOD = od.getNumberOfIDrows();
-		int person = 1;
-
-		final int timeBinCnt = 24; // 24h
-		final double timeBinSize_s = Units.S_PER_D / timeBinCnt; // 24h = 3600 seconds
-
-		for (int i = 0; i < rowsInOD; i++) {
-
-			int counter = 0;
-
-			double demand = upScale * demandList.get(i);
-
-			for (int j = 0; j < demand; j++) {
-				counter = counter + 1;
-
-				addTripMakerTrucks(scenario, Id.createPersonId("truck" + (person++)), zonalSystem,
-						zonalSystem.getZone(oList.get(i)), dList.get(i),
-						(hourList.get(i) + Math.random()) * timeBinSize_s, siteId.get(i));
-			}
-		}
-
-		// Create new population file by merging norrkoping travellers with trucks and
-		// workers in
-		// norrkoping
-		final PopulationWriter writer = new PopulationWriter(scenario.getPopulation());
-		writer.writeV6(populationMerged);
-
-	}
-
-	private static void addTripMakerTrucks(Scenario scenario, Id<Person> personId, ZonalSystem zonalSystem,
-			Zone fromZone, String toZone, double dptTime_s, int siteID) {
-
-		// Exact origin for trucks
-		final Coord fromCoord;
-		final Coord homeCoord;
-		final Coord middleCoord;
-
-		// Create person, add to sub-population, create/add plan
-		final Person person = scenario.getPopulation().getFactory().createPerson(personId);
-		person.getAttributes().putAttribute("subpopulation", "heavyVeh");
-
-		final Plan plan = scenario.getPopulation().getFactory().createPlan();
-		person.addPlan(plan);
-
-		Population population = scenario.getPopulation();
-		PopulationFactory pop = population.getFactory();
-		Network network = scenario.getNetwork();
-
-		if (fromZone.getId().equals("140")) {
-			// Origin for zones
-			List<Node> nodesList = new ArrayList<Node>();
-			nodesList = NetworkUtils.getNodes(network, "294212 128846");
-			fromCoord = nodesList.get(0).getCoord();
-			homeCoord = nodesList.get(1).getCoord();
-		} else if (fromZone.getId().equals("57")) {
-			// Origin for zones
-			List<Node> nodesList = new ArrayList<Node>();
-			nodesList = NetworkUtils.getNodes(network, "165030 165039");
-			fromCoord = nodesList.get(0).getCoord();
-			homeCoord = nodesList.get(1).getCoord();
-
-		} else if (fromZone.getId().equals("120")) {
-			// Origin for zones
-			List<Node> nodesList = new ArrayList<Node>();
-			nodesList = NetworkUtils.getNodes(network, "1041738188 1041737204");
-			fromCoord = nodesList.get(0).getCoord();
-			homeCoord = nodesList.get(1).getCoord();
-
-		} else if (fromZone.getId().equals("81")) {
-			fromCoord = Bejer;
-			homeCoord = Bejer;
-
-		} else if (fromZone.getId().equals("19")) {
-			fromCoord = Renall;
-			homeCoord = Renall;
-
-		} else if (fromZone.getId().equals("20")) {
-			fromCoord = Optimera;
-			homeCoord = Optimera;
-
-		} else {
-			System.out.println("WRONG PLACE");
-			fromCoord = ShapeUtils.drawPointFromGeometry(fromZone.getGeometry());
-			homeCoord = ShapeUtils.drawPointFromGeometry(fromZone.getGeometry());
-		}
-
-		// All other agents
-		Activity start = scenario.getPopulation().getFactory().createActivityFromCoord("truckStart", fromCoord);
-		if (fromZone.getId().equals("81") && toZone.equals("106")) {
-			start.setLinkId(Id.get("564468", Link.class));
-		}
-		start.setEndTime(dptTime_s);
-		plan.addActivity(start);
-
-		Leg leg = pop.createLeg(TransportMode.truck);
-
-		plan.addLeg(leg);
-
-		if (fromZone.getId().equals("81") && toZone.equals("21")) {
-			List<Node> nodesList = new ArrayList<Node>();
-			nodesList = NetworkUtils.getNodes(network, "251899658");
-			middleCoord = nodesList.get(0).getCoord();
-
-			Activity middlePoint = scenario.getPopulation().getFactory().createActivityFromCoord("middlePoint",
-					middleCoord);
-			middlePoint.setLinkId(Id.get("314867", Link.class));
-			middlePoint.setEndTime(dptTime_s + 20);
-			plan.addActivity(middlePoint);
-
-			Leg leg1 = pop.createLeg(TransportMode.truck);
-			leg1.setDepartureTime(dptTime_s + 20);
-			plan.addLeg(leg1);
-
-		}
-
-		if (toZone.equals("22")) {
-			Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("construction", InreHamnen);
-			end.setLinkId(Id.get("1", Link.class));
-			end.setStartTime(dptTime_s + 900);
-			end.setEndTime(dptTime_s + 900 + 3600);
-			plan.addActivity(end);
-			plan.addLeg(leg);
-			Activity start1 = scenario.getPopulation().getFactory().createActivityFromCoord("truckHome", homeCoord);
-			start1.setStartTime(dptTime_s + 900 + 3600 + 600);
-			leg.setTravelTime(900);
-			plan.addActivity(start1);
-
-		} else if (toZone.equals("106")) {
-			if (siteID == 2) {
-
-				Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("construction",
-						Soderporten1);
-				end.setStartTime(dptTime_s + 900);
-				end.setEndTime(dptTime_s + 900 + 3600);
-				plan.addActivity(end);
-				plan.addLeg(leg);
-				Activity start1 = scenario.getPopulation().getFactory().createActivityFromCoord("truckHome", homeCoord);
-				start1.setStartTime(dptTime_s + 900 + 3600 + 600);
-				leg.setTravelTime(900);
-				plan.addActivity(start1);
-
-			} else {
-				Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("construction",
-						Soderporten2);
-				end.setStartTime(dptTime_s + 900);
-				end.setEndTime(dptTime_s + 900 + 3600);
-				plan.addActivity(end);
-				leg.setTravelTime(900);
-				plan.addLeg(leg);
-				Activity start1 = scenario.getPopulation().getFactory().createActivityFromCoord("truckHome", homeCoord);
-				start1.setStartTime(dptTime_s + 900 + 3600 + 600);
-				plan.addActivity(start1);
-			}
-
-		} else if (toZone.equals("21")) {
-			if (siteID == 4) {
-				Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("construction",
-						Spinnhuset);
-				end.setStartTime(dptTime_s + 900);
-				end.setEndTime(dptTime_s + 900 + 3600);
-				plan.addActivity(end);
-				leg.setTravelTime(900);
-				plan.addLeg(leg);
-				Activity start1 = scenario.getPopulation().getFactory().createActivityFromCoord("truckHome", homeCoord);
-				start1.setStartTime(dptTime_s + 900 + 3600 + 600);
-				plan.addActivity(start1);
-
-			} else if (siteID == 7) {
-				Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("construction",
-						Tingsratten);
-				end.setStartTime(dptTime_s + 900);
-				end.setEndTime(dptTime_s + 900 + 3600);
-				plan.addActivity(end);
-				leg.setTravelTime(900);
-				plan.addLeg(leg);
-				Activity start1 = scenario.getPopulation().getFactory().createActivityFromCoord("truckHome", homeCoord);
-				start1.setStartTime(dptTime_s + 900 + 3600 + 600);
-				plan.addActivity(start1);
-
-			} else {
-				Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("construction",
-						HotellSvea);
-				end.setStartTime(dptTime_s + 900);
-				end.setEndTime(dptTime_s + 900 + 3600);
-				plan.addActivity(end);
-				leg.setTravelTime(900);
-				plan.addLeg(leg);
-				Activity start1 = scenario.getPopulation().getFactory().createActivityFromCoord("truckHome", homeCoord);
-				start1.setStartTime(dptTime_s + 900 + 3600 + 600);
-
-				plan.addActivity(start1);
-			}
-
-		}
-
-		scenario.getPopulation().addPerson(person);
-	}
 
 	private static void addTripMaker(Scenario scenario, Id<Person> personId, ZonalSystem zonalSystem, Zone fromZone,
 			Zone toZone, double dptTime_s) {
@@ -1192,24 +975,23 @@ public class NorrkopingProductionRunner {
 
 		Config config = ConfigUtils.loadConfig(configFileName);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Network network = scenario.getNetwork();
-		NetworkFactory netF = network.getFactory();	
 
 		VehicleType car = scenario.getVehicles().getFactory()
 				.createVehicleType(Id.create(TransportMode.car, VehicleType.class));
 		car.setMaximumVelocity(120 / 3.6);
 		//0.1 Better flow in Norrkoping, 1.0 represents 100% traffic based on 10% sample in Nrkp
-		car.setPcuEquivalents(1.0);
+		car.setPcuEquivalents(1);
 		scenario.getVehicles().addVehicleType(car);
 
 		VehicleType truck = scenario.getVehicles().getFactory()
 				.createVehicleType(Id.create(TransportMode.truck, VehicleType.class));
 		truck.setMaximumVelocity(80/3.6);
-		truck.setLength(10);
+		truck.setLength(12.5);
 		//truck.setFlowEfficiencyFactor(1);
-		truck.setPcuEquivalents(0.25);
+		truck.setPcuEquivalents(2.5);
 		truck.setWidth(2.5);
 		truck.setNetworkMode(TransportMode.truck);
+	
 		scenario.getVehicles().addVehicleType(truck);
 		
 		
@@ -1217,8 +999,8 @@ public class NorrkopingProductionRunner {
 				.createVehicleType(Id.create("truck23", VehicleType.class));
 		truck23.setMaximumVelocity(80/3.6);
 		//truck23.setFlowEfficiencyFactor(1);
-		truck23.setLength(23);
-		truck23.setPcuEquivalents(0.5);
+		truck23.setLength(25.5);
+		truck23.setPcuEquivalents(5.0);
 		truck23.setWidth(2.5);
 		truck23.setNetworkMode("truck23");
 		scenario.getVehicles().addVehicleType(truck23);
@@ -1228,7 +1010,7 @@ public class NorrkopingProductionRunner {
 				.createVehicleType(Id.create("carW", VehicleType.class));
 		carW.setMaximumVelocity(120/3.6);
 		carW.setLength(7.5);
-		carW.setPcuEquivalents(0.1);
+		carW.setPcuEquivalents(1.0);
 		carW.setWidth(2.5);
 		carW.setNetworkMode("carW");
 		scenario.getVehicles().addVehicleType(carW);
@@ -1326,8 +1108,8 @@ public class NorrkopingProductionRunner {
 		passwd = "password";
 		
 		// Update network with construction sites
-		//NetworkEditor edit = new NetworkEditor(configFile, user, passwd);
-		//edit.editNework();
+		NetworkEditor edit = new NetworkEditor(configFile, user, passwd);
+		edit.editNework();
 
 		
 		// Use only once to create general population in Norrkoping.
@@ -1340,6 +1122,7 @@ public class NorrkopingProductionRunner {
 		
 		//createDemandWorkers(configFile, 1.0, 6);
 		//runXY2Links(configFile, norrkopingNetwork, populationMerged);
+		//nrkpPlans50
 		
 		createVehicleTypes(configFile);
 		updateConfiguration(configFile, norrkopingNetwork, populationMerged);
