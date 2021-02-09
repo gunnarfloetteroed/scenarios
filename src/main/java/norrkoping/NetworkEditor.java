@@ -46,7 +46,7 @@ public class NetworkEditor {
 
 		Network netOriginal = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(netOriginal).readFile(networkOriginal);
-		
+
 		Network network = scenario.getNetwork();
 		NetworkFactory netF = network.getFactory();
 
@@ -72,16 +72,27 @@ public class NetworkEditor {
 
 		}
 
-		final DatabaseODMatrix od = new DatabaseODMatrix(user, passwd, "localhost", 5432); // 5455);
-		od.getSiteCoordinatesFromDatabase();
-		HashMap<String, Double> xCoord = od.getSiteCoordinatesX();
-		HashMap<String, Double> yCoord = od.getSiteCoordinatesY();
+		// From database
+		/*
+		 * final DatabaseODMatrix od = new DatabaseODMatrix(user, passwd, "localhost",
+		 * 5432); // 5455); od.getSiteCoordinatesFromDatabase(); HashMap<String, Double>
+		 * xCoord = od.getSiteCoordinatesX(); HashMap<String, Double> yCoord =
+		 * od.getSiteCoordinatesY();
+		 * 
+		 * od.getStoreCoordinates(); HashMap<String, Double> xCoordStore =
+		 * od.getStoreCoordinatesX(); HashMap<String, Double> yCoordStore =
+		 * od.getStoreCoordinatesY();
+		 */
 
-		od.getStoreCoordinates();
-		HashMap<String, Double> xCoordStore = od.getStoreCoordinatesX();
-		HashMap<String, Double> yCoordStore = od.getStoreCoordinatesY();
-		
-		//CreareLong Haul coordinate
+		// Offline input
+		ReadInputFiles inputFiles = new ReadInputFiles("run");
+		HashMap<String, Double> xCoord = inputFiles.getXcoordinateSite();
+		HashMap<String, Double> yCoord = inputFiles.getYcoordinateSite();
+
+		HashMap<String, Double> xCoordStore = inputFiles.getXcoordLocalStore();
+		HashMap<String, Double> yCoordStore = inputFiles.getYcoordLocalStore();
+
+		// CreareLong Haul coordinate
 
 		for (HashMap.Entry<String, Double> entry : xCoord.entrySet()) {
 

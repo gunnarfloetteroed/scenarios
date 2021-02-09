@@ -23,36 +23,35 @@ public class ResultWriter {
 	}
 
 	public void main() {
-		
 
-		//File file = new File(outputPath);
+		// File file = new File(outputPath);
 
-		//BufferedWriter bf = null;
-		//;
+		// BufferedWriter bf = null;
+		// ;
 
 		try {
 
-			//bf = new BufferedWriter(new FileWriter(file));
+			// bf = new BufferedWriter(new FileWriter(file));
 			FileWriter csvWriter = new FileWriter(outputPath);
-			
-			//bf.write("ID" + "," + "VALUE");
-			//bf.newLine();
+
+			// bf.write("ID" + "," + "VALUE");
+			// bf.newLine();
 			csvWriter.append("ID");
 			csvWriter.append(",");
 			csvWriter.append("VALUE");
 			csvWriter.append("\n");
-			
+
 			for (HashMap.Entry<String, String> entry : delay.entrySet()) {
 
-				//bf.write(entry.getKey() + "," + entry.getValue());
+				// bf.write(entry.getKey() + "," + entry.getValue());
 
-				//bf.newLine();
-			    csvWriter.append(entry.getKey() + "," + entry.getValue());
-			    csvWriter.append("\n");
-			    
+				// bf.newLine();
+				csvWriter.append(entry.getKey() + "," + entry.getValue());
+				csvWriter.append("\n");
+
 			}
 
-			//bf.flush();
+			// bf.flush();
 			csvWriter.flush();
 			csvWriter.close();
 
@@ -62,8 +61,8 @@ public class ResultWriter {
 
 			try {
 
-				//bf.close();
-				
+				// bf.close();
+
 			} catch (Exception e) {
 			}
 		}

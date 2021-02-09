@@ -48,11 +48,12 @@ public class NetworkToShape {
 	public static void doEverything() {
 
 		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile("C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\ResultFile\\networkUpdated.xml");
+		config.network().setInputFile(
+				"C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\ResultFile\\networkUpdated.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Network network = scenario.getNetwork();
-		
-		//CHANGE COORDIANTE SYSTEM
+
+		// CHANGE COORDIANTE SYSTEM
 
 		CoordinateReferenceSystem crs = MGC.getCRS("EPSG:3006"); // EPSG Code SWEDEN SWEREF99 TM
 
@@ -80,7 +81,7 @@ public class NetworkToShape {
 			String nrWorkers = (numWork.get(link.getId().toString())).toString();
 			String avgDelay1 = (avgDelay.get(link.getId().toString())).toString();
 			String avgSpeed = (speed.get(link.getId().toString())).toString();
-			
+
 			String delayPrc1 = (delayPrc.get(link.getId().toString())).toString();
 
 			SimpleFeature ft = linkFactory.createPolyline(
@@ -88,7 +89,7 @@ public class NetworkToShape {
 					new Object[] { link.getId().toString(), link.getFromNode().getId().toString(),
 							link.getToNode().getId().toString(), link.getLength(), NetworkUtils.getType(link),
 							link.getCapacity(), link.getFreespeed(), valueToInster, nrCars, nrTrucks, nrWorkers,
-							avgDelay1, avgSpeed, delayPrc1},
+							avgDelay1, avgSpeed, delayPrc1 },
 					null);
 			features.add(ft);
 		}
