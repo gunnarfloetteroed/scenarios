@@ -917,7 +917,7 @@ public class NorrkopingProductionRunner {
 		truck.setMaximumVelocity(80 / 3.6);
 		truck.setLength(12.5);
 		// truck.setFlowEfficiencyFactor(1.0);
-		truck.setPcuEquivalents(2.5);
+		truck.setPcuEquivalents(0.25);
 		truck.setWidth(2.0);
 		truck.setNetworkMode(TransportMode.truck);
 
@@ -928,7 +928,7 @@ public class NorrkopingProductionRunner {
 		truck23.setMaximumVelocity(80 / 3.6);
 		// truck23.setFlowEfficiencyFactor(1.0);
 		truck23.setLength(25.5);
-		truck23.setPcuEquivalents(5);
+		truck23.setPcuEquivalents(0.5);
 		truck23.setWidth(2.0);
 		truck23.setNetworkMode("truck23");
 		scenario.getVehicles().addVehicleType(truck23);
@@ -937,7 +937,7 @@ public class NorrkopingProductionRunner {
 		carW.setMaximumVelocity(120 / 3.6);
 		// carW.setFlowEfficiencyFactor(1.0);
 		carW.setLength(7.5);
-		carW.setPcuEquivalents(1.0);
+		carW.setPcuEquivalents(0.1);
 		carW.setWidth(1.0);
 		carW.setNetworkMode("carW");
 		scenario.getVehicles().addVehicleType(carW);
@@ -1037,8 +1037,8 @@ public class NorrkopingProductionRunner {
 
 		// Create agents based on databse demand for consruction workers and transports
 
-		 createDemandWorkers(configFile, 1.0, 6);
-		 runXY2Links(configFile, norrkopingNetwork, populationMerged);
+		 //createDemandWorkers(configFile, 1.0, 6);
+		// runXY2Links(configFile, norrkopingNetwork, populationMerged);
 		// nrkpPlans50
 
 		createVehicleTypes(configFile);

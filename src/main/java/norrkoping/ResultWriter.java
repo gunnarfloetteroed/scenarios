@@ -9,14 +9,12 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.network.Network;
 
 public class ResultWriter {
+	
+	public static String outputPath = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\ResultFile\\Export\\delayZones.csv";
 
-	public static String outputPath;
+	public static HashMap<String, Double> delay = new HashMap<>();
 
-	public static HashMap<String, String> delay = new HashMap<>();
-
-	public ResultWriter(String path, HashMap<String, String> inTable) {
-
-		this.outputPath = path;
+	public ResultWriter(HashMap<String, Double> inTable) {
 
 		this.delay = inTable;
 
@@ -41,7 +39,7 @@ public class ResultWriter {
 			csvWriter.append("VALUE");
 			csvWriter.append("\n");
 
-			for (HashMap.Entry<String, String> entry : delay.entrySet()) {
+			for (HashMap.Entry<String, Double> entry : delay.entrySet()) {
 
 				// bf.write(entry.getKey() + "," + entry.getValue());
 

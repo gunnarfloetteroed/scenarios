@@ -97,6 +97,8 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 		if ((!(event.getLinkId().toString().contains("tr")))) {
 
 			Link link = network.getLinks().get(event.getLinkId());
+			link.getToNode();
+			
 
 			if (event.getVehicleId().toString().contains("_truck23")) {
 				linkTravelTime = link.getLength() / (link.getFreespeed(event.getTime()) * 0.7);
