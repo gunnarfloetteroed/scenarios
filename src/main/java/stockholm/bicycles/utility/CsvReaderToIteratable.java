@@ -134,7 +134,7 @@ public class CsvReaderToIteratable {
 	}
 	
 	
-	private List<String[]> readTable() throws IOException, CsvException{
+	public List<String[]> readTable() throws IOException, CsvException{
 		Reader reader = Files.newBufferedReader(Paths.get(this.CSV_FILE_PATH),Charset.forName("ISO-8859-1"));
 	    CSVParser parser = new CSVParserBuilder()
 	        .withSeparator(this.saparater)

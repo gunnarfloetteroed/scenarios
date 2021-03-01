@@ -31,10 +31,10 @@ public class RunLinkVolumeEventsHandlingProductionRunner {
 //		final String outputFile = outputPath+"output/linkVolume.csv";
 		
 		//path to events file. For this you first need to run a simulation. Boatline scenario
-		String inputPath = "C:/Users/ChengxiL/Box Sync/MatsimBicycleSimulation/Simulation/output/";
+		String inputPath = "C:/Users/ChengxiL/Box Sync/MatsimBicycleSimulation/Simulation/output_baseline/";
 		final String inputFile = inputPath+"output_events.xml.gz";
 		String outputPath = inputPath;
-		final String outputFile = outputPath+"linkVolume_1.csv";
+		final String outputFile = outputPath+"linkVolume_baseline.csv";
 		
 		//create an event object
 		EventsManager events = EventsUtils.createEventsManager();

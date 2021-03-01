@@ -134,6 +134,15 @@ public class MatsimDijkstra implements LeastCostPathCalculator {
 	
 	
 	private void initializeNetwork(Id<Node> startNode) {
+		this.queue = new PriorityQueue<Id<Node>>(11, new Comparator<Id<Node>>() {
+
+			@Override
+			public int compare(Id<Node> o1, Id<Node> o2) {
+				return costToNode.get(o1).compareTo(costToNode.get(o2));
+			}
+
+		});
+		
 		for (Node node : network.getNodes().values()){
 			this.costToNode.put(node.getId(), Double.POSITIVE_INFINITY);
 			this.previousNodes.put(node.getId(), null);

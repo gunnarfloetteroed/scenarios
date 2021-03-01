@@ -14,7 +14,7 @@ public class DemandMatrixToPlanProductionRunner {
 		// final String demandFile = inputPath + "Data/ODDemandWholeDayOutHome.csv";
 
 		// for the demnad file of boat scenario
-		final String demandFile = inputPath + "Data/BoatScenario/ODDemandWholeDayOutHome_boatScenario.csv";
+		final String demandFile = inputPath + "Data/Baseline/ODDemandWholeDayOutHome.csv";
 		
 		
 	    final String networkFile = inputPath + "Simulation/network_StockholmInner.xml.gz";
@@ -23,7 +23,7 @@ public class DemandMatrixToPlanProductionRunner {
 		// final String planFile = inputPath + "Simulation/population_Stockholm.xml";
 		
 		// for the plan file of the boat scenario
-	    final String planFile = inputPath + "Simulation/population_Stockholm_boatScenario.xml";
+	    final String planFile = inputPath + "Simulation/population_Stockholm_baseline.xml";
 		
 		DemandMatrixToPlan planreader = new DemandMatrixToPlan(demandFile, networkFile, planFile);
 		planreader.generatePlan();

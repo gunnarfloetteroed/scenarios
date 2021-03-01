@@ -12,7 +12,7 @@ public class RunAgentTravelTimeEventsHandlingProductionRunner {
 
 	public static void main(String[] args) {
 
-		String inputPath = "C:/Users/ChengxiL/Box Sync/MatsimBicycleSimulation/Simulation/output/";
+		String inputPath = "C:/Users/ChengxiL/Box Sync/MatsimBicycleSimulation/Simulation/output_baseline/";
 		final String inputFile = inputPath+"output_events.xml.gz";
 		String outputPath = inputPath;
 		final String outputFile = outputPath+"linkVolume_1.csv";
