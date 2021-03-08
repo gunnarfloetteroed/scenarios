@@ -13,6 +13,11 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>	
+		
+		<timestamp>${maven.build.timestamp}</timestamp>
+    	<maven.build.timestamp.format>yyyy-MM-dd-HH-mm</maven.build.timestamp.format>
+    	<trashdir>trash/target-${maven.build.timestamp}</trashdir>
+    
 	</properties>
 
 	<repositories>
@@ -68,6 +73,20 @@
 			<artifactId>opdyts</artifactId>
 			<version>2020-08-27_snapshot</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>cadyts</groupId>
+			<artifactId>cadyts</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+		
+	<dependency>
+      <groupId>org.matsim</groupId>
+      <artifactId>matsim-examples</artifactId>
+      <version>13.0-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+		
 
         <dependency>
 			<groupId>org.jfree</groupId>
@@ -86,6 +105,12 @@
 			<artifactId>gt-referencing</artifactId>
 			<version>${geotools.version}</version>
 		</dependency>
+		
+		<dependency>
+          <groupId>org.geotools</groupId>
+          <artifactId>gt-shapefile</artifactId>
+          <version>${geotools.version}</version>
+      	</dependency>
 		
 		<!-- Dependency for database connections -->	
 		<dependency>
@@ -203,7 +228,58 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>rename_target</id>
+                            <phase>pre-clean</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <tasks>
+                                    <move todir="${trashdir}" failonerror="false">
+                                        <fileset dir="target/"/>
+                                    </move>
+                                </tasks>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>clean_trash</id>
+                            <phase>clean</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <tasks>
+                                    <delete dir="trash/" failonerror="false"/>
+                                </tasks>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                
+                <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+           		</plugin>
+                
 		</plugins>
 	</build>
+	
+	
+
+	
+	
+	
+	
 
 </project>

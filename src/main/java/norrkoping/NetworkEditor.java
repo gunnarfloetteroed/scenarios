@@ -24,7 +24,7 @@ public class NetworkEditor {
 
 	public static String configFile;
 
-	public static String networkOriginal = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\originalFiles\\networkOrg.xml";
+	public static String networkOriginal = "./networkOrg.xml";
 
 	public static String user;
 	public static String passwd;
@@ -107,8 +107,8 @@ public class NetworkEditor {
 			linkOut.setCapacity(50000);
 			linkIn.setFreespeed(50);
 			linkOut.setFreespeed(50);
-			linkIn.setAllowedModes(CollectionUtils.stringToSet("car, truck, truck23, carW"));
-			linkOut.setAllowedModes(CollectionUtils.stringToSet("car, truck, truck23, carW"));
+			linkIn.setAllowedModes(CollectionUtils.stringToSet("truck, truck23, carW"));
+			linkOut.setAllowedModes(CollectionUtils.stringToSet("truck, truck23, carW"));
 			network.addLink(linkIn);
 			network.addLink(linkOut);
 
@@ -127,15 +127,15 @@ public class NetworkEditor {
 			linkOut.setCapacity(50000);
 			linkIn.setFreespeed(50);
 			linkOut.setFreespeed(50);
-			linkIn.setAllowedModes(CollectionUtils.stringToSet("car, truck, truck23, carW"));
-			linkOut.setAllowedModes(CollectionUtils.stringToSet("car, truck, truck23, carW"));
+			linkIn.setAllowedModes(CollectionUtils.stringToSet("truck, truck23, carW"));
+			linkOut.setAllowedModes(CollectionUtils.stringToSet("truck, truck23, carW"));
 			network.addLink(linkIn);
 			network.addLink(linkOut);
 
 		}
 
 		new NetworkWriter(network)
-				.write("C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\networkUpdated.xml");
+				.write("./networkUpdated.xml");
 
 	}
 
