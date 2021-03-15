@@ -26,4 +26,8 @@ public class TravelDisutilityBicycle implements TravelDisutility {
 		return (double) link.getAttributes().getAttribute(generalizedCostAttributeName);
 	}
 
+	public String getGeneralizedCostAttributeName() {
+		return generalizedCostAttributeName;
+	}
+
 }

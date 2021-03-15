@@ -89,8 +89,8 @@ public class GPSReader {
 	}
 
 	public List<GPSSequence> read(int radius) throws IOException, CsvException {
-		CsvReaderToIteratable GPSReader = new CsvReaderToIteratable(this.GPSCsvFileName,',');
-		List<String[]> records= GPSReader.readTable();
+		CsvReaderToIteratable GPSDataReader = new CsvReaderToIteratable(this.GPSCsvFileName,',');
+		List<String[]> records= GPSDataReader.readTable();
 		String[] header=records.get(0);			
 		records.remove(0);
 		

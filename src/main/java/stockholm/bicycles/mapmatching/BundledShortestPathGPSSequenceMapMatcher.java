@@ -16,6 +16,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import stockholm.bicycles.routing.MatsimDijkstra;
+import stockholm.bicycles.routing.TravelDisutilityBicycle;
 
 public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapMatcher{
 	protected final Network network;
@@ -39,9 +40,25 @@ public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapM
 		List<GPSPoint> points = this.gpsSequence.getGPSPoints(); // note that GPSPoints already have a sequence
 		int NPoints = points.size();
 		GPSPoint startPoint = points.get(0);
-		this.startNode = NetworkUtils.getNearestNode(this.network, startPoint.getCoord());
+		Link candidateStartLink = NetworkUtils.getNearestLinkExactly(this.network, startPoint.getCoord());
+		double distancep1 = NetworkUtils.getEuclideanDistance(candidateStartLink.getFromNode().getCoord(), startPoint.getCoord());
+		double distancep2 = NetworkUtils.getEuclideanDistance(candidateStartLink.getToNode().getCoord(), startPoint.getCoord());
+		if (distancep1<=distancep2) {
+			this.startNode = candidateStartLink.getFromNode();
+		} else {
+			this.startNode = candidateStartLink.getToNode();
+		}
+		
+		
 		GPSPoint endPoint = points.get(NPoints-1);
-		this.endNode= NetworkUtils.getNearestNode(this.network, endPoint.getCoord());
+		Link candidateEndLink = NetworkUtils.getNearestLinkExactly(this.network, endPoint.getCoord());
+		distancep1 = NetworkUtils.getEuclideanDistance(candidateEndLink.getFromNode().getCoord(), endPoint.getCoord());
+		distancep2 = NetworkUtils.getEuclideanDistance(candidateEndLink.getToNode().getCoord(), endPoint.getCoord());
+		if (distancep1<=distancep2) {
+			this.endNode = candidateEndLink.getFromNode();
+		} else {
+			this.endNode = candidateEndLink.getToNode();
+		}
 		
 	}
 
@@ -50,15 +67,134 @@ public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapM
 	// main method to do map-matching
 	@Override
 	public Path mapMatching() {	
-		// 1. get all possible middle nodes
+		// calculate a weight for each link. the idea is as follow:
+		// if a link is close to GPS points and follows the GPS point directions, then it has a smaller weight. weight is between 0 and 1. 
+		updateNetworkLinkWeights();
+		
+		// 2. get all possible middle nodes
 		List<Collection<Node>> searchableMiddleNodes = getSearchedNodes();
 
-		// do some logic to generate most probable path
+		// 3. do some logic to generate most probable path
 		Path path=DijkstraThroughMidNodes(searchableMiddleNodes);
 
 		return path;
 
 	}
+
+	private void updateNetworkLinkWeights() {
+		Map<Id<Link>, ? extends Link> links = this.network.getLinks();
+		for (Link link:links.values()) {
+			double weight = calculateLinkWeight(link);
+			TravelDisutilityBicycle travelCost = (TravelDisutilityBicycle) this.travelCosts;
+			String generalizedCostAttributeName = travelCost.getGeneralizedCostAttributeName();
+			double currentCost =(double) link.getAttributes().getAttribute(generalizedCostAttributeName);
+			link.getAttributes().putAttribute(generalizedCostAttributeName, currentCost*weight);
+		}
+	}
+
+
+
+	private double calculateLinkWeight(Link link) {
+		Coord fronNodeCoord = link.getFromNode().getCoord();
+		Coord toNodeCoord = link.getToNode().getCoord();
+		int nearestGPSPointIndexFromNode = getNearestGPSPointfromCoord(fronNodeCoord);
+		double distanceFromNodeToNearestGPSPoint=NetworkUtils.getEuclideanDistance(fronNodeCoord, this.gpsSequence.getGPSPoints().get(nearestGPSPointIndexFromNode).getCoord());
+		
+		int nearestGPSPointIndexToNode = getNearestGPSPointfromCoord(toNodeCoord);
+		double distanceToNodeToNearestGPSPoint=NetworkUtils.getEuclideanDistance(toNodeCoord, this.gpsSequence.getGPSPoints().get(nearestGPSPointIndexToNode).getCoord());
+		
+		if (distanceFromNodeToNearestGPSPoint<=100 & distanceToNodeToNearestGPSPoint<=100) {
+			int nearestGPSPointIndexStart=nearestGPSPointIndexFromNode;
+			int nearestGPSPointIndexEnd=nearestGPSPointIndexToNode;
+			if (nearestGPSPointIndexFromNode>=nearestGPSPointIndexToNode) {
+				nearestGPSPointIndexStart=nearestGPSPointIndexToNode;
+				nearestGPSPointIndexEnd=nearestGPSPointIndexFromNode;
+			}
+			double averageDistance=averageEuclideanDistanceToLink(link,nearestGPSPointIndexStart,nearestGPSPointIndexEnd);
+			return (1/(1+Math.exp(-averageDistance/20)))*2-1;
+
+		
+		} else {
+			return 1;
+		}
+		
+	}
+	
+	private double averageEuclideanDistanceToLink(Link candidateLink, int currentPointIndex, int candidateGPSPointIndex) {
+		List<GPSPoint> points = this.gpsSequence.getGPSPoints();
+		double sumDistance=0;
+		int counter=0;
+		for (int i=(currentPointIndex);i<=(candidateGPSPointIndex);i++) {
+			if(i>=0 & i<points.size()) {
+				sumDistance=sumDistance+distanceFromPointsToLine(points.get(i).getCoord(),candidateLink);
+				counter++;
+			}
+
+		}
+		return sumDistance/counter;
+
+	}
+	
+	private double distanceFromPointsToLine(Coord coord, Link candidateLink) {
+		double x=coord.getX();
+		double y=coord.getY();
+		double x1=candidateLink.getFromNode().getCoord().getX();
+		double y1=candidateLink.getFromNode().getCoord().getY();
+		double x2=candidateLink.getToNode().getCoord().getX();
+		double y2=candidateLink.getToNode().getCoord().getY();
+
+		double A = x - x1;
+		double B = y - y1;
+		double C = x2 - x1;
+		double D = y2 - y1;
+
+		double dot = A * C + B * D;
+		double len_sq = C * C + D * D;
+		double param = -1;
+
+		if(len_sq!=0) {
+			param = dot / len_sq;
+		}
+
+		double xx=0;
+		double yy=0;
+
+		if (param < 0) {
+			xx = x1;
+			yy = y1;
+		}
+		else if (param > 1) {
+			xx = x2;
+			yy = y2;
+		}
+		else {
+			xx = x1 + param * C;
+			yy = y1 + param * D;
+		}
+
+		double dx = x - xx;
+		double dy = y - yy;
+
+		return Math.sqrt(dx * dx + dy * dy);
+	}
+
+
+
+	private int getNearestGPSPointfromCoord(Coord coord) {
+		List<GPSPoint> points = this.gpsSequence.getGPSPoints();
+		double currentMinimumDistance=Double.POSITIVE_INFINITY;
+		int currentGPSPointIndex=0;
+		for (GPSPoint point:points) {
+			if (NetworkUtils.getEuclideanDistance(coord, point.getCoord())<currentMinimumDistance) {
+				currentMinimumDistance=NetworkUtils.getEuclideanDistance(coord, point.getCoord());
+				currentGPSPointIndex=points.indexOf(point);
+			}
+		}
+
+		return currentGPSPointIndex;
+	}
+
+
 
 	protected List<Collection<Node>> getSearchedNodes(){
 		List<GPSPoint> points = this.gpsSequence.getGPSPoints(); // note that GPSPoints already have a sequence
@@ -78,7 +214,7 @@ public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapM
 				Collection<Node> nodes= new ArrayList<Node>();
 				nodes.add(this.endNode);
 				searchableMiddleNodes.add(nodes);
-			} else if (i % 15>0 ) {
+			} else if (i % 10>0 ) {
 				// add node to the existing "nodes" collection.
 				List<Node> relevantNodes = getNearestNodesFromNearestLinks(midPoint);
 				for (Node eachNode : relevantNodes) {
@@ -86,7 +222,7 @@ public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapM
 						middleNodes.add(eachNode);
 					}
 				}
-			} else if (i % 15==0 ) {
+			} else if (i % 10==0 ) {
 				// add the current nodes list to searchableMiddleNodes and then start a new node List to get new nodes
 				searchableMiddleNodes.add(middleNodes);
 				middleNodes= new ArrayList<Node>();
@@ -164,7 +300,7 @@ public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapM
 			Node currentNode = searchedNodesMap.get(currentNodeID);
 			Path appendPath = dijkstraRouter.calcLeastCostPath(previousNode, currentNode, 0, null, null);
 			finalPath=appendPath(finalPath,appendPath); // a function to append a Path object back to the finalPath
-			System.out.println("previous node ID: "+currentNodeID);
+			// System.out.println("previous node ID: "+currentNodeID);
 			currentNodeID=previousNodeID;
 		}
 		finalPath=generateNodes(finalPath);

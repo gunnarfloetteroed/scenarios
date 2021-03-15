@@ -1,0 +1,839 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network>
+
+<!-- ====================================================================== -->
+
+	<nodes>
+		<node id="N_0_0" x="0.0" y="0.0" >
+		</node>
+		<node id="N_0_10" x="0.0" y="10.0" >
+		</node>
+		<node id="N_0_20" x="0.0" y="20.0" >
+		</node>
+		<node id="N_0_30" x="0.0" y="30.0" >
+		</node>
+		<node id="N_0_40" x="0.0" y="40.0" >
+		</node>
+		<node id="N_0_50" x="0.0" y="50.0" >
+		</node>
+		<node id="N_100_0" x="100.0" y="0.0" >
+		</node>
+		<node id="N_100_10" x="100.0" y="10.0" >
+		</node>
+		<node id="N_100_20" x="100.0" y="20.0" >
+		</node>
+		<node id="N_100_30" x="100.0" y="30.0" >
+		</node>
+		<node id="N_100_40" x="100.0" y="40.0" >
+		</node>
+		<node id="N_100_50" x="100.0" y="50.0" >
+		</node>
+		<node id="N_10_0" x="10.0" y="0.0" >
+		</node>
+		<node id="N_10_10" x="10.0" y="10.0" >
+		</node>
+		<node id="N_10_20" x="10.0" y="20.0" >
+		</node>
+		<node id="N_10_30" x="10.0" y="30.0" >
+		</node>
+		<node id="N_10_40" x="10.0" y="40.0" >
+		</node>
+		<node id="N_10_50" x="10.0" y="50.0" >
+		</node>
+		<node id="N_20_0" x="20.0" y="0.0" >
+		</node>
+		<node id="N_20_10" x="20.0" y="10.0" >
+		</node>
+		<node id="N_20_20" x="20.0" y="20.0" >
+		</node>
+		<node id="N_20_30" x="20.0" y="30.0" >
+		</node>
+		<node id="N_20_40" x="20.0" y="40.0" >
+		</node>
+		<node id="N_20_50" x="20.0" y="50.0" >
+		</node>
+		<node id="N_30_0" x="30.0" y="0.0" >
+		</node>
+		<node id="N_30_10" x="30.0" y="10.0" >
+		</node>
+		<node id="N_30_20" x="30.0" y="20.0" >
+		</node>
+		<node id="N_30_30" x="30.0" y="30.0" >
+		</node>
+		<node id="N_30_40" x="30.0" y="40.0" >
+		</node>
+		<node id="N_30_50" x="30.0" y="50.0" >
+		</node>
+		<node id="N_40_0" x="40.0" y="0.0" >
+		</node>
+		<node id="N_40_10" x="40.0" y="10.0" >
+		</node>
+		<node id="N_40_20" x="40.0" y="20.0" >
+		</node>
+		<node id="N_40_30" x="40.0" y="30.0" >
+		</node>
+		<node id="N_40_40" x="40.0" y="40.0" >
+		</node>
+		<node id="N_40_50" x="40.0" y="50.0" >
+		</node>
+		<node id="N_50_0" x="50.0" y="0.0" >
+		</node>
+		<node id="N_50_10" x="50.0" y="10.0" >
+		</node>
+		<node id="N_50_20" x="50.0" y="20.0" >
+		</node>
+		<node id="N_50_30" x="50.0" y="30.0" >
+		</node>
+		<node id="N_50_40" x="50.0" y="40.0" >
+		</node>
+		<node id="N_50_50" x="50.0" y="50.0" >
+		</node>
+		<node id="N_60_0" x="60.0" y="0.0" >
+		</node>
+		<node id="N_60_10" x="60.0" y="10.0" >
+		</node>
+		<node id="N_60_20" x="60.0" y="20.0" >
+		</node>
+		<node id="N_60_30" x="60.0" y="30.0" >
+		</node>
+		<node id="N_60_40" x="60.0" y="40.0" >
+		</node>
+		<node id="N_60_50" x="60.0" y="50.0" >
+		</node>
+		<node id="N_70_0" x="70.0" y="0.0" >
+		</node>
+		<node id="N_70_10" x="70.0" y="10.0" >
+		</node>
+		<node id="N_70_20" x="70.0" y="20.0" >
+		</node>
+		<node id="N_70_30" x="70.0" y="30.0" >
+		</node>
+		<node id="N_70_40" x="70.0" y="40.0" >
+		</node>
+		<node id="N_70_50" x="70.0" y="50.0" >
+		</node>
+		<node id="N_80_0" x="80.0" y="0.0" >
+		</node>
+		<node id="N_80_10" x="80.0" y="10.0" >
+		</node>
+		<node id="N_80_20" x="80.0" y="20.0" >
+		</node>
+		<node id="N_80_30" x="80.0" y="30.0" >
+		</node>
+		<node id="N_80_40" x="80.0" y="40.0" >
+		</node>
+		<node id="N_80_50" x="80.0" y="50.0" >
+		</node>
+		<node id="N_90_0" x="90.0" y="0.0" >
+		</node>
+		<node id="N_90_10" x="90.0" y="10.0" >
+		</node>
+		<node id="N_90_20" x="90.0" y="20.0" >
+		</node>
+		<node id="N_90_30" x="90.0" y="30.0" >
+		</node>
+		<node id="N_90_40" x="90.0" y="40.0" >
+		</node>
+		<node id="N_90_50" x="90.0" y="50.0" >
+		</node>
+	</nodes>
+
+<!-- ====================================================================== -->
+
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
+		<link id="LX_N_0_0_to_N_10_0" from="N_0_0" to="N_10_0" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_0_10_to_N_10_10" from="N_0_10" to="N_10_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_0_20_to_N_10_20" from="N_0_20" to="N_10_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_0_30_to_N_10_30" from="N_0_30" to="N_10_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_0_40_to_N_10_40" from="N_0_40" to="N_10_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_0_50_to_N_10_50" from="N_0_50" to="N_10_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_10_0_to_N_20_0" from="N_10_0" to="N_20_0" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_10_10_to_N_20_10" from="N_10_10" to="N_20_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_10_20_to_N_20_20" from="N_10_20" to="N_20_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_10_30_to_N_20_30" from="N_10_30" to="N_20_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_10_40_to_N_20_40" from="N_10_40" to="N_20_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_10_50_to_N_20_50" from="N_10_50" to="N_20_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_20_0_to_N_30_0" from="N_20_0" to="N_30_0" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_20_10_to_N_30_10" from="N_20_10" to="N_30_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_20_20_to_N_30_20" from="N_20_20" to="N_30_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_20_30_to_N_30_30" from="N_20_30" to="N_30_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_20_40_to_N_30_40" from="N_20_40" to="N_30_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_20_50_to_N_30_50" from="N_20_50" to="N_30_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_30_0_to_N_40_0" from="N_30_0" to="N_40_0" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_30_10_to_N_40_10" from="N_30_10" to="N_40_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_30_20_to_N_40_20" from="N_30_20" to="N_40_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_30_30_to_N_40_30" from="N_30_30" to="N_40_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_30_40_to_N_40_40" from="N_30_40" to="N_40_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_30_50_to_N_40_50" from="N_30_50" to="N_40_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_40_0_to_N_50_0" from="N_40_0" to="N_50_0" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_40_10_to_N_50_10" from="N_40_10" to="N_50_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_40_20_to_N_50_20" from="N_40_20" to="N_50_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_40_30_to_N_50_30" from="N_40_30" to="N_50_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_40_40_to_N_50_40" from="N_40_40" to="N_50_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_40_50_to_N_50_50" from="N_40_50" to="N_50_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_50_0_to_N_60_0" from="N_50_0" to="N_60_0" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_50_10_to_N_60_10" from="N_50_10" to="N_60_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_50_20_to_N_60_20" from="N_50_20" to="N_60_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_50_30_to_N_60_30" from="N_50_30" to="N_60_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_50_40_to_N_60_40" from="N_50_40" to="N_60_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_50_50_to_N_60_50" from="N_50_50" to="N_60_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_60_0_to_N_70_0" from="N_60_0" to="N_70_0" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_60_10_to_N_70_10" from="N_60_10" to="N_70_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_60_20_to_N_70_20" from="N_60_20" to="N_70_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_60_30_to_N_70_30" from="N_60_30" to="N_70_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_60_40_to_N_70_40" from="N_60_40" to="N_70_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_60_50_to_N_70_50" from="N_60_50" to="N_70_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_70_0_to_N_80_0" from="N_70_0" to="N_80_0" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_70_10_to_N_80_10" from="N_70_10" to="N_80_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_70_20_to_N_80_20" from="N_70_20" to="N_80_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_70_30_to_N_80_30" from="N_70_30" to="N_80_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_70_40_to_N_80_40" from="N_70_40" to="N_80_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_70_50_to_N_80_50" from="N_70_50" to="N_80_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_80_0_to_N_90_0" from="N_80_0" to="N_90_0" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_80_10_to_N_90_10" from="N_80_10" to="N_90_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_80_20_to_N_90_20" from="N_80_20" to="N_90_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_80_30_to_N_90_30" from="N_80_30" to="N_90_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_80_40_to_N_90_40" from="N_80_40" to="N_90_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_80_50_to_N_90_50" from="N_80_50" to="N_90_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_90_0_to_N_100_0" from="N_90_0" to="N_100_0" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_90_10_to_N_100_10" from="N_90_10" to="N_100_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_90_20_to_N_100_20" from="N_90_20" to="N_100_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_90_30_to_N_100_30" from="N_90_30" to="N_100_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_90_40_to_N_100_40" from="N_90_40" to="N_100_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="LX_N_90_50_to_N_100_50" from="N_90_50" to="N_100_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_0_0_to_N_0_10" from="N_0_0" to="N_0_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_0_10_to_N_0_20" from="N_0_10" to="N_0_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">20.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_0_20_to_N_0_30" from="N_0_20" to="N_0_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">30.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_0_30_to_N_0_40" from="N_0_30" to="N_0_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">40.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_0_40_to_N_0_50" from="N_0_40" to="N_0_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">50.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_100_0_to_N_100_10" from="N_100_0" to="N_100_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_100_10_to_N_100_20" from="N_100_10" to="N_100_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">20.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_100_20_to_N_100_30" from="N_100_20" to="N_100_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">30.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_100_30_to_N_100_40" from="N_100_30" to="N_100_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">40.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_100_40_to_N_100_50" from="N_100_40" to="N_100_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">50.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_10_0_to_N_10_10" from="N_10_0" to="N_10_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_10_10_to_N_10_20" from="N_10_10" to="N_10_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">20.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_10_20_to_N_10_30" from="N_10_20" to="N_10_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">30.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_10_30_to_N_10_40" from="N_10_30" to="N_10_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">40.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_10_40_to_N_10_50" from="N_10_40" to="N_10_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">50.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_20_0_to_N_20_10" from="N_20_0" to="N_20_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_20_10_to_N_20_20" from="N_20_10" to="N_20_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">20.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_20_20_to_N_20_30" from="N_20_20" to="N_20_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">30.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_20_30_to_N_20_40" from="N_20_30" to="N_20_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">40.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_20_40_to_N_20_50" from="N_20_40" to="N_20_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">50.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_30_0_to_N_30_10" from="N_30_0" to="N_30_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_30_10_to_N_30_20" from="N_30_10" to="N_30_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">20.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_30_20_to_N_30_30" from="N_30_20" to="N_30_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">30.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_30_30_to_N_30_40" from="N_30_30" to="N_30_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">40.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_30_40_to_N_30_50" from="N_30_40" to="N_30_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">50.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_40_0_to_N_40_10" from="N_40_0" to="N_40_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_40_10_to_N_40_20" from="N_40_10" to="N_40_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">20.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_40_20_to_N_40_30" from="N_40_20" to="N_40_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">30.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_40_30_to_N_40_40" from="N_40_30" to="N_40_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">40.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_40_40_to_N_40_50" from="N_40_40" to="N_40_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">50.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_50_0_to_N_50_10" from="N_50_0" to="N_50_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_50_10_to_N_50_20" from="N_50_10" to="N_50_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">20.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_50_20_to_N_50_30" from="N_50_20" to="N_50_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">30.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_50_30_to_N_50_40" from="N_50_30" to="N_50_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">40.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_50_40_to_N_50_50" from="N_50_40" to="N_50_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">50.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_60_0_to_N_60_10" from="N_60_0" to="N_60_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_60_10_to_N_60_20" from="N_60_10" to="N_60_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">20.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_60_20_to_N_60_30" from="N_60_20" to="N_60_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">30.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_60_30_to_N_60_40" from="N_60_30" to="N_60_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">40.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_60_40_to_N_60_50" from="N_60_40" to="N_60_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">50.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_70_0_to_N_70_10" from="N_70_0" to="N_70_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_70_10_to_N_70_20" from="N_70_10" to="N_70_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">20.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_70_20_to_N_70_30" from="N_70_20" to="N_70_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">30.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_70_30_to_N_70_40" from="N_70_30" to="N_70_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">40.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_70_40_to_N_70_50" from="N_70_40" to="N_70_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">50.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_80_0_to_N_80_10" from="N_80_0" to="N_80_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_80_10_to_N_80_20" from="N_80_10" to="N_80_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">20.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_80_20_to_N_80_30" from="N_80_20" to="N_80_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">30.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_80_30_to_N_80_40" from="N_80_30" to="N_80_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">40.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_80_40_to_N_80_50" from="N_80_40" to="N_80_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">50.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_90_0_to_N_90_10" from="N_90_0" to="N_90_10" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">10.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_90_10_to_N_90_20" from="N_90_10" to="N_90_20" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">20.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_90_20_to_N_90_30" from="N_90_20" to="N_90_30" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">30.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_90_30_to_N_90_40" from="N_90_30" to="N_90_40" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">40.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="LY_N_90_40_to_N_90_50" from="N_90_40" to="N_90_50" length="10.0" freespeed="5.0" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+			<attributes>
+				<attribute name="generalizedCost" class="java.lang.Double">50.0</attribute>
+				<attribute name="matched" class="java.lang.Integer">0</attribute>
+			</attributes>
+		</link>
+	</links>
+
+<!-- ====================================================================== -->
+
+</network>

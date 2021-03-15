@@ -67,21 +67,21 @@ public class RunBicyclePTTest {
 		//				});
 
 
-				controler.addOverridingModule(new AbstractModule() {
-					@Override
-					public void install() {
-						this.install(new SBBTransitModule());
-						this.install(new SwissRailRaptorModule());
-					}
-					
-					@Provides
-					QSimComponentsConfig provideQSimComponentsConfig() {
-						QSimComponentsConfig components = new QSimComponentsConfig();
-						new StandardQSimComponentConfigurator(config).configure(components);
-						SBBTransitEngineQSimModule.configure(components);
-						return components;
-					}
-				});
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				this.install(new SBBTransitModule());
+				this.install(new SwissRailRaptorModule());
+			}
+
+			@Provides
+			QSimComponentsConfig provideQSimComponentsConfig() {
+				QSimComponentsConfig components = new QSimComponentsConfig();
+				new StandardQSimComponentConfigurator(config).configure(components);
+				SBBTransitEngineQSimModule.configure(components);
+				return components;
+			}
+		});
 
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
@@ -90,36 +90,36 @@ public class RunBicyclePTTest {
 				// addTravelDisutilityFactoryBinding(TransportMode.walk).toInstance(new StockholmWalkTravelDisutilityFactory());
 			}
 		});
-		
-//		RaptorParameters check = RaptorUtils.createParameters(config);
-//		System.out.println(check.toString());
+
+		//		RaptorParameters check = RaptorUtils.createParameters(config);
+		//		System.out.println(check.toString());
 		// PlansCalcRouteConfigGroup params = config.plansCalcRoute();
 		// RaptorParameters check = RaptorUtils.createParameters(config);
 		// System.out.println("111");
-		
-//		Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons();
-//		Person person1 = persons.get(Id.createPersonId("person_1"));
-//		List<? extends Plan> p1Plans = person1.getPlans();
-//		Plan p1PlanElements= p1Plans.get(0);
-//		List<PlanElement> planElements = p1PlanElements.getPlanElements();
-//		PlanElement act = planElements.get(0);
-//		Link link = NetworkUtils.getNearestLink(scenario.getNetwork(), ((Activity) act).getCoord());
-//		System.out.println(act.toString());
-//		System.out.println(link.toString());
-		
-		
-		
-		
-//		SwissRailRaptorConfigGroup srrConfig = ConfigUtils.addOrGetModule(config, SwissRailRaptorConfigGroup.class);
-//		if (srrConfig.isUseIntermodalAccessEgress()) {
-//			for (IntermodalAccessEgressParameterSet params : srrConfig.getIntermodalAccessEgressParameterSets()) {
-//				String mode = params.getMode();
-//				System.out.println(mode);
-//			}
-//		}
-	   controler.run();
-	    
+
+		//		Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons();
+		//		Person person1 = persons.get(Id.createPersonId("person_1"));
+		//		List<? extends Plan> p1Plans = person1.getPlans();
+		//		Plan p1PlanElements= p1Plans.get(0);
+		//		List<PlanElement> planElements = p1PlanElements.getPlanElements();
+		//		PlanElement act = planElements.get(0);
+		//		Link link = NetworkUtils.getNearestLink(scenario.getNetwork(), ((Activity) act).getCoord());
+		//		System.out.println(act.toString());
+		//		System.out.println(link.toString());
+
+
+
+
+		//		SwissRailRaptorConfigGroup srrConfig = ConfigUtils.addOrGetModule(config, SwissRailRaptorConfigGroup.class);
+		//		if (srrConfig.isUseIntermodalAccessEgress()) {
+		//			for (IntermodalAccessEgressParameterSet params : srrConfig.getIntermodalAccessEgressParameterSets()) {
+		//				String mode = params.getMode();
+		//				System.out.println(mode);
+		//			}
+		//		}
+		controler.run();
+
 	}
-	
+
 
 }

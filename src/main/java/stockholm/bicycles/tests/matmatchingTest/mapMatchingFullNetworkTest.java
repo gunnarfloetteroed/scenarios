@@ -25,6 +25,7 @@ import stockholm.bicycles.mapmatching.BundledShortestPathGPSSequenceMapMatcher;
 import stockholm.bicycles.mapmatching.GPSPoint;
 import stockholm.bicycles.mapmatching.GPSSequence;
 import stockholm.bicycles.mapmatching.MySpatialTemporalGPSSequenceMapMatcher;
+import stockholm.bicycles.mapmatching.NearestLinkGPSSequenceMapMatcher;
 import stockholm.bicycles.mapmatching.ShortestPathGPSSequenceMapMatcher;
 import stockholm.bicycles.routing.TravelDisutilityBicycle;
 import stockholm.bicycles.utility.CsvWriter;
@@ -36,9 +37,9 @@ public class mapMatchingFullNetworkTest {
 		// read GPS data
 		String inputGPSFileName="//vti.se/root/RUCY/GPS data/cykel_filtered_oneTrip.csv";
 		String inputNetworkFileName="C:/Users/ChengxiL/VTI/RUCY TrV ansökan - General/Data/Network/network_NVDB.xml";
-		String writePath="//vti.se/root/RUCY/GPS data/writePath_test.csv";
+		String writePath="//vti.se/root/RUCY/GPS data/writePath_test_NearestLinks.csv";
 		GPSReader reader = new GPSReader(inputGPSFileName);
-		List<GPSSequence> GPSSequences = reader.read(20);
+		List<GPSSequence> GPSSequences = reader.read(15);
 		for (GPSSequence GPSSequence: GPSSequences) {
 			// GPSSequence.printInfo();
 		}
@@ -55,7 +56,7 @@ public class mapMatchingFullNetworkTest {
 
 		// output to csv file
 		List<String[]> outputStringList= new ArrayList<String[]>();
-		String[] header= new String[]{"counter", "linkID", "personID"};
+		String[] header= new String[]{"counter", "linkID", "tripID"};
 		outputStringList.add(header);
 		
 		// remove the first 10 and last one points in the GPS trace
@@ -75,6 +76,8 @@ public class mapMatchingFullNetworkTest {
 			
             // map matching
 			BundledShortestPathGPSSequenceMapMatcher matcher = new BundledShortestPathGPSSequenceMapMatcher(network,gpsSequence,travelDisutility);
+			// NearestLinkGPSSequenceMapMatcher matcher = new NearestLinkGPSSequenceMapMatcher(network,gpsSequence,travelDisutility);
+	
 			Path testPath = matcher.mapMatching();
 			long endTime   = System.nanoTime();
 			System.out.println("Total run time: "+(endTime-startTime)/10e9);

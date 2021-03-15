@@ -155,7 +155,7 @@ public class TransCad2MATSimNetwork_RUCY {
 
 			double cykelbanafactor =1;
 			if (gcm_vag==2) {
-				cykelbanafactor=0.5;
+				cykelbanafactor=1;
 			}
 			
 			
