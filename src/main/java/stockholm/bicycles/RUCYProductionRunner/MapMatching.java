@@ -28,7 +28,7 @@ public class MapMatching {
 		// read GPS data
 		String inputGPSFileName="//vti.se/root/RUCY/GPS data/cykel_filtered_20Trips.csv";
 		String inputNetworkFileName="C:/Users/ChengxiL/VTI/RUCY TrV ansökan - General/Data/Network/network_NVDB.xml";
-		String writePath="//vti.se/root/RUCY/GPS data/writePath_test_20trips.csv";
+		String writePath="//vti.se/root/RUCY/GPS data//writePath_test_20Trips.csv";
 		GPSReader reader = new GPSReader(inputGPSFileName);
 		List<GPSSequence> GPSSequences = reader.read(15);
 		

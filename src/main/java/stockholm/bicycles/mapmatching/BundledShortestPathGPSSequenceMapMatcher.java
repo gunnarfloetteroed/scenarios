@@ -88,33 +88,38 @@ public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapM
 
 	private void updateNetworkLinkWeights() {
 		Map<Id<Link>, ? extends Link> links = this.network.getLinks();
-		LinkedHashSet<Id<Link>> linksIdtoCalculateWeight = new LinkedHashSet<Id<Link>>();
 		List<GPSPoint> points = this.gpsSequence.getGPSPoints();
+		List<Node> nodeList = new ArrayList<Node>();
+		int counter=1;
 		for (GPSPoint point:points) {
-			List<Id<Link>> linkIdList = getNearestLinks(point);
-			for (Id<Link> linkId:linkIdList) {
-				linksIdtoCalculateWeight.add(linkId);
+			nodeList.add(network.getFactory().createNode(Id.createNodeId("N_"+counter), point.getCoord()));
+			counter++;
+		}
+		double[] boundingBox = NetworkUtils.getBoundingBox(nodeList);
+		double Xmin = boundingBox[0]-500;
+		double Ymin = boundingBox[1]-500;
+		double Xmax = boundingBox[2]+500;
+		double Ymax = boundingBox[3]+500;
+		
+		
+		
+		
+		for (Link link:links.values()) {
+			
+			Coord fronNodeCoord = link.getFromNode().getCoord();
+			Coord toNodeCoord = link.getToNode().getCoord();
+			double X1=fronNodeCoord.getX();
+			double Y1=fronNodeCoord.getY();
+			double X2=toNodeCoord.getX();
+			double Y2=toNodeCoord.getY();
+			if ((Xmin<X1 & X1<Xmax) & (Xmin<X2 & X2<Xmax) & (Ymin<Y1 & Y1<Ymax) & (Ymin<Y2 & Y2<Ymax)) {
+				double weight = calculateLinkWeight(link);
+				TravelDisutilityBicycle travelCost = (TravelDisutilityBicycle) this.travelCosts;
+				String generalizedCostAttributeName = travelCost.getGeneralizedCostAttributeName();
+				double currentCost =(double) link.getAttributes().getAttribute(generalizedCostAttributeName);
+				link.getAttributes().putAttribute(generalizedCostAttributeName, currentCost*weight);
 			}
 		}
-		
-		for (Id<Link> eachLinkId:linksIdtoCalculateWeight) {
-			Link link = links.get(eachLinkId);
-			double weight = calculateLinkWeight(link);
-			TravelDisutilityBicycle travelCost = (TravelDisutilityBicycle) this.travelCosts;
-			String generalizedCostAttributeName = travelCost.getGeneralizedCostAttributeName();
-			double currentCost =(double) link.getAttributes().getAttribute(generalizedCostAttributeName);
-			link.getAttributes().putAttribute(generalizedCostAttributeName, currentCost*weight);
-		}
-		
-		
-		
-//		for (Link link:links.values()) {
-//			double weight = calculateLinkWeight(link);
-//			TravelDisutilityBicycle travelCost = (TravelDisutilityBicycle) this.travelCosts;
-//			String generalizedCostAttributeName = travelCost.getGeneralizedCostAttributeName();
-//			double currentCost =(double) link.getAttributes().getAttribute(generalizedCostAttributeName);
-//			link.getAttributes().putAttribute(generalizedCostAttributeName, currentCost*weight);
-//		}
 	}
 
 
