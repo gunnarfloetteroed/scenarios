@@ -3,6 +3,8 @@ package stockholm.bicycles.mapmatching;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -12,8 +14,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.router.FastDijkstra;
+import org.matsim.core.router.FastDijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import stockholm.bicycles.routing.MatsimDijkstra;
 import stockholm.bicycles.routing.TravelDisutilityBicycle;
@@ -83,13 +88,33 @@ public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapM
 
 	private void updateNetworkLinkWeights() {
 		Map<Id<Link>, ? extends Link> links = this.network.getLinks();
-		for (Link link:links.values()) {
+		LinkedHashSet<Id<Link>> linksIdtoCalculateWeight = new LinkedHashSet<Id<Link>>();
+		List<GPSPoint> points = this.gpsSequence.getGPSPoints();
+		for (GPSPoint point:points) {
+			List<Id<Link>> linkIdList = getNearestLinks(point);
+			for (Id<Link> linkId:linkIdList) {
+				linksIdtoCalculateWeight.add(linkId);
+			}
+		}
+		
+		for (Id<Link> eachLinkId:linksIdtoCalculateWeight) {
+			Link link = links.get(eachLinkId);
 			double weight = calculateLinkWeight(link);
 			TravelDisutilityBicycle travelCost = (TravelDisutilityBicycle) this.travelCosts;
 			String generalizedCostAttributeName = travelCost.getGeneralizedCostAttributeName();
 			double currentCost =(double) link.getAttributes().getAttribute(generalizedCostAttributeName);
 			link.getAttributes().putAttribute(generalizedCostAttributeName, currentCost*weight);
 		}
+		
+		
+		
+//		for (Link link:links.values()) {
+//			double weight = calculateLinkWeight(link);
+//			TravelDisutilityBicycle travelCost = (TravelDisutilityBicycle) this.travelCosts;
+//			String generalizedCostAttributeName = travelCost.getGeneralizedCostAttributeName();
+//			double currentCost =(double) link.getAttributes().getAttribute(generalizedCostAttributeName);
+//			link.getAttributes().putAttribute(generalizedCostAttributeName, currentCost*weight);
+//		}
 	}
 
 
@@ -240,8 +265,9 @@ public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapM
 	}
 
 	protected Path DijkstraThroughMidNodes(List<Collection<Node>> searchableMiddleNodes) {
-		MatsimDijkstra dijkstraRouter = new MatsimDijkstra(this.network, this.travelCosts, null);
-
+		// MatsimDijkstra dijkstraRouter = new MatsimDijkstra(this.network, this.travelCosts, null);
+		FastDijkstraFactory fastDijkstraFactory = new FastDijkstraFactory();
+		FastDijkstra dijkstraRouter = (FastDijkstra) fastDijkstraFactory.createPathCalculator(this.network, this.travelCosts, new FreeSpeedTravelTime());
 		// 1. initialize all objects needed and return the collection of Nodes that gonna be scanned.
 		Map<Id<Node>, Node> searchedNodesMap = initializeSearchedNetwork(searchableMiddleNodes);
 		// 2. loop each node in searchableMiddleNodes in sequence to calculate shortest path between nodes
@@ -308,7 +334,19 @@ public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapM
 
 	}
 
-	
+	private List<Id<Link>> getNearestLinks(GPSPoint point) {
+		List<Id<Link>> linkList = new ArrayList<Id<Link>>();
+    	Coord pointCoord = point.getCoord();
+    	for (int i=-5;i<6;i++) {
+    		for (int j=-5;j<6;j++) {
+    			Coord newCoord = new Coord(pointCoord.getX()+i*point.getNodeSearchRadius()/5,pointCoord.getY()+j*point.getNodeSearchRadius()/5);
+    			Link candidateLink = NetworkUtils.getNearestLinkExactly(this.network, newCoord);
+    			Id<Link> candidateLinkId = candidateLink.getId();
+    			linkList.add(candidateLinkId);
+    		}
+    	}
+		return linkList;
+	}
 	
     private List<Node> getNearestNodesFromNearestLinks(GPSPoint point){
     	List<Node> nodes = new ArrayList<Node>();

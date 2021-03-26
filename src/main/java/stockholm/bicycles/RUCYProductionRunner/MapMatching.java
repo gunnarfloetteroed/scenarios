@@ -42,7 +42,7 @@ public class MapMatching {
 		Network network = scenario.getNetwork();
 
 		TravelDisutility travelDisutility = new TravelDisutilityBicycle("generalizedCost");
-		long startTime = System.nanoTime();
+		
 
 
 
@@ -70,13 +70,13 @@ public class MapMatching {
 				// gpsSequence.printInfo();
 
 
-
+				long startTime = System.nanoTime();
 				// map matching
 				BundledShortestPathGPSSequenceMapMatcher matcher = new BundledShortestPathGPSSequenceMapMatcher(network,gpsSequence,travelDisutility);
 				// NearestLinkGPSSequenceMapMatcher matcher = new NearestLinkGPSSequenceMapMatcher(network,gpsSequence,travelDisutility);
 
 				Path testPath = matcher.mapMatching();
-
+				
 
 				List<Link> linksInPath = testPath.links;
 
@@ -99,6 +99,8 @@ public class MapMatching {
 					counter++;
 
 				}
+				long endTime   = System.nanoTime();
+				System.out.println("Total run time for persom: "+gpsSequence.getPersonID().toString()+" is: "+(endTime-startTime)/10e9);
 
 				//					System.out.println(testPath.travelCost);
 				//					System.out.println(testPath.travelTime);
@@ -108,8 +110,8 @@ public class MapMatching {
 
 
 		}
-		long endTime   = System.nanoTime();
-		System.out.println("Total run time: "+(endTime-startTime)/10e9);
+		
+		
 
 
 		CsvWriter.write(outputStringList, writePath);
