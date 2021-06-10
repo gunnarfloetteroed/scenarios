@@ -1,4 +1,4 @@
-package stockholm.bicycles.imprtGPS;
+package stockholm.bicycles.io.GPSIO;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -33,6 +33,7 @@ public class GPSReader {
 	private final String GPSCsvFileName;
 	private int personIDLocation=-1;
 	private int modeLocation=-1;
+	private int timeStampLocation=-1;
 	private int latPosition=-1;
 	private int longPosition;
 	private int deltaDistancePosition=-1;
@@ -62,6 +63,9 @@ public class GPSReader {
 	    	if( header[i].equals("mode")) {
 	    		this.modeLocation=i;
 	    	}
+	    	if( header[i].equals("timestamp")) {
+	    		this.timeStampLocation=i;
+	    	}
 	    	if( header[i].equals("lat")) {
 	    		this.latPosition=i;
 	    	}
@@ -81,9 +85,9 @@ public class GPSReader {
 	     csvReader.close();
 		 reader.close();
 	     
-	     if (this.personIDLocation==-1 | this.modeLocation==-1 | this.latPosition==-1 | 
+	     if (this.personIDLocation==-1 | this.modeLocation==-1 | this.timeStampLocation==-1 | this.latPosition==-1 | 
 	    	 this.longPosition==-1 | this.deltaDistancePosition==-1 | this.deltaTimePosition==-1 | this.speedPosition==-1) {
-	    	 throw new RuntimeException( "please check the input csv header, it must include: segment_id,mode,lat,lon,delta_m,delta_s,kmh.") ;
+	    	 throw new RuntimeException( "please check the input csv header, it must include: segment_id,mode,timestamp,lat,lon,delta_m,delta_s,kmh.") ;
 	     }
 	    
 	}
@@ -102,27 +106,25 @@ public class GPSReader {
 		List<GPSPoint> gpsPoints = new ArrayList<GPSPoint>();
 		int personTripCounter=0;
 		double sum_m=0;
-		double sum_s=0;
 		for (int i =0; i<(numberOfRows);i++) {
 			String[] record=records.get(i);
 			String TripId=record[this.personIDLocation];
 			String currentMode=record[this.modeLocation];
+			double timeStamp = Double. parseDouble(record[this.timeStampLocation]);
 			double latitude = Double. parseDouble(record[this.latPosition]);
 			double longtitude = Double. parseDouble(record[this.longPosition]);
 			double delta_m = Double. parseDouble(record[this.deltaDistancePosition]);
-			double delta_s = Double. parseDouble(record[this.deltaTimePosition]);
 			double speed = Double. parseDouble(record[this.speedPosition]);
 			Coord coord = coordinateTransform.transform(new Coord(longtitude, latitude));
 			// the sum of distance and time	
 			if (i==0) {  // first record
 				currentTripId=TripId;
-			    OptionalTime time = OptionalTime.defined(0);
+			    OptionalTime time = OptionalTime.defined(timeStamp);
 			    GPSPoint point = new GPSPoint(coord,time,0,radius,speed);
 			    gpsPoints.add(point);
 			} else if(i<(numberOfRows-1) & TripId.equals(currentTripId)) { // the next trip id
 				sum_m=sum_m+delta_m;
-				sum_s=sum_s+delta_s;
-				OptionalTime time = OptionalTime.defined(sum_s);
+				OptionalTime time = OptionalTime.defined(timeStamp);
 			    GPSPoint point = new GPSPoint(coord,time,sum_m,radius,speed);
 			    gpsPoints.add(point);
 			} else if (i<(numberOfRows-1) & (!TripId.equals(currentTripId))) {
@@ -133,16 +135,14 @@ public class GPSReader {
 				System.out.println(personTripCounter+": "+"GPS sequence for person-trip: "+ personID.toString()+" is loaded.");
 				
 				sum_m=0;
-				sum_s=0;
 				gpsPoints = new ArrayList<GPSPoint>();
 				currentTripId=TripId;
-				OptionalTime time = OptionalTime.defined(0);
+				OptionalTime time = OptionalTime.defined(timeStamp);
 			    GPSPoint point = new GPSPoint(coord,time,0,radius,speed);
 			    gpsPoints.add(point);
 			} else if (i==(numberOfRows-1)) {
 				sum_m=sum_m+delta_m;
-				sum_s=sum_s+delta_s;
-				OptionalTime time = OptionalTime.defined(sum_s);
+				OptionalTime time = OptionalTime.defined(timeStamp);
 			    GPSPoint point = new GPSPoint(coord,time,sum_m,radius,speed);
 			    gpsPoints.add(point);
 			    Id<Person> personID = Id.create(currentTripId, Person.class);

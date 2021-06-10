@@ -13,7 +13,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import stockholm.bicycles.imprtGPS.GPSReader;
+import stockholm.bicycles.io.GPSIO.GPSReader;
 import stockholm.bicycles.mapmatching.BundledShortestPathGPSSequenceMapMatcher;
 import stockholm.bicycles.mapmatching.GPSPoint;
 import stockholm.bicycles.mapmatching.GPSSequence;
@@ -27,7 +27,7 @@ public class MapMatching {
 
 		// read GPS data
 		String inputGPSFileName="//vti.se/root/RUCY/GPS data/cykel_filtered_20Trips.csv";
-		String inputNetworkFileName="C:/Users/ChengxiL/VTI/RUCY TrV ansökan - General/Data/Network/network_NVDB.xml";
+		String inputNetworkFileName="C:/Users/ChengxiL/VTI/RUCY TrV ansökan - General/Data/Network/MatsimNetwork/network_NVDB.xml";
 		String writePath="//vti.se/root/RUCY/GPS data//writePath_test_20Trips.csv";
 		GPSReader reader = new GPSReader(inputGPSFileName);
 		List<GPSSequence> GPSSequences = reader.read(15);
@@ -117,7 +117,6 @@ public class MapMatching {
 		CsvWriter.write(outputStringList, writePath);
 
 
-		// mapmatching
 
 
 	}

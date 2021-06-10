@@ -17,7 +17,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import com.opencsv.exceptions.CsvException;
 
-import stockholm.bicycles.imprtGPS.GPSReader;
+import stockholm.bicycles.io.GPSIO.GPSReader;
 import stockholm.bicycles.mapmatching.GPSPoint;
 import stockholm.bicycles.mapmatching.GPSSequence;
 import stockholm.bicycles.routing.TravelDisutilityBicycle;

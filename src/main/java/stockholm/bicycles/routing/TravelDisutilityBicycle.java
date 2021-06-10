@@ -16,13 +16,18 @@ public class TravelDisutilityBicycle implements TravelDisutility {
 	@Override
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
 		
-		// TODO Auto-generated method stub
+		if (generalizedCostAttributeName.equals("Length")) {
+			return link.getLength();
+		}
 		return (double) link.getAttributes().getAttribute(generalizedCostAttributeName);
 	}
 
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
-		// TODO Auto-generated method stub
+		
+		if (generalizedCostAttributeName.equals("Length")) {
+			return link.getLength();
+		}
 		return (double) link.getAttributes().getAttribute(generalizedCostAttributeName);
 	}
 

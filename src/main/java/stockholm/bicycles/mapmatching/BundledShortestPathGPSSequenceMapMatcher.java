@@ -136,7 +136,7 @@ public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapM
 		if (distanceFromNodeToNearestGPSPoint<=100 & distanceToNodeToNearestGPSPoint<=100) {
 			int nearestGPSPointIndexStart=nearestGPSPointIndexFromNode;
 			int nearestGPSPointIndexEnd=nearestGPSPointIndexToNode;
-			if (nearestGPSPointIndexFromNode>=nearestGPSPointIndexToNode) {
+			if (nearestGPSPointIndexFromNode>nearestGPSPointIndexToNode) {
 				nearestGPSPointIndexStart=nearestGPSPointIndexToNode;
 				nearestGPSPointIndexEnd=nearestGPSPointIndexFromNode;
 			}
@@ -339,20 +339,20 @@ public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapM
 
 	}
 
-	private List<Id<Link>> getNearestLinks(GPSPoint point) {
-		List<Id<Link>> linkList = new ArrayList<Id<Link>>();
-    	Coord pointCoord = point.getCoord();
-    	for (int i=-5;i<6;i++) {
-    		for (int j=-5;j<6;j++) {
-    			Coord newCoord = new Coord(pointCoord.getX()+i*point.getNodeSearchRadius()/5,pointCoord.getY()+j*point.getNodeSearchRadius()/5);
-    			Link candidateLink = NetworkUtils.getNearestLinkExactly(this.network, newCoord);
-    			Id<Link> candidateLinkId = candidateLink.getId();
-    			linkList.add(candidateLinkId);
-    		}
-    	}
-		return linkList;
-	}
-	
+//	private List<Id<Link>> getNearestLinks(GPSPoint point) {
+//		List<Id<Link>> linkList = new ArrayList<Id<Link>>();
+//    	Coord pointCoord = point.getCoord();
+//    	for (int i=-5;i<6;i++) {
+//    		for (int j=-5;j<6;j++) {
+//    			Coord newCoord = new Coord(pointCoord.getX()+i*point.getNodeSearchRadius()/5,pointCoord.getY()+j*point.getNodeSearchRadius()/5);
+//    			Link candidateLink = NetworkUtils.getNearestLinkExactly(this.network, newCoord);
+//    			Id<Link> candidateLinkId = candidateLink.getId();
+//    			linkList.add(candidateLinkId);
+//    		}
+//    	}
+//		return linkList;
+//	}
+//	
     private List<Node> getNearestNodesFromNearestLinks(GPSPoint point){
     	List<Node> nodes = new ArrayList<Node>();
     	Coord pointCoord = point.getCoord();

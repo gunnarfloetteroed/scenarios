@@ -89,7 +89,10 @@ public class TransCad2MATSimNetwork_RUCY {
 		double beelineDistance = Math.sqrt(Math.pow((fromNodeCoord.getX() - toNideCoord.getX()),2)+Math.pow((fromNodeCoord.getY() - toNideCoord.getY()),2));
 		if (linkLengthMeterFromData<beelineDistance) {
 			outputLinklength=beelineDistance;
-			log.warn("Link ID: "+matsimABLink.getId().toString()+" has SHAPE_LEN: "+linkLengthMeterFromData + ". The beeline distance is: "+beelineDistance);
+			if (linkLengthMeterFromData-beelineDistance<-1) {
+				log.warn("Link ID: "+matsimABLink.getId().toString()+" has SHAPE_LEN: "+linkLengthMeterFromData + ". The beeline distance is: "+beelineDistance);
+			}
+			
 		}
 		return outputLinklength;
 		
@@ -112,21 +115,22 @@ public class TransCad2MATSimNetwork_RUCY {
 		for (String TransCadNodeID: TransCadNodeIDSet) {
 			Map<String, String> ANode = nodeTable.row(TransCadNodeID); 
 			// transform each node into Matsim node object
+			double NodeX= Double.parseDouble(ANode.get("Longitude"));
 			double NodeY= Double.parseDouble(ANode.get("Latitude"));
-			double NodeX= Double.parseDouble(ANode.get("Longitude"));		
+					
 			// Coord coord = new Coord(NodeX,NodeY);
 			
 			final Coord coord = coordinateTransform.transform(new Coord(1e-6*NodeX, 1e-6*NodeY));
 			final Node matsimNode = matsimNetworkFactory.createNode(Id.create(TransCadNodeID, Node.class),coord);
 			
 			
-			String Fid= ANode.get("Fid");	
+			// String Fid= ANode.get("Fid");	
 			// nodeAttributes.putAttribute(TransCadNodeID, "Altitude",NodeAltitude);
 			// nodeAttributes.putAttribute(TransCadNodeID, "CentroidID",CentroidID);
 			
 			
 			
-			matsimNode.getAttributes().putAttribute("Fid",Fid);
+			// matsimNode.getAttributes().putAttribute("Fid",Fid);
 			matsimNetwork.addNode(matsimNode);
 			System.out.println("Node added: "+TransCadNodeID);
 		}
@@ -144,12 +148,12 @@ public class TransCad2MATSimNetwork_RUCY {
 		Set<String> TransCadLinkIDSet=linkTable.rowKeySet();
 		for (String TransCadLinkID: TransCadLinkIDSet) {
 			Map<String, String> ALink = linkTable.row(TransCadLinkID); 
-			String FromNode= ALink.get("From ID");
-			String ToNode= ALink.get("To ID");	
-			String gcm_vag_string=ALink.get("vagtrafik");
+			String FromNode= ALink.get("FromNodeID");
+			String ToNode= ALink.get("ToNodeID");	
+			String gcm_vag_string=ALink.get("VAGTRAFIK");
 			int gcm_vag=0;
 			if (!gcm_vag_string.isEmpty()) {
-				gcm_vag=Integer.parseInt(ALink.get("vagtrafik"));	
+				gcm_vag=Integer.parseInt(ALink.get("VAGTRAFIK"));	
 			}
 			
 
@@ -158,60 +162,79 @@ public class TransCad2MATSimNetwork_RUCY {
 				cykelbanafactor=1;
 			}
 			
-			
+			String directionForbidden_String=ALink.get("FORBJUDENF");
+			int directionForbidden=0;
+			if (!directionForbidden_String.isEmpty()) {
+				directionForbidden=Integer.parseInt(directionForbidden_String);	
+			}
 			
 			final Node matsimFromNode = matsimNetwork.getNodes().get(Id.create(FromNode, Node.class));
 			final Node matsimToNode = matsimNetwork.getNodes().get(Id.create(ToNode, Node.class));	
+			double linkLengthFromDataMeter= Double.parseDouble(ALink.get("Length"))*1000;
 			
 			// create a AB link
-			String TransCadLinkID_AB=TransCadLinkID+"_AB";
-			
-			final Link matsimABLink = matsimNetworkFactory.createLink(Id.create(TransCadLinkID_AB, Link.class),
-					matsimFromNode, matsimToNode);
-			// set link length and speed as default attribute to links
-			double linkLengthFromDataMeter= Double.parseDouble(ALink.get("Length"))*1000;
-			double linkLength = checkLength(linkLengthFromDataMeter,matsimABLink);
-			if (linkLength<=0) {
-				linkLength=0.1;
+			if (directionForbidden!=1) {
+				String TransCadLinkID_AB=TransCadLinkID+"_AB";
+				
+				final Link matsimABLink = matsimNetworkFactory.createLink(Id.create(TransCadLinkID_AB, Link.class),
+						matsimFromNode, matsimToNode);
+				// set link length and speed as default attribute to links
+				
+				double linkLength = checkLength(linkLengthFromDataMeter,matsimABLink);
+				if (linkLength<=0) {
+					linkLength=0.1;
+				}
+				
+				// double bicycleSpeedM_S_AB= Double.parseDouble(ALink.get("AB_cykelspeed"))/3.6;// change back to: double bicycleSpeedM_S= Double.parseDouble(ALink.get("bicycleSpeed")) * Units.M_S_PER_KM_H;
+				matsimABLink.setLength(linkLength); // change back to: matsimLink.setLength(LinkLengthKM * Units.M_PER_KM);
+				matsimABLink.setFreespeed(17/3.6);  
+				matsimABLink.setAllowedModes(allowedModes);
+				matsimABLink.getAttributes().putAttribute("generalizedCost",linkLength*cykelbanafactor);
+				
+				
+				// specify which other attributes you want to save as link attributes
+//				double bicycleGeneralizedCost_AB= Double.parseDouble(ALink.get("AB_GK_Broach"));
+//				String linkType= ALink.get("link_type");	
+//				String lutning_AB= ALink.get("AB_slope");	
+//				String connector= ALink.get("Skaft");	
+//				
+//				// put link attributes
+//				matsimABLink.getAttributes().putAttribute("SHAPE_LEN",linkLengthFromDataMeter);
+//				matsimABLink.getAttributes().putAttribute("generalizedCost",bicycleGeneralizedCost_AB);
+//				matsimABLink.getAttributes().putAttribute("linkType",linkType);
+//				matsimABLink.getAttributes().putAttribute("slope",lutning_AB);
+//				matsimABLink.getAttributes().putAttribute("connector",connector);
+				matsimNetwork.addLink(matsimABLink);
+				System.out.println("AB_Link added: "+TransCadLinkID);
+				
 			}
 			
-			// double bicycleSpeedM_S_AB= Double.parseDouble(ALink.get("AB_cykelspeed"))/3.6;// change back to: double bicycleSpeedM_S= Double.parseDouble(ALink.get("bicycleSpeed")) * Units.M_S_PER_KM_H;
-			matsimABLink.setLength(linkLength); // change back to: matsimLink.setLength(LinkLengthKM * Units.M_PER_KM);
-			matsimABLink.setFreespeed(17/3.6);  
-			matsimABLink.setAllowedModes(allowedModes);
-			matsimABLink.getAttributes().putAttribute("generalizedCost",linkLength/(17/3.6)*cykelbanafactor);
-			
-			
-			// specify which other attributes you want to save as link attributes
-//			double bicycleGeneralizedCost_AB= Double.parseDouble(ALink.get("AB_GK_Broach"));
-//			String linkType= ALink.get("link_type");	
-//			String lutning_AB= ALink.get("AB_slope");	
-//			String connector= ALink.get("Skaft");	
-//			
-//			// put link attributes
-//			matsimABLink.getAttributes().putAttribute("SHAPE_LEN",linkLengthFromDataMeter);
-//			matsimABLink.getAttributes().putAttribute("generalizedCost",bicycleGeneralizedCost_AB);
-//			matsimABLink.getAttributes().putAttribute("linkType",linkType);
-//			matsimABLink.getAttributes().putAttribute("slope",lutning_AB);
-//			matsimABLink.getAttributes().putAttribute("connector",connector);
-			matsimNetwork.addLink(matsimABLink);
-			System.out.println("AB_Link added: "+TransCadLinkID);
 			
 			
 			// add a BA_link
-			String TransCadLinkID_BA=TransCadLinkID+"_BA";
-			final Link matsimBALink = matsimNetworkFactory.createLink(Id.create(TransCadLinkID_BA, Link.class),
-					 matsimToNode,matsimFromNode);
+			if (directionForbidden!=2) {
+				String TransCadLinkID_BA=TransCadLinkID+"_BA";
+				final Link matsimBALink = matsimNetworkFactory.createLink(Id.create(TransCadLinkID_BA, Link.class),
+						 matsimToNode,matsimFromNode);
+				
+				double bicycleSpeedM_S_BA= 17/3.6;// change back to: double bicycleSpeedM_S= Double.parseDouble(ALink.get("bicycleSpeed")) * Units.M_S_PER_KM_H;
+				
+				double linkLength = checkLength(linkLengthFromDataMeter,matsimBALink);
+				if (linkLength<=0) {
+					linkLength=0.1;
+				}
+				
+				matsimBALink.setLength(linkLength); // change back to: matsimLink.setLength(LinkLengthKM * Units.M_PER_KM);
+				matsimBALink.setFreespeed(bicycleSpeedM_S_BA); 
+				matsimBALink.setAllowedModes(allowedModes);
+				matsimBALink.getAttributes().putAttribute("generalizedCost",linkLength*cykelbanafactor);
+				matsimNetwork.addLink(matsimBALink);
+				System.out.println("BA_Link added: "+TransCadLinkID);
+			}
 			
-			double bicycleSpeedM_S_BA= 17/3.6;// change back to: double bicycleSpeedM_S= Double.parseDouble(ALink.get("bicycleSpeed")) * Units.M_S_PER_KM_H;
 			
 			
-			matsimBALink.setLength(linkLength); // change back to: matsimLink.setLength(LinkLengthKM * Units.M_PER_KM);
-			matsimBALink.setFreespeed(bicycleSpeedM_S_BA); 
-			matsimBALink.setAllowedModes(allowedModes);
-			matsimBALink.getAttributes().putAttribute("generalizedCost",linkLength/(17/3.6)*cykelbanafactor);
-			matsimNetwork.addLink(matsimBALink);
-			System.out.println("BA_Link added: "+TransCadLinkID);
+			
 		}
 		System.out.println("Total links loaded: "+ TransCadLinkIDSet.size());
 		linkTable=null;

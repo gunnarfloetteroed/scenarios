@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.opencsv.exceptions.CsvException;
 
-import stockholm.bicycles.imprtGPS.GPSReader;
+import stockholm.bicycles.io.GPSIO.GPSReader;
 import stockholm.bicycles.mapmatching.GPSPoint;
 import stockholm.bicycles.mapmatching.GPSSequence;
 
