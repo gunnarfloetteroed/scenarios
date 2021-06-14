@@ -48,13 +48,11 @@ public class NetworkToShape {
 	public static void doEverything() {
 
 		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(
-				"C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\ResultFile\\networkUpdated.xml");
+		config.network().setInputFile("./networkUpdated.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Network network = scenario.getNetwork();
 
 		// CHANGE COORDIANTE SYSTEM
-
 		CoordinateReferenceSystem crs = MGC.getCRS("EPSG:3006"); // EPSG Code SWEDEN SWEREF99 TM
 
 		Collection<SimpleFeature> features = new ArrayList<>();

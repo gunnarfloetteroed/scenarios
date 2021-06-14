@@ -13,6 +13,8 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
 public class ResultWriter {
+	//Old class used for write some outputs.
+	
 	
 	public static String outputPath = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\ResultFile\\Export\\delayZones.csv";
 	public static String outputPath2 = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\validation\\linkVolumesOut.csv";
@@ -42,7 +44,7 @@ public class ResultWriter {
 		try {
 
 			// bf = new BufferedWriter(new FileWriter(file));
-			FileWriter csvWriter = new FileWriter(outputPath2);
+			FileWriter csvWriter = new FileWriter(outputPath3);
 			// bf.write("ID" + "," + "VALUE");
 			// bf.newLine();
 	

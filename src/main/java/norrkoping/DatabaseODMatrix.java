@@ -371,9 +371,6 @@ public class DatabaseODMatrix implements ODMatrix {
 			ArrayList<Filter> filters = new ArrayList<Filter>();
 			Query query = new Query("od-trucksTest", factory.and(filters));
 
-			// query.setSortBy(new SortBy[] {factory.sort("od-trucksTest",
-			// SortOrder.ASCENDING)});
-
 			// Getting a feature source to the zone table.
 			SimpleFeatureSource source = dataStore.getFeatureSource("od-trucksTest");
 
