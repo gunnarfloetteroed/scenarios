@@ -48,13 +48,13 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 
 	private HashMap<String, Double> linkSpeed = new HashMap<>();
 	private HashMap<String, Double> linkSpeedPercent = new HashMap<>();
-	
+
 	public static ArrayList<String> truckLinks = new ArrayList<>();
 	public static ArrayList<String> truckLinksTest = new ArrayList<>();
 	public static ArrayList<String> workerLinks = new ArrayList<>();
 
 	private Network network;
-	
+
 	double timeStart = 0.0 * 3600;
 	double timeEnd = 25.0 * 3600;
 
@@ -64,7 +64,8 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 
 	public CongestionHandler(Network network, HashMap<String, Double> inTable, HashMap<String, Double> inTable2,
 			HashMap<String, Double> inTable3, HashMap<String, Double> inTable4, HashMap<String, Double> inTable5,
-			HashMap<String, Double> inTable7, HashMap<String, Double> inTable8, HashMap<String, Double> inTable9) throws Exception {
+			HashMap<String, Double> inTable7, HashMap<String, Double> inTable8, HashMap<String, Double> inTable9)
+			throws Exception {
 		this.network = network;
 		this.delay = inTable;
 		this.numberOfCars = inTable2;
@@ -81,11 +82,11 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 			hourDelayTrucks.put(i, 0.0);
 			hourDelayWorkers.put(i, 0.0);
 			hourCars.put(i, 0.0);
-			hourCarsSpeed.put(i,0.0);
-			hourTruckVol.put(i,0.0);
-			hourTruckVol10m.put(i,0.0);
-			hourTruckVol23m.put(i,0.0);
-			
+			hourCarsSpeed.put(i, 0.0);
+			hourTruckVol.put(i, 0.0);
+			hourTruckVol10m.put(i, 0.0);
+			hourTruckVol23m.put(i, 0.0);
+
 		}
 
 		for (Link l : network.getLinks().values()) {
@@ -93,13 +94,13 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 			linkSpeedPercent.put(l.getId().toString(), 0.0);
 
 		}
-		
+
 		ReadInputFiles input = new ReadInputFiles("");
 		input.readTruckLinks();
 		input.readWorkerLinks();
 		truckLinks = input.getTruckLinks();
 		workerLinks = input.getWorkerLinks();
-		
+
 	}
 
 	@Override
@@ -110,7 +111,7 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 
 	}
 
-	//Calculates the entry times on links
+	// Calculates the entry times on links
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 
@@ -118,7 +119,6 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 
 			Link link = network.getLinks().get(event.getLinkId());
 			link.getToNode();
-			
 
 			if (event.getVehicleId().toString().contains("_truck23")) {
 				linkTravelTime = link.getLength() / (link.getFreespeed(event.getTime()) * 0.65);
@@ -135,149 +135,141 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 		}
 	}
 
-	//Calculates exit times on links and delay, speed etc.
+	// Calculates exit times on links and delay, speed etc.
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 
 		if ((!(event.getLinkId().toString().contains("tr")))
 				&& ((event.getTime() > timeStart && event.getTime() < timeEnd))) {
-			
-			
+
 			String linkAnalyse = event.getLinkId().toString();
-			
-			//Choose analysis type. true = whole network, only HGV links, only one link etc.
-			
-			//if(linkAnalyse.contains("1058093")) {
-			if(true) {
-			//if(workerLinks.contains(linkAnalyse)) {
-			//if(truckLinks.contains(linkAnalyse)) {
-				
-			
 
-			int h = (int) Math.floor(event.getTime() / 3600);
+			// Choose analysis type. true = whole network, only HGV links, only one link
+			// etc.
 
-			
-			double travelTime;
-			double speed;
-			double linkFreeTravel;
-			double delayTime;
-			double speedPercent;
-			
-			Link link = network.getLinks().get(event.getLinkId());
+			// if(linkAnalyse.contains("1058093")) {
+			if (true) {
+				// if(workerLinks.contains(linkAnalyse)) {
+				// if(truckLinks.contains(linkAnalyse)) {
 
-			//Calculate delay seconds
-			if (this.enterTime.get(event.getVehicleId()) <= 0.0) {
-				travelTime = 0.0;
-				delayTime = 0.0;
-				speed = 0.7 * link.getFreespeed();
+				int h = (int) Math.floor(event.getTime() / 3600);
 
-			} else {
-				travelTime = event.getTime() - this.enterTime.get(event.getVehicleId());
-				
-				if (event.getVehicleId().toString().contains("_truck23")) {
-					linkFreeTravel = link.getLength() / (link.getFreespeed(event.getTime()) * 0.65);
-				} else if (event.getVehicleId().toString().contains("_truck")) {
-					linkFreeTravel = link.getLength() / (link.getFreespeed(event.getTime()) * 0.8);
-				} else {
-					linkFreeTravel = link.getLength() / link.getFreespeed(event.getTime());
+				double travelTime;
+				double speed;
+				double linkFreeTravel;
+				double delayTime;
+				double speedPercent;
 
-				}
-						
-				delayTime = travelTime - linkFreeTravel;
-				if(delayTime<1.0) {
+				Link link = network.getLinks().get(event.getLinkId());
+
+				// Calculate delay seconds
+				if (this.enterTime.get(event.getVehicleId()) <= 0.0) {
+					travelTime = 0.0;
 					delayTime = 0.0;
+					speed = 0.7 * link.getFreespeed();
+
+				} else {
+					travelTime = event.getTime() - this.enterTime.get(event.getVehicleId());
+
+					if (event.getVehicleId().toString().contains("_truck23")) {
+						linkFreeTravel = link.getLength() / (link.getFreespeed(event.getTime()) * 0.65);
+					} else if (event.getVehicleId().toString().contains("_truck")) {
+						linkFreeTravel = link.getLength() / (link.getFreespeed(event.getTime()) * 0.8);
+					} else {
+						linkFreeTravel = link.getLength() / link.getFreespeed(event.getTime());
+
+					}
+
+					delayTime = travelTime - linkFreeTravel;
+					if (delayTime < 1.0) {
+						delayTime = 0.0;
+					}
+
+					if (travelTime <= 1.0 && delayTime <= 1.0) {
+						speed = 0.7 * link.getFreespeed();
+
+					} else {
+						speed = link.getLength() / travelTime;
+
+					}
+
 				}
-				
-				
+
+				// Save delay and results for HGV if needed
+				if (event.getVehicleId().toString().contains("truck")) {
+					String link111 = event.getLinkId().toString();
+
+					if (!(truckLinks.contains(link111))) {
+						// Used once to find HGV routes
+						if (!(link111.contains("in") || link111.contains("out"))) {
+
+							// truckLinks.add(link111);
+						}
+					}
+
+					numberOfTrucks.put(event.getLinkId().toString(),
+							(numberOfTrucks.get(event.getLinkId().toString()) + 1));
+					delayTrucks.put(event.getLinkId().toString(),
+							delayTrucks.get(event.getLinkId().toString()) + delayTime);
+
+					if (h < 24) {
+						hourDelayTrucks.put(h, (hourDelayTrucks.get(h) + delayTime));
+						hourTruckVol.put(h, (hourTruckVol.get(h) + 1));
+
+						if (event.getVehicleId().toString().contains("_truck23")) {
+							hourTruckVol23m.put(h, (hourTruckVol23m.get(h) + 1));
+						} else {
+							hourTruckVol10m.put(h, (hourTruckVol10m.get(h) + 1));
+						}
+					}
+
+				} else if (event.getVehicleId().toString().contains("worker")) {
+
+					numberOfWorkers.put(event.getLinkId().toString(),
+							(numberOfWorkers.get(event.getLinkId().toString()) + 1));
+					delayWorkers.put(event.getLinkId().toString(),
+							delayWorkers.get(event.getLinkId().toString()) + delayTime);
+
+					if (h < 24) {
+						hourDelayWorkers.put(h, (hourDelayWorkers.get(h) + delayTime));
+					}
+
+				} else {
+
+					delay.put(event.getLinkId().toString(), delay.get(event.getLinkId().toString()) + delayTime);
+					numberOfCars.put(event.getLinkId().toString(),
+							(numberOfCars.get(event.getLinkId().toString()) + 1));
+
+					if (h < 24) {
+						hourCarsDelay.put(h, (hourCarsDelay.get(h) + delayTime));
+						hourCars.put(h, (hourCars.get(h) + 1));
+						hourCarsSpeed.put(h, (hourCarsSpeed.get(h) + speed));
+
+					}
+					linkSpeed.put(event.getLinkId().toString(), linkSpeed.get(event.getLinkId().toString()) + speed);
+
+				}
+
 				if (travelTime <= 1.0 && delayTime <= 1.0) {
 					speed = 0.7 * link.getFreespeed();
-					
+					speedPercent = (speed - link.getFreespeed(event.getTime())) / link.getFreespeed(event.getTime());
+					linkSpeedPercent.put(event.getLinkId().toString(),
+							linkSpeedPercent.get(event.getLinkId().toString()) + speedPercent);
+
+				} else if (delayTime <= 1.0) {
+					// Old stuff don't need
+
 				} else {
-					speed = link.getLength() / travelTime;		
-					
+
+					speedPercent = (speed - link.getFreespeed(event.getTime())) / link.getFreespeed(event.getTime());
+					linkSpeedPercent.put(event.getLinkId().toString(),
+							linkSpeedPercent.get(event.getLinkId().toString()) + speedPercent);
+
 				}
 
 			}
-			
-
-			//Save delay and results for HGV if needed
-			if (event.getVehicleId().toString().contains("truck")) {
-				String link111 = event.getLinkId().toString();
-				
-				if(!(truckLinks.contains(link111))) {
-					//Used once to find HGV routes
-					if(!(link111.contains("in")|| link111.contains("out"))) {
-											
-						//truckLinks.add(link111);
-					}	
-				}
-		
-
-				numberOfTrucks.put(event.getLinkId().toString(),
-						(numberOfTrucks.get(event.getLinkId().toString()) + 1));
-				delayTrucks.put(event.getLinkId().toString(),
-						delayTrucks.get(event.getLinkId().toString()) + delayTime);
-
-				if (h < 24) {
-					hourDelayTrucks.put(h, (hourDelayTrucks.get(h) + delayTime));
-					hourTruckVol.put(h, (hourTruckVol.get(h) + 1));
-					
-					if(event.getVehicleId().toString().contains("_truck23")) {
-						hourTruckVol23m.put(h, (hourTruckVol23m.get(h) + 1));
-					} else {
-						hourTruckVol10m.put(h, (hourTruckVol10m.get(h) + 1));
-					}
-				}
-
-			} else if (event.getVehicleId().toString().contains("worker")) {
-				
-				numberOfWorkers.put(event.getLinkId().toString(),
-						(numberOfWorkers.get(event.getLinkId().toString()) + 1));
-				delayWorkers.put(event.getLinkId().toString(),
-						delayWorkers.get(event.getLinkId().toString()) + delayTime);
-
-				if (h < 24) {
-					hourDelayWorkers.put(h, (hourDelayWorkers.get(h) + delayTime));
-				}
-
-			} else {
-
-				delay.put(event.getLinkId().toString(), delay.get(event.getLinkId().toString()) + delayTime);
-				numberOfCars.put(event.getLinkId().toString(), (numberOfCars.get(event.getLinkId().toString()) + 1));
-				
-				if (h < 24) {
-					hourCarsDelay.put(h, (hourCarsDelay.get(h) + delayTime));
-					hourCars.put(h, (hourCars.get(h) + 1));
-					hourCarsSpeed.put(h, (hourCarsSpeed.get(h) + speed));
-					
-				}
-				linkSpeed.put(event.getLinkId().toString(), linkSpeed.get(event.getLinkId().toString()) + speed);
-				
-			}
-
-			
-
-			if (travelTime <= 1.0 && delayTime <= 1.0) {
-				speed = 0.7 * link.getFreespeed();
-				speedPercent = (speed - link.getFreespeed(event.getTime())) / link.getFreespeed(event.getTime());
-				linkSpeedPercent.put(event.getLinkId().toString(),
-						linkSpeedPercent.get(event.getLinkId().toString()) + speedPercent);
-
-			} else if (delayTime <= 1.0) {
-					//Old stuff don't need
-
-			} else {
-
-				speedPercent = (speed - link.getFreespeed(event.getTime())) / link.getFreespeed(event.getTime());
-				linkSpeedPercent.put(event.getLinkId().toString(),
-						linkSpeedPercent.get(event.getLinkId().toString()) + speedPercent);
-
-			}
-
-
-		}
 		} // TRUCK OR WORKER IF STATEMENT
-		//} //LINK ANALYSIS STATEMENT *************************************
+			// } //LINK ANALYSIS STATEMENT *************************************
 	}
 
 	@Override
@@ -397,7 +389,7 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 
 		return hourCars;
 	}
-	
+
 	public HashMap<Integer, Double> getHourCarsSpeed() {
 
 		return hourCarsSpeed;
@@ -412,33 +404,30 @@ public class CongestionHandler implements LinkEnterEventHandler, LinkLeaveEventH
 
 		return linkSpeedPercent;
 	}
-	
-	
+
 	public HashMap<Integer, Double> getHourTruckVol() {
 
 		return hourTruckVol;
 	}
-	
+
 	public HashMap<Integer, Double> getHourTruckVol10m() {
 
 		return hourTruckVol10m;
 	}
-	
+
 	public HashMap<Integer, Double> getHourTruckVol23m() {
 
 		return hourTruckVol23m;
 	}
-	
-	
-	public ArrayList <String> getTruckLinks(){
-		
-		return truckLinks;	
+
+	public ArrayList<String> getTruckLinks() {
+
+		return truckLinks;
 	}
 
-	public ArrayList <String> getWorkerLinks(){
-	
-		return workerLinks;	
+	public ArrayList<String> getWorkerLinks() {
+
+		return workerLinks;
 	}
-	
-	
+
 }

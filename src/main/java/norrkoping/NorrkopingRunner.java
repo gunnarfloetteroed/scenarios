@@ -118,6 +118,5 @@ public class NorrkopingRunner {
 		}
 		runSimulation(args[0]);
 	}
-	
-}
 
+}

@@ -13,15 +13,14 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
 public class ResultWriter {
-	//Old class used for write some outputs.
-	
-	
+	// Old class used for write some outputs.
+
 	public static String outputPath = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\original_data_matsim\\ResultFile\\Export\\delayZones.csv";
 	public static String outputPath2 = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\validation\\linkVolumesOut.csv";
 	public static String outputPath3 = "C:\\Users\\TOPO-O\\Documents\\Master_RZ\\matsim\\validation\\workerLinks.csv";
 
 	public static HashMap<String, Double> delay = new HashMap<>();
-	
+
 	ArrayList<String> volumes = new ArrayList<>();
 	public static String sum;
 
@@ -31,11 +30,9 @@ public class ResultWriter {
 		this.volumes = inArray;
 
 	}
-	
-	
-	
+
 	public void writeVolumes() {
-		
+
 		// File file = new File(outputPath);
 
 		// BufferedWriter bf = null;
@@ -47,9 +44,8 @@ public class ResultWriter {
 			FileWriter csvWriter = new FileWriter(outputPath3);
 			// bf.write("ID" + "," + "VALUE");
 			// bf.newLine();
-	
 
-			for (int i = 0; i<volumes.size(); i++) {
+			for (int i = 0; i < volumes.size(); i++) {
 
 				// bf.write(entry.getKey() + "," + entry.getValue());
 
@@ -74,15 +70,8 @@ public class ResultWriter {
 			} catch (Exception e) {
 			}
 		}
-		
-		
-		
+
 	}
-	
-	
-	
-	
-	
 
 	public void main() {
 

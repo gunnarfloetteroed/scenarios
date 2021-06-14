@@ -145,9 +145,9 @@ public class NorrkopingProductionRunner {
 
 	static final String norrkopingNetwork = "./networkUpdated.xml";
 	static final String norrkopingNetworkOriginal = "./networkOrg.xml";
-	//Output file for car population if necessary 
+	// Output file for car population if necessary
 	static final String nrkpPlans100 = "./nrkpPlans100.xml";
-	
+
 	static final String inputPlans = "./inputPlans.xml.gz";
 	static final String vehiclesFile = "./vehicleTypes.xml";
 	static final String populationMerged = "./popMerged.xml";
@@ -159,7 +159,7 @@ public class NorrkopingProductionRunner {
 
 	static final Coord centrum = new Coord(569092.878, 6495008.141);
 
-	//Coordinates for origin and destination on E4	
+	// Coordinates for origin and destination on E4
 	static final Coord fromLinkoping = new Coord(542656.7185038754, 6478707.856454755);
 	static final Coord toLinkoping = new Coord(542649.8589400095, 6478720.787579953);
 
@@ -181,8 +181,8 @@ public class NorrkopingProductionRunner {
 	public static String user;
 	public static String passwd;
 
-	//Used only once to create zoneType definitions
-	//Now read as input - ZoneTypesIn.csv
+	// Used only once to create zoneType definitions
+	// Now read as input - ZoneTypesIn.csv
 	public static void createZoneTypes() {
 
 		System.out.println("Zones");
@@ -223,11 +223,11 @@ public class NorrkopingProductionRunner {
 	}
 
 	public static void createDemandWorkers(String configFile, double upScale, int nrSites) throws Exception {
-		//This method below is hard-coded with many manual adjustments so that it works
-		//Basically every site depending on the demand receives a 
-		
+		// This method below is hard-coded with many manual adjustments so that it works
+		// Basically every site depending on the demand receives a
+
 		System.out.println("WORKERS");
-		//Read input csv files
+		// Read input csv files
 		ReadInputFiles inputFiles = new ReadInputFiles("run");
 		inputFiles.readZoneType();
 		HashMap<String, String> zoneType = new HashMap<>(inputFiles.getZoneType());
@@ -240,8 +240,8 @@ public class NorrkopingProductionRunner {
 		ZonalSystem zonalSystem = new ZonalSystem(norrkopingZoneShapeFile,
 				StockholmTransformationFactory.WGS84_SWEREF99, "id");
 
-		//Right now everything is offline and not connected to database
-		
+		// Right now everything is offline and not connected to database
+
 		// final DatabaseODMatrix od = new DatabaseODMatrix(user, passwd, "localhost",
 		// 5432); // 5455);
 		// od.createArrayListsWorkers();
@@ -252,10 +252,10 @@ public class NorrkopingProductionRunner {
 		ArrayList<Integer> oWorker = inputFiles.getOriginWorkers();
 		ArrayList<Integer> dWorker = inputFiles.getDestinationWorkers();
 		ArrayList<Integer> flowWorker = inputFiles.getFlowWorkers();
-		
+
 		double sites1 = (double) nrSites;
-		//worker demand up-scale if necessary
-		double totWorkerSupply = sites1*upScale;
+		// worker demand up-scale if necessary
+		double totWorkerSupply = sites1 * upScale;
 
 		for (int i = 0; i < totWorkerSupply; i++) {
 			inputFiles.readFileWorkersInfo();
@@ -289,13 +289,13 @@ public class NorrkopingProductionRunner {
 				String type = zoneType.get(oWorker.get(i).toString());
 
 				for (int j = 0; j < flow; j++) {
-					
+
 					counter = counter + 1;
 					int index = copyWorkerZone.indexOf(type);
 
 					if (copyWorkerTransport.get(index).contains("car")) {
 						carCounter = carCounter + 1;
-						if (emptyShare.get(dWorker.get(i)) < (carShare.get(dWorker.get(i)))*scale) {
+						if (emptyShare.get(dWorker.get(i)) < (carShare.get(dWorker.get(i))) * scale) {
 							emptyShare.put(dWorker.get(i), (emptyShare.get(dWorker.get(i)) + 1.0));
 
 						} else {
@@ -419,7 +419,6 @@ public class NorrkopingProductionRunner {
 		scenario.getPopulation().addPerson(person);
 	}
 
-	
 	public static void createDemandNorrkoping(final double demandUpscale) {
 
 		final Config config = ConfigUtils.createConfig();
@@ -434,7 +433,7 @@ public class NorrkopingProductionRunner {
 		final DatabaseODMatrix od = new DatabaseODMatrix(user, passwd, "localhost", 5432); // 5455);
 
 		int persons = od.getOdSize() - 1;
-		
+
 		double total = (double) persons;
 
 		Coord toCoord = new Coord();
@@ -461,8 +460,8 @@ public class NorrkopingProductionRunner {
 
 		Coord fromSoderkoping = nodesList.get(8).getCoord();
 		Coord toSoderkoping = nodesList.get(9).getCoord();
-		
-		int totalTest=0;
+
+		int totalTest = 0;
 
 		for (int i = 0; i < persons; i++) {
 			value = (double) i / total;
@@ -537,11 +536,10 @@ public class NorrkopingProductionRunner {
 					addTripMakerPersons(scenario, Id.createPersonId(counter), fromCoord, toCoord,
 							(departure + Math.random()) * 3600);
 					counter = counter + 1;
-					
+
 				}
 			}
-			
-			
+
 			input.clear();
 
 		}
@@ -575,15 +573,15 @@ public class NorrkopingProductionRunner {
 
 		System.out.println("Truck Method OD OFFILNE.");
 
-		//Get site and supplier coordinates
+		// Get site and supplier coordinates
 		ReadInputFiles inputFiles = new ReadInputFiles("run");
 		HashMap<String, Double> xCoord = inputFiles.getXcoordinateSite();
 		HashMap<String, Double> yCoord = inputFiles.getYcoordinateSite();
 
 		HashMap<String, Double> xCoordStore = inputFiles.getXcoordLocalStore();
 		HashMap<String, Double> yCoordStore = inputFiles.getYcoordLocalStore();
-		
-		//OD-matrix from other class
+
+		// OD-matrix from other class
 		odCalculationTrucks odTrucks = new odCalculationTrucks("a", "s", trucksIn, siteList);
 		odTrucks.createODTrucks();
 		ArrayList<Integer> origin = odTrucks.getOriginHGV();
@@ -600,8 +598,8 @@ public class NorrkopingProductionRunner {
 		for (int k = 0; k < siteList.size(); k++) {
 			totalTrucks = totalTrucks + siteTrucksTotal.get(siteList.get(k));
 		}
-		
-		//Two truck dimensions
+
+		// Two truck dimensions
 		double truck23 = Math.round(totalTrucks * largeTrucks);
 		double trucksSmall = totalTrucks - truck23;
 
@@ -620,7 +618,7 @@ public class NorrkopingProductionRunner {
 		for (int i = 0; i < origin.size(); i++) {
 			if (siteList.contains(destination.get(i))) {
 
-				//Two unload times depending on supplier
+				// Two unload times depending on supplier
 				if (origin.get(i) == 1 || origin.get(i) == 2 || origin.get(i) == 3) {
 					unloadTime = 1800;
 				} else {
@@ -648,7 +646,7 @@ public class NorrkopingProductionRunner {
 					fromCoord = nodesList.get(0).getCoord();
 					homeCoord = nodesList.get(1).getCoord();
 
-				}  else {
+				} else {
 					// Origin for zones
 					fromCoord = new Coord(xCoordStore.get(origin.get(i).toString()),
 							yCoordStore.get(origin.get(i).toString()));
@@ -659,8 +657,8 @@ public class NorrkopingProductionRunner {
 				coordConstruction = new Coord(xCoord.get(destination.get(i).toString()),
 						yCoord.get(destination.get(i).toString()));
 
-				//Manual adjustment so that proportions between 23m and 10m are correct
-				//In the beginning schedule every second truck as 23m
+				// Manual adjustment so that proportions between 23m and 10m are correct
+				// In the beginning schedule every second truck as 23m
 				if (var == 1 && countLarge <= truck23) {
 					truck = "truck23";
 					countLarge = countLarge + 1;
@@ -677,33 +675,32 @@ public class NorrkopingProductionRunner {
 					truck = "truck23";
 					countLarge = countLarge + 1;
 				}
-				
-				
+
 				double departureTime = 0;
-				//Used for logistic solution
-				//SFS has the departure from 4:30 so made adaption here
-				if(departure.get(i) == 4) {
+				// Used for logistic solution
+				// SFS has the departure from 4:30 so made adaption here
+				if (departure.get(i) == 4) {
 					double randomPart = Math.random();
-					//Use division of 2 for SFS
-					//double randomPart = Math.random()/2;
+					// Use division of 2 for SFS
+					// double randomPart = Math.random()/2;
 					departureTime = (departure.get(i) + randomPart) * timeBinSize_s;
-				} else if(departure.get(i) == 6) {
+				} else if (departure.get(i) == 6) {
 					double randomPart = Math.random();
-					//Use division of 2 for SFS
-					//double randomPart = Math.random()/2;
+					// Use division of 2 for SFS
+					// double randomPart = Math.random()/2;
 					departureTime = (departure.get(i) + randomPart) * timeBinSize_s;
-					
+
 				} else {
 					departureTime = (departure.get(i) + Math.random()) * timeBinSize_s;
 				}
-				
-				
-				addTripTrucksOD(scenario, Id.createPersonId("truck" + (person++)), fromCoord, homeCoord, coordConstruction, departureTime, truck, origin.get(i), destination.get(i));
+
+				addTripTrucksOD(scenario, Id.createPersonId("truck" + (person++)), fromCoord, homeCoord,
+						coordConstruction, departureTime, truck, origin.get(i), destination.get(i));
 			}
 
 		}
 
-		//merge input population with HGV trucks and workers
+		// merge input population with HGV trucks and workers
 		final PopulationWriter writer = new PopulationWriter(scenario.getPopulation());
 		writer.writeV6(populationMerged);
 
@@ -757,7 +754,7 @@ public class NorrkopingProductionRunner {
 
 		plan.addLeg(leg);
 
-		//Route and departure to construction site
+		// Route and departure to construction site
 		if ((origin == 2 && dest == 2) || (origin == 12 && dest == 2) || (origin == 2 && dest == 6)
 				|| (origin == 12 && dest == 6)) {
 			middleCoordTo = nodesList.get(0).getCoord();
@@ -794,7 +791,6 @@ public class NorrkopingProductionRunner {
 
 		}
 
-
 		Activity end = scenario.getPopulation().getFactory().createActivityFromCoord("construction", coordConstruction);
 		end.setStartTime(dptTime_s + travelTime);
 		end.setEndTime(dptTime_s + travelTime + unloadTime);
@@ -802,8 +798,8 @@ public class NorrkopingProductionRunner {
 		plan.addActivity(end);
 		plan.addLeg(leg);
 
-		//Route and departure after construction site
-		//Adjust routes with fake activities
+		// Route and departure after construction site
+		// Adjust routes with fake activities
 		if ((origin == 2 && dest == 2) || (origin == 12 && dest == 2) || (origin == 2 && dest == 6)
 				|| (origin == 12 && dest == 6)) {
 			middleCoordFrom = nodesList.get(1).getCoord();
@@ -815,7 +811,7 @@ public class NorrkopingProductionRunner {
 
 		}
 
-		//Adjust routes with fake activities
+		// Adjust routes with fake activities
 		if ((origin == 3 && dest == 3) || (origin == 3 && dest == 4) || (origin == 3 && dest == 5)
 				|| (origin == 3 && dest == 7)) {
 			middleCoordFrom1 = nodesList1.get(0).getCoord();
@@ -827,7 +823,7 @@ public class NorrkopingProductionRunner {
 
 		}
 
-		//Adjust routes with fake activities
+		// Adjust routes with fake activities
 		if ((origin == 1 && dest == 6) || (origin == 1 && dest == 2)) {
 			middleCoordFrom2 = nodesList1.get(1).getCoord();
 			Activity middlePointFrom = scenario.getPopulation().getFactory().createActivityFromCoord("middlePoint",
@@ -861,7 +857,6 @@ public class NorrkopingProductionRunner {
 		final PopulationWriter writer = new PopulationWriter(scenario.getPopulation());
 		writer.writeV6(popFileName);
 	}
-
 
 	static void runSimulation(final String configFileName) {
 
@@ -998,7 +993,6 @@ public class NorrkopingProductionRunner {
 
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
-
 		config.qsim().setFlowCapFactor(flowCap);
 		config.qsim().setStorageCapFactor(storageCap);
 
@@ -1015,7 +1009,7 @@ public class NorrkopingProductionRunner {
 		config.qsim().setMainModes(mainModes);
 		config.plansCalcRoute().setNetworkModes(mainModes);
 		config.travelTimeCalculator().setAnalyzedModesAsString("car,truck, truck23, carW");
-		config.travelTimeCalculator().setSeparateModes(true); 
+		config.travelTimeCalculator().setSeparateModes(true);
 
 		PlanCalcScoreConfigGroup.ModeParams truck1 = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.truck);
 		truck1.setMonetaryDistanceRate(0); // all to zero
@@ -1077,12 +1071,12 @@ public class NorrkopingProductionRunner {
 		// Use only once to create general population in Norrkoping.
 		user = "name";
 		passwd = "psswd";
-		
-		//Use only once to create general population in Norrkoping.
-		//createDemandNorrkoping(3.0);
+
+		// Use only once to create general population in Norrkoping.
+		// createDemandNorrkoping(3.0);
 		// runXY2Links(configFileUpdated,norrkopingNetworkOriginal,nrkpPlans100);
 
-		//Database id and password
+		// Database id and password
 		// Scanner scanner = new Scanner(System.in);
 		// System.out.println("DB user name: ");
 		// user = scanner.nextLine();
@@ -1095,7 +1089,7 @@ public class NorrkopingProductionRunner {
 		NetworkEditor edit = new NetworkEditor(configFile, user, passwd);
 		edit.editNework();
 
-		//Define iterations, link flow and storage capacity
+		// Define iterations, link flow and storage capacity
 		iterations = 0;
 		flowCap = 1.0;
 		storageCap = 1.0;
@@ -1107,11 +1101,11 @@ public class NorrkopingProductionRunner {
 
 		// number of replications whe HGV are scheduled
 		int replications = 1;
-		
+
 		for (int i = 0; i < replications; i++) {
 
 			// Create agents based on HGV and worker flow
-			//If only cars are run remove/comment the lines below until runSimulation
+			// If only cars are run remove/comment the lines below until runSimulation
 			createDemandWorkers(configFile, workerFlow, numberOfSites);
 			runXY2Links(configFile, norrkopingNetwork, populationMerged);
 			createVehicleTypes(configFile);
@@ -1131,7 +1125,7 @@ public class NorrkopingProductionRunner {
 			FileUtils.cleanDirectory(source);
 
 		}
-		
+
 		System.out.println("END OF SIMULATION");
 		long end = System.currentTimeMillis();
 		// finding the time difference and converting it into seconds
