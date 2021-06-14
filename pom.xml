@@ -80,6 +80,7 @@
 			<version>1.1.0</version>
 		</dependency>
 		
+		
 	<dependency>
       <groupId>org.matsim</groupId>
       <artifactId>matsim-examples</artifactId>
@@ -174,6 +175,12 @@
 			<type>test-jar</type>
 			<version>${matsim.version}</version>
 			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>cadytsIntegration</artifactId>
+			<version>${matsim.version}</version>
 		</dependency>
 
 		<!--dependencies from here to where stated below are added as a service; they can be removed if you don't need them-->
