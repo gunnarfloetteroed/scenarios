@@ -107,7 +107,7 @@ public class GPSReader {
 		int personTripCounter=0;
 		double sum_m=0;
 		for (int i =0; i<(numberOfRows);i++) {
-			String[] record=records.get(i);
+			String[] record=records.get(0);
 			String TripId=record[this.personIDLocation];
 			String currentMode=record[this.modeLocation];
 			double timeStamp = Double. parseDouble(record[this.timeStampLocation]);
@@ -150,7 +150,7 @@ public class GPSReader {
 				personTripCounter++;
 				System.out.println(personTripCounter+": "+"GPS sequence for person-trip: "+ personID.toString()+" is loaded.");
 			}
-			
+			records.remove(0);
 			
 
 		}

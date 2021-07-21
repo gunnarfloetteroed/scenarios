@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -24,6 +25,7 @@ import stockholm.bicycles.routing.MatsimDijkstra;
 import stockholm.bicycles.routing.TravelDisutilityBicycle;
 
 public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapMatcher{
+	private static Logger logger = Logger.getLogger(BundledShortestPathGPSSequenceMapMatcher.class);
 	protected final Network network;
 	protected final GPSSequence gpsSequence;
 	protected final TravelDisutility travelCosts;
@@ -72,6 +74,15 @@ public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapM
 	// main method to do map-matching
 	@Override
 	public Path mapMatching() {	
+		List<GPSPoint> points = this.gpsSequence.getGPSPoints();
+		GPSPoint startPoint = points.get(0);
+		int NPoints = points.size();
+		GPSPoint endPoint = points.get(NPoints-1);
+		double DistanceStartNode=NetworkUtils.getEuclideanDistance(this.startNode.getCoord(), startPoint.getCoord());
+		double DistanceEndNode=NetworkUtils.getEuclideanDistance(this.endNode.getCoord(), endPoint.getCoord());
+		if (DistanceStartNode>50000 | DistanceEndNode>50000) {
+			logger.warn("the following GPS trace: "+this.gpsSequence.getPersonID().toString()+" is not within the study area.");
+			return null;}
 		// calculate a weight for each link. the idea is as follow:
 		// if a link is close to GPS points and follows the GPS point directions, then it has a smaller weight. weight is between 0 and 1. 
 		updateNetworkLinkWeights();

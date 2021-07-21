@@ -190,6 +190,7 @@ public class TransCad2MATSimNetwork_RUCY {
 				matsimABLink.setFreespeed(17/3.6);  
 				matsimABLink.setAllowedModes(allowedModes);
 				matsimABLink.getAttributes().putAttribute("generalizedCost",linkLength*cykelbanafactor);
+
 				
 				
 				// specify which other attributes you want to save as link attributes

@@ -33,12 +33,13 @@ import com.opencsv.enums.CSVReaderNullFieldIndicator;
 import com.opencsv.exceptions.CsvException;
 
 import stockholm.bicycles.utility.CsvReaderToIteratable;
+import stockholm.bicycles.utility.mapMatchning.PathUtils;
 
 
 public class PathReader {
 	private static final Logger log = Logger.getLogger( PathReader.class ) ;
 	private final String pathFileName;
-	protected final String networkFileName;
+	protected final Network network;
 	private int counterIDLocation=-1;
 	private int linkIDLocation=-1;
 	private int tripIDLocation=-1;
@@ -46,9 +47,13 @@ public class PathReader {
 	public PathReader(String pathFileName, String networkFileName) throws IOException, CsvException {
 		super();
 		this.pathFileName = pathFileName;
-		this.networkFileName = networkFileName;
 		
-		
+		// 1: read network
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		(new MatsimNetworkReader(scenario.getNetwork())).readFile(networkFileName);
+		this.network = scenario.getNetwork();
+
 		Reader reader = Files.newBufferedReader(Paths.get(this.pathFileName),Charset.forName("ISO-8859-1"));
 	    CSVParser parser = new CSVParserBuilder()
 	        .withSeparator(',')
@@ -77,19 +82,51 @@ public class PathReader {
 	     
 	     if (this.counterIDLocation==-1 | this.linkIDLocation==-1 | this.tripIDLocation==-1) {
 	    	 throw new RuntimeException( "please check the input path csv header, it must include: counter,linkID,tripID.") ;
-	     }
-		
-		
-		
-		
+	     }	
 	}
+	
+	
+	public PathReader(String pathFileName, Network network) throws IOException, CsvException {
+		super();
+		this.pathFileName = pathFileName;
+		this.network = network;
+
+		Reader reader = Files.newBufferedReader(Paths.get(this.pathFileName),Charset.forName("ISO-8859-1"));
+	    CSVParser parser = new CSVParserBuilder()
+	        .withSeparator(',')
+	        .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_QUOTES)
+	        .withIgnoreLeadingWhiteSpace(true)
+	        .build();
+	    CSVReader csvReader = new CSVReaderBuilder(reader)
+	            .withCSVParser(parser)
+	            .build();
+	     String[] header = csvReader.readNext();
+	
+	     
+	     for (int i=0; i<header.length;i++) {
+	    	if( header[i].equals("counter")) {
+	    		this.counterIDLocation=i;
+	    	}
+	    	if( header[i].equals("linkID")) {
+	    		this.linkIDLocation=i;
+	    	}
+	    	if( header[i].equals("tripID")) {
+	    		this.tripIDLocation=i;
+	    	}
+	     }  
+	     csvReader.close();
+		 reader.close();
+	     
+	     if (this.counterIDLocation==-1 | this.linkIDLocation==-1 | this.tripIDLocation==-1) {
+	    	 throw new RuntimeException( "please check the input path csv header, it must include: counter,linkID,tripID.") ;
+	     }	
+	}	
+	
+	
+	
 
 	public HashMap<String,Path> read() throws IOException, CsvException {
-		// 1: read network
-		Config config = ConfigUtils.createConfig();
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		(new MatsimNetworkReader(scenario.getNetwork())).readFile(this.networkFileName);
-		Network network = scenario.getNetwork();
+		
 		
 		// 2: read the path csv file
 		// the path csv file should have the following structure
@@ -121,7 +158,7 @@ public class PathReader {
 			} else if(i<(numberOfRows-1) & TripId.equals(currentTripId)) { // the next link id for the given trip
 				linkIDList.add(linkId);
 			} else if (i<(numberOfRows-1) & (!TripId.equals(currentTripId))) { // the next trip id
-				Path path = createPath(network,linkIDList);
+				Path path = createPath(this.network,linkIDList);
 				pathMap.put(currentTripId, path);
 				
 				linkIDList= new ArrayList<String>();
@@ -129,7 +166,7 @@ public class PathReader {
 				linkIDList.add(linkId);
 			} else if (i==(numberOfRows-1)) {
 				linkIDList.add(linkId);
-				Path path = createPath(network,linkIDList);
+				Path path = createPath(this.network,linkIDList);
 				pathMap.put(currentTripId, path);
 			}
 			
@@ -200,8 +237,8 @@ public class PathReader {
 				}
 				
 				if (foundLink==false) {
-					throw new IllegalArgumentException("following links cannot be found in the linkList: " 
-				+ currentLinkID + " and " + nextLinkID+" .");
+					throw new IllegalArgumentException("following links cannot be found in the linkList, current link ID: " 
+				+ currentLinkID + " and downstream link ID: " + nextLinkID+" .");
 				}
 				
 			}
@@ -226,8 +263,8 @@ public class PathReader {
 					} 
 				}
 				if (foundLink==false) {
-					throw new IllegalArgumentException("following links cannot be found in the linkList: " 
-				+ lastLink.getId()+" and "+nextLinkID +" .");
+					throw new IllegalArgumentException("following links cannot be found in the linkList, current link ID: " 
+				+ lastLink.getId()+" and downstream link ID: "+nextLinkID +" .");
 				}
 				
 			}	

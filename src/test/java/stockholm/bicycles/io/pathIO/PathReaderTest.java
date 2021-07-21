@@ -28,14 +28,14 @@ public class PathReaderTest {
 	@Test
 	public void test() throws IOException, CsvException {
 		String inputNetworkFileName="C:/Users/ChengxiL/VTI/RUCY TrV ansökan - General/Data/Network/MatsimNetwork/network_NVDB.xml";
-		String pathFile="//vti.se/root/RUCY/GPS data//writePath_test_20Trips.csv";
+		String pathFile="//vti.se/root/RUCY/GPS data/mapMatchingValidation/validationMapMatchingGroundTruth.csv";
 		PathReader reader = new PathReader( pathFile,inputNetworkFileName);
 		HashMap<String, Path> check = reader.read();
 		for (Entry<String, Path> entry:check.entrySet()) {
 			// System.out.println("Trip id: "+entry.getKey()+" .");
 			List<Link> links = entry.getValue().links;
 			for (Link link:links) {
-				System.out.println("Trip id: "+entry.getKey()+"-->" + "linkID: "+link.getId());
+				System.out.println("Trip id: "+entry.getKey()+" to " + "linkID: "+link.getId());
 			}
 		}
 //		// fail("Not yet implemented");

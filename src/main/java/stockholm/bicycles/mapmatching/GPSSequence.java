@@ -2,12 +2,15 @@ package stockholm.bicycles.mapmatching;
 
 import java.util.List;
 
+
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
 
 public class GPSSequence {
 
+	private static Logger logger = Logger.getLogger(GPSSequence.class);
 	private Id<Person> personID;
 	private String mode;
 	
@@ -49,10 +52,10 @@ public class GPSSequence {
 	}
 	
 	public void printInfo() {
-		System.out.println(this.personID.toString());
-		System.out.println(this.mode);
+		logger.info(this.personID.toString());
+		logger.info(this.mode);
 		for (GPSPoint GPSPoint : this.gpsPoints) {
-			System.out.println("timeStamp: "+GPSPoint.getTimeStamp().toString()+ ". distance:"+GPSPoint.getDelta_m()+". speed: "+GPSPoint.getSpeed()+ ". Coordinate: "+GPSPoint.getCoord().toString());
+			logger.info("timeStamp: "+GPSPoint.getTimeStamp().toString()+ ". distance:"+GPSPoint.getDelta_m()+". speed: "+GPSPoint.getSpeed()+ ". Coordinate: "+GPSPoint.getCoord().toString());
 		}
 	}
 

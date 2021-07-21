@@ -82,7 +82,8 @@ public class NearestLinkGPSSequenceMapMatcher implements GPSSequenceMapMatcher{
 			}
 			if (nextGPSPointIndex==-1) {
 				exitFlag=true;
-				System.out.println("there is no outer links from the node: "+pathNodes.get(pathNodes.size()-1).getId().toString()+".");
+				logger.warn("there is no outer links from the node: "+pathNodes.get(pathNodes.size()-1).getId().toString()+".");
+				return null;
 			}
 			currentGPSPointIndex=nextGPSPointIndex;
 		}
@@ -183,7 +184,7 @@ public class NearestLinkGPSSequenceMapMatcher implements GPSSequenceMapMatcher{
 			startGPSPointIndex=0;
 		}
 		int endGPSPointIndex=candidateGPSPointIndex+2;
-		if (candidateGPSPointIndex>(points.size()-1)) {
+		if (endGPSPointIndex>=(points.size()-1)) {
 			endGPSPointIndex=points.size()-1;
 		}
 		int totalNumberOfGPSPoints=endGPSPointIndex-startGPSPointIndex+1;
@@ -262,7 +263,7 @@ public class NearestLinkGPSSequenceMapMatcher implements GPSSequenceMapMatcher{
 			}
 		}
 		
-		System.out.println("angel for link: " + candidateLink.getId()+" is: link angel: "+ linkThetaAngel + ". and GPSPoint angel: " + GPSPointThetainAngel);
+		// System.out.println("angel for link: " + candidateLink.getId()+" is: link angel: "+ linkThetaAngel + ". and GPSPoint angel: " + GPSPointThetainAngel);
 		double angelDiff=Math.abs(linkThetaAngel-GPSPointThetainAngel);
 		if (angelDiff>=270) {
 			angelDiff=360-angelDiff;

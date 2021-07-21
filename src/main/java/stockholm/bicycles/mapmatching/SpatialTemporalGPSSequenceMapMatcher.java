@@ -12,8 +12,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.router.FastDijkstra;
+import org.matsim.core.router.FastDijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import stockholm.bicycles.routing.MatsimDijkstra;
 
@@ -34,14 +38,31 @@ public class SpatialTemporalGPSSequenceMapMatcher implements GPSSequenceMapMatch
 		this.network=network;
 		this.gpsSequence=gpsSequence;
 		this.travelCosts = travelCosts;
-		// TODO Auto-generated constructor stub
+
+
 		// get start and end node
 		List<GPSPoint> points = this.gpsSequence.getGPSPoints(); // note that GPSPoints already have a sequence
 		int NPoints = points.size();
 		GPSPoint startPoint = points.get(0);
-		this.startNode = NetworkUtils.getNearestNode(this.network, startPoint.getCoord());
+		Link candidateStartLink = NetworkUtils.getNearestLinkExactly(this.network, startPoint.getCoord());
+		double distancep1 = NetworkUtils.getEuclideanDistance(candidateStartLink.getFromNode().getCoord(), startPoint.getCoord());
+		double distancep2 = NetworkUtils.getEuclideanDistance(candidateStartLink.getToNode().getCoord(), startPoint.getCoord());
+		if (distancep1<=distancep2) {
+			this.startNode = candidateStartLink.getFromNode();
+		} else {
+			this.startNode = candidateStartLink.getToNode();
+		}
+
+
 		GPSPoint endPoint = points.get(NPoints-1);
-		this.endNode= NetworkUtils.getNearestNode(this.network, endPoint.getCoord());
+		Link candidateEndLink = NetworkUtils.getNearestLinkExactly(this.network, endPoint.getCoord());
+		distancep1 = NetworkUtils.getEuclideanDistance(candidateEndLink.getFromNode().getCoord(), endPoint.getCoord());
+		distancep2 = NetworkUtils.getEuclideanDistance(candidateEndLink.getToNode().getCoord(), endPoint.getCoord());
+		if (distancep1<=distancep2) {
+			this.endNode = candidateEndLink.getFromNode();
+		} else {
+			this.endNode = candidateEndLink.getToNode();
+		}
 	}
 
 
@@ -83,44 +104,48 @@ public class SpatialTemporalGPSSequenceMapMatcher implements GPSSequenceMapMatch
 
 
 	protected Path DijkstraThroughMidNodes(List<Collection<Node>> searchableMiddleNodes) {
-		MatsimDijkstra dijkstraRouter = new MatsimDijkstra(this.network, this.travelCosts, null);
+		FastDijkstraFactory fastDijkstraFactory = new FastDijkstraFactory();
+		FastDijkstra dijkstraRouter = (FastDijkstra) fastDijkstraFactory.createPathCalculator(this.network, this.travelCosts, new FreeSpeedTravelTime());
+
+
+		// MatsimDijkstra dijkstraRouter = new MatsimDijkstra(this.network, this.travelCosts, null);
 		List<GPSPoint> points = this.gpsSequence.getGPSPoints();
 		// 1. initialize all objects needed and return the collection of Nodes that gonna be scanned.
 		Map<Id<Node>, Node> searchedNodesMap = initializeSearchedNetwork(searchableMiddleNodes);
 		// 2. loop each node in searchableMiddleNodes in sequence to calculate shortest path between nodes
 		int numberOfMidPoints=searchableMiddleNodes.size();
-			for (int counter=1;counter<numberOfMidPoints;counter++) {
-				Collection<Node> nodeList =searchableMiddleNodes.get(counter);
-				GPSPoint currentPoint = points.get(counter); // the current GPSPoint
-				// now we need to loop between every 2 possible combinations of nodes from two consecutive GPS points.
-				Collection<Node> nodeListPreviousPoint = searchableMiddleNodes.get(counter-1);
-				GPSPoint previousPoint = points.get(counter-1); // the previous GPSPoint
-				// if the previous one is empty means we need to go to the closest non-empty one
-				if (nodeListPreviousPoint.size()==0) {
-					int countBack=counter-2;
+		for (int counter=1;counter<numberOfMidPoints;counter++) {
+			Collection<Node> nodeList =searchableMiddleNodes.get(counter);
+			GPSPoint currentPoint = points.get(counter); // the current GPSPoint
+			// now we need to loop between every 2 possible combinations of nodes from two consecutive GPS points.
+			Collection<Node> nodeListPreviousPoint = searchableMiddleNodes.get(counter-1);
+			GPSPoint previousPoint = points.get(counter-1); // the previous GPSPoint
+			// if the previous one is empty means we need to go to the closest non-empty one
+			if (nodeListPreviousPoint.size()==0) {
+				int countBack=counter-2;
+				nodeListPreviousPoint=searchableMiddleNodes.get(countBack);
+				while (countBack>0 && nodeListPreviousPoint.size()==0) {
+					countBack--;
 					nodeListPreviousPoint=searchableMiddleNodes.get(countBack);
-					while (countBack>0 && nodeListPreviousPoint.size()==0) {
-						countBack--;
-						nodeListPreviousPoint=searchableMiddleNodes.get(countBack);
-						previousPoint = points.get(countBack);
-					}
+					previousPoint = points.get(countBack);
 				}
-				Node currentClosestNode=NetworkUtils.getNearestNode(this.network, currentPoint.getCoord());
-				Node previousClosestNode=NetworkUtils.getNearestNode(this.network, previousPoint.getCoord());
-				Path pathBetweenCurrentAndPreviousPoints = dijkstraRouter.calcLeastCostPath(previousClosestNode, currentClosestNode, 0, null, null);
-				for (Node searchedNode:nodeList) {
-					for (Node nodeInPreviousPoint:nodeListPreviousPoint) {
-						// calculate the score. Note that we select the path with highest score and score should be positive by definition if there is no connection, returns -inf
-						double costScore =calculateScorebetweenTwoCandidatePoints(dijkstraRouter,nodeInPreviousPoint,searchedNode,previousPoint,currentPoint,pathBetweenCurrentAndPreviousPoints);
-						// System.out.println("current node: "+ searchedNode.getId()+" to previous node: "+nodeInPreviousPoint.getId()+ ", the score is: "+(this.costToMiddileNode.get(nodeInPreviousPoint.getId())+costScore));
-						if (this.costToMiddileNode.get(nodeInPreviousPoint.getId())+costScore>this.costToMiddileNode.get(searchedNode.getId())) {
-							this.costToMiddileNode.put(searchedNode.getId(), this.costToMiddileNode.get(nodeInPreviousPoint.getId())+costScore);
-							this.previousMiddileNodes.put(searchedNode.getId(), nodeInPreviousPoint.getId());
-							
-						}
+			}
+			Node currentClosestNode=NetworkUtils.getNearestNode(this.network, currentPoint.getCoord());
+			Node previousClosestNode=NetworkUtils.getNearestNode(this.network, previousPoint.getCoord());
+			Path pathBetweenCurrentAndPreviousPoints = dijkstraRouter.calcLeastCostPath(previousClosestNode, currentClosestNode, 0, null, null);
+			for (Node searchedNode:nodeList) {
+				for (Node nodeInPreviousPoint:nodeListPreviousPoint) {
+					// calculate the score. Note that we select the path with highest score and score should be positive by definition if there is no connection, returns -inf
+					double costScore =calculateScorebetweenTwoCandidatePoints(dijkstraRouter,nodeInPreviousPoint,searchedNode,previousPoint,currentPoint,pathBetweenCurrentAndPreviousPoints);
+					// System.out.println("current node: "+ searchedNode.getId()+" to previous node: "+nodeInPreviousPoint.getId()+ ", the score is: "+(this.costToMiddileNode.get(nodeInPreviousPoint.getId())+costScore));
+					if (this.costToMiddileNode.get(nodeInPreviousPoint.getId())+costScore>this.costToMiddileNode.get(searchedNode.getId())) {
+						this.costToMiddileNode.put(searchedNode.getId(), this.costToMiddileNode.get(nodeInPreviousPoint.getId())+costScore);
+						this.previousMiddileNodes.put(searchedNode.getId(), nodeInPreviousPoint.getId());
+
 					}
 				}
 			}
+		}
 
 
 
@@ -145,14 +170,14 @@ public class SpatialTemporalGPSSequenceMapMatcher implements GPSSequenceMapMatch
 
 	}
 
-	private double calculateScorebetweenTwoCandidatePoints(MatsimDijkstra dijkstraRouter,Node nodeInPreviousPoint,Node searchedNode,GPSPoint previousPoint,GPSPoint currentPoint,Path pathBetweenCurrentAndPreviousPoints) {
+	private double calculateScorebetweenTwoCandidatePoints(LeastCostPathCalculator router,Node nodeInPreviousPoint,Node searchedNode,GPSPoint previousPoint,GPSPoint currentPoint,Path pathBetweenCurrentAndPreviousPoints) {
 		// calculate the score according to the Matsim route choice paper
 		// calculate spatial score
 		NormalDistribution normal = new NormalDistribution(0,20.0);  // use 20 standard deviation
 		double currentPointProbability = normal.density(NetworkUtils.getEuclideanDistance(searchedNode.getCoord(), currentPoint.getCoord()));
-		Path pathBetweenCurrentAndPreviousNodes=dijkstraRouter.calcLeastCostPath(nodeInPreviousPoint, searchedNode, 0, null, null);
+		Path pathBetweenCurrentAndPreviousNodes=router.calcLeastCostPath(nodeInPreviousPoint, searchedNode, 0, null, null);
 		if (pathBetweenCurrentAndPreviousNodes!=null & pathBetweenCurrentAndPreviousPoints!=null) {
-			
+
 			// calculate the temporal probability
 			double sumLength=0;  // length is in meter.
 			double sumFreeSpeed=0;
@@ -174,7 +199,7 @@ public class SpatialTemporalGPSSequenceMapMatcher implements GPSSequenceMapMatch
 		} else {
 			return Double.NEGATIVE_INFINITY;
 		}
-		
+
 	}
 
 
