@@ -10,7 +10,7 @@ import com.opencsv.exceptions.CsvException;
 
 import stockholm.bicycles.io.pathIO.PathReader;
 import stockholm.bicycles.mapmatching.mapmatchingstatistics.PathValidationStatistics;
-import stockholm.bicycles.utility.mapMatchning.PathUtils;
+import stockholm.bicycles.utility.mapMatchningUtil.PathUtils;
 
 public class MapMatchingValidation {
 

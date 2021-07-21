@@ -33,7 +33,7 @@ import com.opencsv.enums.CSVReaderNullFieldIndicator;
 import com.opencsv.exceptions.CsvException;
 
 import stockholm.bicycles.utility.CsvReaderToIteratable;
-import stockholm.bicycles.utility.mapMatchning.PathUtils;
+import stockholm.bicycles.utility.mapMatchningUtil.PathUtils;
 
 
 public class PathReader {

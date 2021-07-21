@@ -15,6 +15,7 @@ import com.opencsv.exceptions.CsvException;
 import stockholm.bicycles.io.GPSIO.GPSReader;
 import stockholm.bicycles.io.pathIO.PathReader;
 import stockholm.bicycles.mapmatching.GPSSequence;
+import stockholm.bicycles.utility.mapMatchningUtil.PathUtils;
 
 public class PathUtilsTest {
 

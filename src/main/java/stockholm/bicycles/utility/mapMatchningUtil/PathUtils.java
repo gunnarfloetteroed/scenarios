@@ -1,4 +1,4 @@
-package stockholm.bicycles.utility.mapMatchning;
+package stockholm.bicycles.utility.mapMatchningUtil;
 
 
 import java.util.ArrayList;

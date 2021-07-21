@@ -1,4 +1,4 @@
-package stockholm.bicycles.utility.mapMatchning;
+package stockholm.bicycles.utility.mapMatchningUtil;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
