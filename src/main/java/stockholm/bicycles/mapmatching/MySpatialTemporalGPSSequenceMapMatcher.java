@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -87,7 +88,8 @@ public class MySpatialTemporalGPSSequenceMapMatcher implements GPSSequenceMapMat
 		List<String> nodeIDs= new ArrayList<String>();
 		for (int i=0;i<NPoints;i++) { // loop first to last node
 			GPSPoint midPoint = points.get(i);
-			Collection<Node> nodes = NetworkUtils.getNearestNodes(this.network, midPoint.getCoord(), midPoint.getNodeSearchRadius());
+			Collection<Node> nodes=getNearestNodesFromNearestLinks(midPoint);
+			// Collection<Node> nodes = NetworkUtils.getNearestNodes(this.network, midPoint.getCoord(), midPoint.getNodeSearchRadius());
 			if (i==0) {
 				Collection<Node> validNodes = new ArrayList<Node>();
 				validNodes.add(this.startNode);
@@ -280,6 +282,48 @@ public class MySpatialTemporalGPSSequenceMapMatcher implements GPSSequenceMapMat
 			nodeList.add(toNode);
 		}
 		return new Path(nodeList,linkList,travelTime,travelCost);
+	}
+	
+	
+	private List<Node> getNearestNodesFromNearestLinks(GPSPoint point){
+		List<Node> nodes = new ArrayList<Node>();
+		Coord pointCoord = point.getCoord();
+		for (int i=-5;i<6;i++) {
+			for (int j=-5;j<6;j++) {
+				Coord newCoord = new Coord(pointCoord.getX()+i*point.getNodeSearchRadius()/5,pointCoord.getY()+j*point.getNodeSearchRadius()/5);
+				Link candidateLink = NetworkUtils.getNearestLinkExactly(this.network, newCoord);
+				Node fromNode = candidateLink.getFromNode();
+				Node toNode = candidateLink.getToNode();
+				if (!nodes.contains(fromNode)) {
+					nodes.add(fromNode);
+				}
+				if (!nodes.contains(toNode)) {
+					nodes.add(toNode);
+				}
+
+
+				//    			Link candidateLink2 = NetworkUtils.getNearestLink(this.network, newCoord);
+				//    			Node fromNode2 = candidateLink2.getFromNode();
+				//    			Node toNode2 = candidateLink2.getToNode();
+				//    			if (!nodes.contains(fromNode2)) {
+				//    				nodes.add(fromNode2);
+				//    			}
+				//    			if (!nodes.contains(toNode2)) {
+				//    				nodes.add(toNode2);
+				//    			}
+
+
+			}
+		}
+
+		Collection<Node> nearestNodes = NetworkUtils.getNearestNodes(this.network, pointCoord, point.getNodeSearchRadius());
+		for (Node nearestNode: nearestNodes) {
+			if (!nodes.contains(nearestNode)) {
+				nodes.add(nearestNode);
+			}
+		}
+
+		return nodes;	
 	}
 
 }

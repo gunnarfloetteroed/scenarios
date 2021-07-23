@@ -108,7 +108,7 @@ public class mapMatchingFullNetworkTest {
 		}
 		
 		
-		CsvWriter.write(outputStringList, writePath);
+		// CsvWriter.write(outputStringList, writePath);
 
 
 		// mapmatching

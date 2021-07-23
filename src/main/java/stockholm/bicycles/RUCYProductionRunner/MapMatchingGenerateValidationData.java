@@ -21,18 +21,19 @@ import stockholm.bicycles.mapmatching.GPSPoint;
 import stockholm.bicycles.mapmatching.GPSSequence;
 import stockholm.bicycles.mapmatching.MySpatialTemporalGPSSequenceMapMatcher;
 import stockholm.bicycles.mapmatching.NearestLinkGPSSequenceMapMatcher;
+import stockholm.bicycles.mapmatching.ShortestPathGPSSequenceMapMatcher;
 import stockholm.bicycles.mapmatching.SpatialTemporalGPSSequenceMapMatcher;
 import stockholm.bicycles.routing.TravelDisutilityBicycle;
 import stockholm.bicycles.utility.CsvWriter;
 
-public class MapMatching {
+public class MapMatchingGenerateValidationData {
 
 	public static void main(String[] args) throws Exception {
 
 		// read GPS data
 		String inputGPSFileName="//vti.se/root/RUCY/GPS data/FinalGPSData/cykel_forMapMatchingValidation_final.csv";
 		String inputNetworkFileName="C:/Users/ChengxiL/VTI/RUCY TrV ansökan - General/Data/Network/MatsimNetwork/network_NVDB.xml";
-		String writePath="//vti.se/root/RUCY/GPS data/mapMatchingValidation/spatialTemporalMatcher_forMapMatchingValidation_final.csv";
+		String writePath="//vti.se/root/RUCY/GPS data/mapMatchingValidation/LinkWeightsMethod_forMapMatchingValidation_final.csv";
 		GPSReader reader = new GPSReader(inputGPSFileName);
 		List<GPSSequence> GPSSequences = reader.read(50);
 
@@ -78,9 +79,9 @@ public class MapMatching {
 
 				long startTime = System.nanoTime();
 				// map matching
-				// BundledShortestPathGPSSequenceMapMatcher matcher = new BundledShortestPathGPSSequenceMapMatcher(network,gpsSequence,travelDisutility);
+				BundledShortestPathGPSSequenceMapMatcher matcher = new BundledShortestPathGPSSequenceMapMatcher(network,gpsSequence,travelDisutility);
 				// NearestLinkGPSSequenceMapMatcher matcher = new NearestLinkGPSSequenceMapMatcher(network,gpsSequence,travelDisutility);
-				MySpatialTemporalGPSSequenceMapMatcher matcher= new MySpatialTemporalGPSSequenceMapMatcher(network,gpsSequence,travelDisutility);
+				// ShortestPathGPSSequenceMapMatcher matcher= new ShortestPathGPSSequenceMapMatcher(network,gpsSequence,travelDisutility);
 
 				Path testPath = matcher.mapMatching();
 
@@ -104,7 +105,8 @@ public class MapMatching {
 
 					}
 					long endTime   = System.nanoTime();
-					System.out.println("Total run time for persom: "+gpsSequence.getPersonID().toString()+" is: "+(endTime-startTime)/10e9);
+					double runTime= (double) (endTime-startTime)/1_000_000_000;
+					System.out.println("Total run time for persom: "+gpsSequence.getPersonID().toString()+" is: "+runTime);
 				}
 
 			}

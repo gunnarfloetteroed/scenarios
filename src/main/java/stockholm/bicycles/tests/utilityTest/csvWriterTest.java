@@ -15,6 +15,10 @@ public class csvWriterTest {
 		
 		String writePath="//vti.se/root/RUCY/GPS data/writeCsv_test.csv";
 		CsvWriter.write(testStringList, writePath);
+		
+		List<String[]> testStringList2= new ArrayList<String[]>();
+		testStringList2.add(new String[] {"1", "Emma Watson", "emma.watson@example.com", "UK"});
+		CsvWriter.write(testStringList2, writePath);
 
 	}
 

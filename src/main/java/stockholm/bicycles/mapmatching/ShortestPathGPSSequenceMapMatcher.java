@@ -8,13 +8,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.router.FastDijkstra;
+import org.matsim.core.router.FastDijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import stockholm.bicycles.routing.MatsimDijkstra;
 
@@ -24,18 +28,18 @@ public class ShortestPathGPSSequenceMapMatcher implements GPSSequenceMapMatcher{
 	protected final TravelDisutility travelCosts;
 	protected Node startNode;
 	protected Node endNode;
-	
+
 	private Map<Id<Node>,Double> costToMiddileNode = new HashMap<Id<Node>, Double>();
 	private Map<Id<Node>,Id<Node>> previousMiddileNodes = new HashMap<Id<Node>, Id<Node>>();
 
-	
+
 
 	public ShortestPathGPSSequenceMapMatcher(Network network,GPSSequence gpsSequence,TravelDisutility travelCosts) {
 		super();
 		this.network=network;
 		this.gpsSequence=gpsSequence;
 		this.travelCosts = travelCosts;
-		
+
 		// get start and end node
 		List<GPSPoint> points = this.gpsSequence.getGPSPoints(); // note that GPSPoints already have a sequence
 		int NPoints = points.size();
@@ -43,10 +47,10 @@ public class ShortestPathGPSSequenceMapMatcher implements GPSSequenceMapMatcher{
 		this.startNode = NetworkUtils.getNearestNode(this.network, startPoint.getCoord());
 		GPSPoint endPoint = points.get(NPoints-1);
 		this.endNode= NetworkUtils.getNearestNode(this.network, endPoint.getCoord());
-		
+
 	}
 
-	
+
 
 	// main method to do map-matching
 	@Override
@@ -68,7 +72,8 @@ public class ShortestPathGPSSequenceMapMatcher implements GPSSequenceMapMatcher{
 		List<Collection<Node>> searchableMiddleNodes = new ArrayList<Collection<Node>>();
 		for (int i=0;i<NPoints;i++) { // loop first to last node
 			GPSPoint midPoint = points.get(i);
-			Collection<Node> nodes = NetworkUtils.getNearestNodes(this.network, midPoint.getCoord(), midPoint.getNodeSearchRadius());
+			// Collection<Node> nodes = NetworkUtils.getNearestNodes(this.network, midPoint.getCoord(), midPoint.getNodeSearchRadius());
+			Collection<Node> nodes=getNearestNodesFromNearestLinks(midPoint);
 			if (i==0) {
 				nodes= new ArrayList<Node>();
 				nodes.add(this.startNode);
@@ -84,51 +89,53 @@ public class ShortestPathGPSSequenceMapMatcher implements GPSSequenceMapMatcher{
 	}
 
 	protected Path DijkstraThroughMidNodes(List<Collection<Node>> searchableMiddleNodes) {
-		MatsimDijkstra dijkstraRouter = new MatsimDijkstra(this.network, this.travelCosts, null);
+		// MatsimDijkstra dijkstraRouter = new MatsimDijkstra(this.network, this.travelCosts, null);
+		FastDijkstraFactory fastDijkstraFactory = new FastDijkstraFactory();
+		FastDijkstra dijkstraRouter = (FastDijkstra) fastDijkstraFactory.createPathCalculator(this.network, this.travelCosts, new FreeSpeedTravelTime());
 
 		// 1. initialize all objects needed and return the collection of Nodes that gonna be scanned.
 		Map<Id<Node>, Node> searchedNodesMap = initializeSearchedNetwork(searchableMiddleNodes);
 		// 2. loop each node in searchableMiddleNodes in sequence to calculate shortest path between nodes
 		int numberOfMidPoints=searchableMiddleNodes.size();
 		first:
-		for (int counter=1;counter<numberOfMidPoints;counter++) {
-			Collection<Node> nodeList =searchableMiddleNodes.get(counter);
-			 // now we need to loop between every 2 possible combinations of nodes from two consecutive GPS points.
-			Collection<Node> nodeListPreviousPoint = searchableMiddleNodes.get(counter-1);
-			// if the previous one is empty means we need to go to the closest non-empty one
-			if (nodeListPreviousPoint.size()==0) {
-				int countBack=counter-2;
-				nodeListPreviousPoint=searchableMiddleNodes.get(countBack);
-				while (countBack>0 && nodeListPreviousPoint.size()==0) {
-					countBack--;
+			for (int counter=1;counter<numberOfMidPoints;counter++) {
+				Collection<Node> nodeList =searchableMiddleNodes.get(counter);
+				// now we need to loop between every 2 possible combinations of nodes from two consecutive GPS points.
+				Collection<Node> nodeListPreviousPoint = searchableMiddleNodes.get(counter-1);
+				// if the previous one is empty means we need to go to the closest non-empty one
+				if (nodeListPreviousPoint.size()==0) {
+					int countBack=counter-2;
 					nodeListPreviousPoint=searchableMiddleNodes.get(countBack);
-				}
-			}
-			
-			
-			for (Node searchedNode:nodeList) {
-				for (Node nodeInPreviousPoint:nodeListPreviousPoint) {
-					if (this.costToMiddileNode.get(nodeInPreviousPoint.getId())<this.costToMiddileNode.get(searchedNode.getId())) {
-						Path testPath = dijkstraRouter.calcLeastCostPath(nodeInPreviousPoint, searchedNode, 0, null, null);
-						if (testPath != null) {
-							double pathCost = testPath.travelCost;
-							if (this.costToMiddileNode.get(nodeInPreviousPoint.getId())+pathCost<this.costToMiddileNode.get(searchedNode.getId())) {
-								this.costToMiddileNode.put(searchedNode.getId(), this.costToMiddileNode.get(nodeInPreviousPoint.getId())+pathCost);
-								this.previousMiddileNodes.put(searchedNode.getId(), nodeInPreviousPoint.getId());
-							}
-
-						}
+					while (countBack>0 && nodeListPreviousPoint.size()==0) {
+						countBack--;
+						nodeListPreviousPoint=searchableMiddleNodes.get(countBack);
 					}
 				}
-				if (this.endNode.getId() == searchedNode.getId() && this.previousMiddileNodes.get(endNode.getId())!=null) {
-					break first;
+
+
+				for (Node searchedNode:nodeList) {
+					for (Node nodeInPreviousPoint:nodeListPreviousPoint) {
+						if (this.costToMiddileNode.get(nodeInPreviousPoint.getId())<this.costToMiddileNode.get(searchedNode.getId())) {
+							Path testPath = dijkstraRouter.calcLeastCostPath(nodeInPreviousPoint, searchedNode, 0, null, null);
+							if (testPath != null) {
+								double pathCost = testPath.travelCost;
+								if (this.costToMiddileNode.get(nodeInPreviousPoint.getId())+pathCost<this.costToMiddileNode.get(searchedNode.getId())) {
+									this.costToMiddileNode.put(searchedNode.getId(), this.costToMiddileNode.get(nodeInPreviousPoint.getId())+pathCost);
+									this.previousMiddileNodes.put(searchedNode.getId(), nodeInPreviousPoint.getId());
+								}
+
+							}
+						}
+					}
+					if (this.endNode.getId() == searchedNode.getId() && this.previousMiddileNodes.get(endNode.getId())!=null) {
+						break first;
+					}
 				}
+
+
 			}
 
-		
-		}
-		
-		
+
 
 		// go back according to previousMiddileNodes so we can calculate the route back
 		Path finalPath = new Path(new ArrayList<Node>(), new ArrayList<Link>(), 0, 0);
@@ -138,13 +145,13 @@ public class ShortestPathGPSSequenceMapMatcher implements GPSSequenceMapMatcher{
 			if (previousNodeID==null) {
 				finalPath=null;
 				break;
-				
+
 			}
 			Node previousNode = searchedNodesMap.get(previousNodeID);
 			Node currentNode = searchedNodesMap.get(currentNodeID);
 			Path appendPath = dijkstraRouter.calcLeastCostPath(previousNode, currentNode, 0, null, null);
 			finalPath=appendPath(finalPath,appendPath); // a function to append a Path object back to the finalPath
-			System.out.println("previous node ID: "+currentNodeID);
+			// System.out.println("previous node ID: "+currentNodeID);
 			currentNodeID=previousNodeID;
 		}
 		finalPath=generateNodes(finalPath);
@@ -152,8 +159,8 @@ public class ShortestPathGPSSequenceMapMatcher implements GPSSequenceMapMatcher{
 
 	}
 
-	
-	
+
+
 
 	private Map<Id<Node>, Node> initializeSearchedNetwork(List<Collection<Node>> searchableMiddleNodes) {
 
@@ -163,15 +170,15 @@ public class ShortestPathGPSSequenceMapMatcher implements GPSSequenceMapMatcher{
 		for (Collection<Node> nodeList:searchableMiddleNodes) {
 			for (Node searchedNode:nodeList) {
 				nodeMap.put(searchedNode.getId(), searchedNode);
-		}
+			}
 
 
-		for (Node node : nodeMap.values()){
-			this.costToMiddileNode.put(node.getId(), Double.POSITIVE_INFINITY);
-			this.previousMiddileNodes.put(node.getId(), null);
+			for (Node node : nodeMap.values()){
+				this.costToMiddileNode.put(node.getId(), Double.POSITIVE_INFINITY);
+				this.previousMiddileNodes.put(node.getId(), null);
+			}
+			this.costToMiddileNode.put(this.startNode.getId(), 0.0);
 		}
-		this.costToMiddileNode.put(this.startNode.getId(), 0.0);
-	}
 		return nodeMap;
 
 	}
@@ -195,7 +202,7 @@ public class ShortestPathGPSSequenceMapMatcher implements GPSSequenceMapMatcher{
 
 
 	}
-	
+
 	private Path generateNodes(Path finalPath) {
 		if (finalPath == null) {
 			return null;
@@ -203,7 +210,7 @@ public class ShortestPathGPSSequenceMapMatcher implements GPSSequenceMapMatcher{
 		List<Link> linkList = finalPath.links;
 		double travelCost = finalPath.travelCost;
 		double travelTime = finalPath.travelTime;
-		
+
 		List<Node> nodeList = new ArrayList<Node>();
 		Link firstLink = linkList.get(0);
 		Node firstNode = firstLink.getFromNode();
@@ -213,6 +220,49 @@ public class ShortestPathGPSSequenceMapMatcher implements GPSSequenceMapMatcher{
 			nodeList.add(toNode);
 		}
 		return new Path(nodeList,linkList,travelTime,travelCost);
+	}
+	
+	
+	
+	private List<Node> getNearestNodesFromNearestLinks(GPSPoint point){
+		List<Node> nodes = new ArrayList<Node>();
+		Coord pointCoord = point.getCoord();
+		for (int i=-5;i<6;i++) {
+			for (int j=-5;j<6;j++) {
+				Coord newCoord = new Coord(pointCoord.getX()+i*point.getNodeSearchRadius()/5,pointCoord.getY()+j*point.getNodeSearchRadius()/5);
+				Link candidateLink = NetworkUtils.getNearestLinkExactly(this.network, newCoord);
+				Node fromNode = candidateLink.getFromNode();
+				Node toNode = candidateLink.getToNode();
+				if (!nodes.contains(fromNode)) {
+					nodes.add(fromNode);
+				}
+				if (!nodes.contains(toNode)) {
+					nodes.add(toNode);
+				}
+
+
+				//    			Link candidateLink2 = NetworkUtils.getNearestLink(this.network, newCoord);
+				//    			Node fromNode2 = candidateLink2.getFromNode();
+				//    			Node toNode2 = candidateLink2.getToNode();
+				//    			if (!nodes.contains(fromNode2)) {
+				//    				nodes.add(fromNode2);
+				//    			}
+				//    			if (!nodes.contains(toNode2)) {
+				//    				nodes.add(toNode2);
+				//    			}
+
+
+			}
+		}
+
+		Collection<Node> nearestNodes = NetworkUtils.getNearestNodes(this.network, pointCoord, point.getNodeSearchRadius());
+		for (Node nearestNode: nearestNodes) {
+			if (!nodes.contains(nearestNode)) {
+				nodes.add(nearestNode);
+			}
+		}
+
+		return nodes;	
 	}
 
 	public Network getNetwork() {

@@ -23,7 +23,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 
-
+import stockholm.bicycles.mapmatching.BundledShortestPathGPSSequenceMapMatcher;
 import stockholm.bicycles.mapmatching.GPSPoint;
 import stockholm.bicycles.mapmatching.GPSSequence;
 import stockholm.bicycles.mapmatching.MySpatialTemporalGPSSequenceMapMatcher;
@@ -78,8 +78,9 @@ public class mapMatchingSimpleNetworkTest {
 //			break;
 //		}
 		
-		MySpatialTemporalGPSSequenceMapMatcher matcher = new MySpatialTemporalGPSSequenceMapMatcher(network,GPSSequence,travelDisutility);
+		// MySpatialTemporalGPSSequenceMapMatcher matcher = new MySpatialTemporalGPSSequenceMapMatcher(network,GPSSequence,travelDisutility);
 		// ShortestPathGPSSequenceMapMatcher matcher = new ShortestPathGPSSequenceMapMatcher(network,GPSSequence,travelDisutility);
+		BundledShortestPathGPSSequenceMapMatcher matcher = new BundledShortestPathGPSSequenceMapMatcher(network,GPSSequence,travelDisutility);
 		Path testPath = matcher.mapMatching();
 		long endTime   = System.nanoTime();
 		System.out.println("Total run time: "+(endTime-startTime)/10e9);

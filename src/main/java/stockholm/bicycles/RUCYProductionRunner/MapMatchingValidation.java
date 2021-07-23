@@ -17,7 +17,7 @@ public class MapMatchingValidation {
 	public static void main(String[] args) throws IOException, CsvException {
 		// TODO Auto-generated method stub
 		String inputGroundTruthPathFile="//vti.se/root/RUCY/GPS data/mapMatchingValidation/validationMapMatchingGroundTruth.csv";
-		String matMatchingPathFile="//vti.se/root/RUCY/GPS data/mapMatchingValidation/spatialTemporalMatcher_forMapMatchingValidation_final.csv";
+		String matMatchingPathFile="//vti.se/root/RUCY/GPS data/mapMatchingValidation/LinkWeightsMethod_forMapMatchingValidation_final.csv";
 		String inputNetworkFileName="C:/Users/ChengxiL/VTI/RUCY TrV ansökan - General/Data/Network/MatsimNetwork/network_NVDB.xml";
 		PathReader groundTruthPathReader = new PathReader( inputGroundTruthPathFile,inputNetworkFileName);
 		HashMap<String, Path> groundTruthPath = groundTruthPathReader.read();

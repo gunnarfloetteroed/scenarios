@@ -23,7 +23,7 @@ public class PathUtilsTest {
 	public void test() throws IOException, CsvException {
 		String inputNetworkFileName="C:/Users/ChengxiL/VTI/RUCY TrV ansökan - General/Data/Network/MatsimNetwork/network_NVDB.xml";
 		String pathFile="//vti.se/root/RUCY/GPS data/mapMatchingValidation/LinkWeightsMethod_forMapMatchingValidation_final.csv";
-		String inputGPSFileName="//vti.se/root/RUCY/GPS data/FinalGPSData/cykel_forMapMatchingValidation.csv";
+		String inputGPSFileName="//vti.se/root/RUCY/GPS data/FinalGPSData/cykel_forMapMatchingValidation_final.csv";
 		
 		// read GPS sequences
 		GPSReader gpsReader = new GPSReader(inputGPSFileName);
