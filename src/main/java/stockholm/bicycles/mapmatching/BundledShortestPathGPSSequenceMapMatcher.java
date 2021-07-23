@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -32,6 +33,7 @@ public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapM
 	protected final TravelDisutility travelCosts;
 	protected Node startNode;
 	protected Node endNode;
+	private HashMap<Id<Link>, Double> linkWeights = new HashMap<Id<Link>, Double>();
 
 	private Map<Id<Node>,Double> costToMiddileNode = new HashMap<Id<Node>, Double>();
 	private Map<Id<Node>,Id<Node>> previousMiddileNodes = new HashMap<Id<Node>, Id<Node>>();
@@ -103,17 +105,34 @@ public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapM
 		// calculate a weight for each link. the idea is as follow:
 		// if a link is close to GPS points and follows the GPS point directions, then it has a smaller weight. weight is between 0 and 1. 
 		updateNetworkLinkWeights();
-
+		logger.info("link weight updated.");
 		// 2. get all possible middle nodes
 		List<Collection<Node>> searchableMiddleNodes = getSearchedNodes();
-
+		logger.info("superNetwork constructed.");
 		// 3. do some logic to generate most probable path
 		Path path=DijkstraThroughMidNodes(searchableMiddleNodes);
-
-
+		logger.info("routing in superNetwork done.");
+		restorNetworkWeight();
+		logger.info("network weight restored.");
 		return path;
 
 	}
+	
+	private void restorNetworkWeight() {
+		Map<Id<Link>, ? extends Link> links = this.network.getLinks();
+		
+		for (Entry<Id<Link>, Double> linkWeight: this.linkWeights.entrySet()) {
+			Id<Link> LinkID = linkWeight.getKey();
+			Double cost = linkWeight.getValue();
+			Link link = links.get(LinkID);
+			
+			TravelDisutilityBicycle travelCost = (TravelDisutilityBicycle) this.travelCosts;
+			String generalizedCostAttributeName = travelCost.getGeneralizedCostAttributeName();
+			link.getAttributes().putAttribute(generalizedCostAttributeName, cost);
+		}
+		
+	}
+
 	public PathWithMatchingEvaluationStatistics mapMatchingWithStatistics() {
 		/**
 		 * Main method for mapMatching. Compared to this.mapMatching(), it also returns 
@@ -166,6 +185,7 @@ public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapM
 				TravelDisutilityBicycle travelCost = (TravelDisutilityBicycle) this.travelCosts;
 				String generalizedCostAttributeName = travelCost.getGeneralizedCostAttributeName();
 				double currentCost =(double) link.getAttributes().getAttribute(generalizedCostAttributeName);
+				this.linkWeights.put(link.getId(), currentCost);
 				link.getAttributes().putAttribute(generalizedCostAttributeName, currentCost*weight);
 			}
 		}
@@ -351,7 +371,7 @@ public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapM
 			Node currentNode = searchedNodesMap.get(currentNodeID);
 			Path appendPath = dijkstraRouter.calcLeastCostPath(previousNode, currentNode, 0, null, null);
 			finalPath=appendPath(finalPath,appendPath); // a function to append a Path object back to the finalPath
-			// System.out.println("previous node ID: "+currentNodeID);
+			logger.info("trip ID: "+this.gpsSequence.getPersonID().toString()+". Previous node ID: "+currentNodeID);
 			currentNodeID=previousNodeID;
 			
 			if (visitedNodesID.contains(previousNodeID.toString())) {
