@@ -68,7 +68,7 @@ public class GPSWriter {
 		final CoordinateTransformation coordinateTransform = StockholmTransformationFactory.getCoordinateTransformation(
 				StockholmTransformationFactory.WGS84_SWEREF99, StockholmTransformationFactory.WGS84);		
 		for (int k=0;k<gpsSequences.size();k++) {
-			GPSSequenceWithDistanceToMatchedPath gpsSequence=gpsSequences.get(k);
+			GPSSequenceWithDistanceToMatchedPath gpsSequence=gpsSequences.get(0);
 			List<GPSPoint> points = gpsSequence.getGPSPoints();
 			List<Double> distanceToNearestLinks = gpsSequence.getDistanceToNearestLink();
 			List<String> nearestLinkIDs = gpsSequence.getNearestLinkID();
@@ -101,6 +101,7 @@ public class GPSWriter {
 				currentDistance=point.getDelta_m();
 				counter++;
 			}
+			gpsSequences.remove(0);
 		}
 		CsvWriter.write(outputStringList, filePath);
 

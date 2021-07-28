@@ -1,9 +1,7 @@
 package stockholm.bicycles.tests.importGPSTest;
 
-import java.io.IOException;
 import java.util.List;
 
-import com.opencsv.exceptions.CsvException;
 
 import stockholm.bicycles.io.GPSIO.GPSReader;
 import stockholm.bicycles.io.GPSIO.GPSWriter;

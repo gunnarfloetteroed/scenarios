@@ -30,110 +30,134 @@ public class MapMatchingFullData {
 
 
 		// read GPS data
-		String inputGPSFileName="//vti.se/root/RUCY/GPS data/FinalGPSData/cykel_forMapMatching_2.csv";
-		String inputNetworkFileName="C:/Users/ChengxiL/VTI/RUCY TrV ansökan - General/Data/Network/MatsimNetwork/network_NVDB.xml";
-		String writePath="//vti.se/root/RUCY/GPS data/mapMatchingValidation/LinkWeightsMethod_MapMatching_2";
-		String writeGPS="//vti.se/root/RUCY/GPS data/FinalGPSData/GPSDataWithDistanceToNearestLinks/cykel_mapMatchingWithDistanceToNearestLinks_1.csv";
-		GPSReader reader = new GPSReader(inputGPSFileName);
-		List<GPSSequence> GPSSequences = reader.read(50);
+		String inputGPSFileName="D:\\RUCY\\GPSData\\FinalGPSData/cykel_forMapMatching";
+		String inputNetworkFileName="D:\\RUCY\\network\\network_NVDB.xml";
+		String writePathFileName="D:\\RUCY\\GPSData\\MapMatchingResults\\LinkWeightsMethod_MapMatching";
+		
+		int start=1;
+		int end=10;
+		for (int i=start;i<=end;i++) {
+			String inputGPSFileName_i=inputGPSFileName+"_"+i+".csv";
+			String writePathFileName_i=writePathFileName+"_"+i+".csv";
+			mapMatchingInitiation mapMatchingStart = new mapMatchingInitiation(inputGPSFileName_i,inputNetworkFileName,writePathFileName_i);
+			mapMatchingStart.run();
+		}	
+	}
 
-		//		for (GPSSequence GPSSequence: GPSSequences) {
-		//			GPSSequence.printInfo();
-		//		}
-		// load network
-		Config config = ConfigUtils.createConfig();
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		(new MatsimNetworkReader(scenario.getNetwork())).readFile(inputNetworkFileName);
-		Network network = scenario.getNetwork();
+}
 
+class mapMatchingInitiation {
+	private String inputGPSFileName;
+	private String inputNetworkFileName;
+	private String writePathFileName;
+	
 
-		// 
-		TravelDisutility travelDisutility = new TravelDisutilityBicycle("generalizedCost");
-
-
-
-
-		// output to csv file matched path
-		List<String[]> outputStringList= new ArrayList<String[]>();
-		String[] header= new String[]{"counter", "linkID", "tripID"};
-		outputStringList.add(header);
-
-		// remove the first 10 and last one points in the GPS trace
-		List<GPSSequenceWithDistanceToMatchedPath> gPSSequencesWithDistanceToMatchedPath = new ArrayList<GPSSequenceWithDistanceToMatchedPath>();
-		int NGPSSequence = GPSSequences.size();
-		int csvFileNumber=1;
-		for (int k=0;k<NGPSSequence;k++) {
-			GPSSequence gpsSequence=GPSSequences.get(0);
-			
-			System.out.println("Following GPS sequence starts processing: "+gpsSequence.getPersonID().toString());
-			List<GPSPoint> points = gpsSequence.getGPSPoints();
-			if (points.size()>100) {
-
-				for (int i=0;i<10;i++) {
-					points.remove(0);
-				}
-
-				for (int i=0;i<10;i++) {
-					int gpsPointsLength=points.size();
-					points.remove(gpsPointsLength-1);
-				}
-				// gpsSequence.printInfo();
+	
+	mapMatchingInitiation(String inputGPSFileName, String inputNetworkFileName, String writePathFileName) {
+		super();
+		this.inputGPSFileName = inputGPSFileName;
+		this.inputNetworkFileName = inputNetworkFileName;
+		this.writePathFileName = writePathFileName;
+	}
 
 
-				long startTime = System.nanoTime();
-				// map matching
-				BundledShortestPathGPSSequenceMapMatcher matcher = new BundledShortestPathGPSSequenceMapMatcher(network,gpsSequence,travelDisutility);
 
-				Path testPath = matcher.mapMatching();
-				if (testPath !=null) {
-					List<Link> linksInPath = testPath.links;
+	void run() throws Exception {
+		
+	
+	GPSReader reader = new GPSReader(inputGPSFileName);
+	List<GPSSequence> GPSSequences = reader.read(50);
 
-					int counter=1;
-					for (Link link : linksInPath) {
-						String linkIDWithABBA=link.getId().toString();
-						if (linkIDWithABBA.contains("_AB")) {
-							linkIDWithABBA = linkIDWithABBA.replaceAll("_AB", "");
-						} else if (linkIDWithABBA.contains("_BA")) {
-							linkIDWithABBA = linkIDWithABBA.replaceAll("_BA", "");
-						}
-						String[] newLine= new String[]{Integer.toString(counter), linkIDWithABBA, gpsSequence.getPersonID().toString()};
-						outputStringList.add(newLine);
-						counter++;
+	//		for (GPSSequence GPSSequence: GPSSequences) {
+	//			GPSSequence.printInfo();
+	//		}
+	// load network
+	Config config = ConfigUtils.createConfig();
+	Scenario scenario = ScenarioUtils.createScenario(config);
+	(new MatsimNetworkReader(scenario.getNetwork())).readFile(inputNetworkFileName);
+	Network network = scenario.getNetwork();
 
-					}
-//					GPSSequenceWithDistanceToMatchedPath gPSSequenceWithDistanceToMatchedPath = result.getgPSSequenceWithDistanceToMatchedPath();
-//					gPSSequencesWithDistanceToMatchedPath.add(gPSSequenceWithDistanceToMatchedPath);
-				}
 
-				long endTime   = System.nanoTime();
-				double runTime= (double) (endTime-startTime)/1_000_000_000;
-				System.out.println("Total run time for persom: "+gpsSequence.getPersonID().toString()+" is: "+runTime);
-			
-				
+	// 
+	TravelDisutility travelDisutility = new TravelDisutilityBicycle("generalizedCost");
+
+
+
+
+	// output to csv file matched path
+	List<String[]> outputStringList= new ArrayList<String[]>();
+	String[] header= new String[]{"counter", "linkID", "tripID"};
+	outputStringList.add(header);
+
+	// remove the first 10 and last one points in the GPS trace
+	int NGPSSequence = GPSSequences.size();
+	for (int k=0;k<NGPSSequence;k++) {
+		GPSSequence gpsSequence=GPSSequences.get(0);
+
+		System.out.println("Following GPS sequence starts processing: "+gpsSequence.getPersonID().toString());
+		List<GPSPoint> points = gpsSequence.getGPSPoints();
+		if (points.size()>100) {
+
+			for (int i=0;i<10;i++) {
+				points.remove(0);
 			}
 
-			
-			gpsSequence=null;
-			GPSSequences.remove(0);
-			
-			if (outputStringList.size()>10000) {
-				String writePath_part = writePath+"_"+csvFileNumber+".csv";
-				CsvWriter.write(outputStringList, writePath_part);
-				outputStringList= new ArrayList<String[]>();
-				csvFileNumber++;
+			for (int i=0;i<10;i++) {
+				int gpsPointsLength=points.size();
+				points.remove(gpsPointsLength-1);
 			}
+
+
+			long startTime = System.nanoTime();
+			// map matching
+			System.out.println("before matcher: "+gpsSequence.getPersonID().toString());
+			BundledShortestPathGPSSequenceMapMatcher matcher = new BundledShortestPathGPSSequenceMapMatcher(network,gpsSequence,travelDisutility);
+			Path testPath = matcher.mapMatching();
+			System.out.println("after matcher: "+gpsSequence.getPersonID().toString());
+			if (testPath !=null) {
+				List<Link> linksInPath = testPath.links;
+
+				int counter=1;
+				for (Link link : linksInPath) {
+					String linkIDWithABBA=link.getId().toString();
+//					if (linkIDWithABBA.contains("_AB")) {
+//						linkIDWithABBA = linkIDWithABBA.replaceAll("_AB", "");
+//					} else if (linkIDWithABBA.contains("_BA")) {
+//						linkIDWithABBA = linkIDWithABBA.replaceAll("_BA", "");
+//					}
+					String[] newLine= new String[]{Integer.toString(counter), linkIDWithABBA, gpsSequence.getPersonID().toString()};
+					outputStringList.add(newLine);
+					counter++;
+
+				}
+				//					GPSSequenceWithDistanceToMatchedPath gPSSequenceWithDistanceToMatchedPath = result.getgPSSequenceWithDistanceToMatchedPath();
+				//					gPSSequencesWithDistanceToMatchedPath.add(gPSSequenceWithDistanceToMatchedPath);
+			}
+
+			long endTime   = System.nanoTime();
+			double runTime= (double) (endTime-startTime)/1_000_000_000;
+			System.out.println("Total run time for person: "+gpsSequence.getPersonID().toString()+" is: "+runTime);
+
+
 		}
 
 
-
-//		GPSWriter gpsWriter = new GPSWriter();
-//		gpsWriter.writeWithDistanceToLink(gPSSequencesWithDistanceToMatchedPath, writeGPS);
-//		CsvWriter.write(outputStringList, writePath);
-
-
-
-
+		gpsSequence=null;
+		GPSSequences.remove(0);
 
 	}
 
+
+
+	//		GPSWriter gpsWriter = new GPSWriter();
+	//		gpsWriter.writeWithDistanceToLink(gPSSequencesWithDistanceToMatchedPath, writeGPS);
+	CsvWriter.write(outputStringList, writePathFileName);
+
+
+
+
+
+   }
+
+	
 }

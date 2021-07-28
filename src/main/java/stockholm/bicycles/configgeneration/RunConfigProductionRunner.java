@@ -21,9 +21,13 @@ public class RunConfigProductionRunner {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		String inputPathScenario = "D:/MatsimBicycleSimulation/Simulation/";
-
+		String inputPlanFile="D:/MatsimBicycleSimulation/Simulation/population_Stockholm_baseline.xml";
+		String outputDir="D:/MatsimBicycleSimulation/Simulation/output_baseline";
+		
 		final String ConfigFile = inputPathScenario + "config_Stockholm.xml";
 		Config config = ConfigUtils.loadConfig(  ConfigFile ) ;
+		config.controler().setOutputDirectory(outputDir);
+		config.plans().setInputFile(inputPlanFile);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config );
 		Network network= scenario.getNetwork();

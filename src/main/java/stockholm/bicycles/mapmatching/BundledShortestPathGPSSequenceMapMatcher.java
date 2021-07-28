@@ -371,7 +371,7 @@ public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapM
 			Node currentNode = searchedNodesMap.get(currentNodeID);
 			Path appendPath = dijkstraRouter.calcLeastCostPath(previousNode, currentNode, 0, null, null);
 			finalPath=appendPath(finalPath,appendPath); // a function to append a Path object back to the finalPath
-			logger.info("trip ID: "+this.gpsSequence.getPersonID().toString()+". Previous node ID: "+currentNodeID);
+			// logger.info("trip ID: "+this.gpsSequence.getPersonID().toString()+". Previous node ID: "+currentNodeID);
 			currentNodeID=previousNodeID;
 			
 			if (visitedNodesID.contains(previousNodeID.toString())) {
@@ -487,6 +487,9 @@ public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapM
 			return null;
 		}
 		List<Link> linkList = finalPath.links;
+		if (linkList.size()==0) {
+			return null;
+		}
 		double travelCost = finalPath.travelCost;
 		double travelTime = finalPath.travelTime;
 
