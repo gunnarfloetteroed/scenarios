@@ -1,8 +1,8 @@
 package stockholm.bicycles.mapmatching.mapmatchingstatistics;
 
 public class PathValidationStatistics {
-	private double percentageLengthMatched;
-	private double percentageLengthIncorrectMatched;
+	private double percentageLengthMatched=-1;
+	private double percentageLengthIncorrectMatched=-1;
 
 	public double getPercentageLengthMatched() {
 		return percentageLengthMatched;

@@ -85,6 +85,10 @@ public final class PathUtils {
 		 * @param mapmatchedPath The map-matchedPath.
 		 * @return PathValidationStatistics An object holding the comparison statistics.
 		 */
+		
+		if (groundTruthPath==null | mapmatchedPath==null) {
+			return new PathValidationStatistics();
+		}
 		List<Link> groundTruthLinks = groundTruthPath.links;
 		List<Link> mapMatchedLinks = mapmatchedPath.links;
 		ArrayList<String> mapMatchedLinksID= new ArrayList<String>();
@@ -133,7 +137,9 @@ public final class PathUtils {
 		 * @param path The path.
 		 * @return double the average distance from GPS points to path.
 		 */
-
+		if (gpsSequence==null | path==null) {
+			return -1;
+		}
 		// create a small network
 		Network smallNetwork = NetworkUtils.createNetwork();
 		List<Node> allNodes = path.nodes;
@@ -166,6 +172,10 @@ public final class PathUtils {
 		 * @param path The path.
 		 * @return DistanceFromGPSPointsToNearestLinksData the object holding distance from each GPS point to its nearest link and the nearest link ID.
 		 */
+		
+		if (gpsSequence==null | path==null) {
+			return new DistanceFromGPSPointsToNearestLinksData();
+		}
 		List<Double> distanceToNearestLink = new ArrayList<Double>();
 		List<String> nearestLinkID = new ArrayList<String>();
 

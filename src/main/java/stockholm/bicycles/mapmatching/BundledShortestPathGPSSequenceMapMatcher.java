@@ -133,31 +133,53 @@ public class BundledShortestPathGPSSequenceMapMatcher implements GPSSequenceMapM
 		
 	}
 
-	public PathWithMatchingEvaluationStatistics mapMatchingWithStatistics() {
+	public PathWithMatchingEvaluationStatistics mapMatchingAlternativePath() {
 		/**
 		 * Main method for mapMatching. Compared to this.mapMatching(), it also returns 
 		 * @return Path the matched path given the GPS sequence.
 		 */
 		Path path = this.mapMatching();
-		PathWithMatchingEvaluationStatistics matchingResults= new PathWithMatchingEvaluationStatistics();
-		matchingResults.setMatchedPath(path);
-		DistanceFromGPSPointsToNearestLinksData distanceFromGPSPointsToNearestLinksData = PathUtils.distanceEachGPSPointPathToGPS(this.gpsSequence, path);
-		matchingResults.setAverageDistanceFromPathToGPS(PathUtils.averageDistancePathToGPS(this.gpsSequence, path));
+		List<Link> matchedLinks = path.links;
+		double totalLength=0;
+		for (Link matchedLink:matchedLinks) {
+			totalLength=totalLength+matchedLink.getLength();
+		}
 		
+		double currentLength=0;
+		for (Link matchedLink:matchedLinks) {
+			if (currentLength>500 & currentLength<(totalLength-500)) {
+				network.removeLink(matchedLink.getId());
+			}
+			currentLength=currentLength+matchedLink.getLength();
+		}
+		Path alternativePath = this.mapMatching();
+		
+		currentLength=0;
+		for (Link matchedLink:matchedLinks) {
+			if (currentLength>500 & currentLength<(totalLength-500)) {
+				network.addLink(matchedLink);
+			}
+			currentLength=currentLength+matchedLink.getLength();
+		}
+		
+		
+		PathWithMatchingEvaluationStatistics matchingResults= new PathWithMatchingEvaluationStatistics();
+		matchingResults.setMatchedPath(alternativePath);
+		DistanceFromGPSPointsToNearestLinksData distanceFromGPSPointsToNearestLinksData = PathUtils.distanceEachGPSPointPathToGPS(this.gpsSequence, alternativePath);
 		
 		GPSSequenceWithDistanceToMatchedPath gPSSequenceWithDistanceToMatchedPath = 
 				new GPSSequenceWithDistanceToMatchedPath(
 						this.gpsSequence,
 						distanceFromGPSPointsToNearestLinksData.getDistanceToNearestLink(),
 						distanceFromGPSPointsToNearestLinksData.getNearestLinkID());
-		
 		matchingResults.setgPSSequenceWithDistanceToMatchedPath(gPSSequenceWithDistanceToMatchedPath);
-		
+		matchingResults.setAverageDistanceFromPathToGPS(PathUtils.averageDistancePathToGPS(this.gpsSequence, alternativePath));
 		return matchingResults;
 	}
 
 
 	private void updateNetworkLinkWeights() {
+		this.linkWeights = new HashMap<Id<Link>, Double>();
 		Map<Id<Link>, ? extends Link> links = this.network.getLinks();
 		List<GPSPoint> points = this.gpsSequence.getGPSPoints();
 		List<Node> nodeList = new ArrayList<Node>();
